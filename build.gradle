@@ -50,7 +50,7 @@ dependencies {
     implementation('net.lindseybot:worker-help:0.0.1')
 
     // Dependencies
-    implementation('net.lindseybot:shared:0.3.2')
+    implementation('net.lindseybot:shared:0.3.3')
     implementation('net.dv8tion:JDA:4.3.0_339') {
         exclude module: 'opus-java'
     }
