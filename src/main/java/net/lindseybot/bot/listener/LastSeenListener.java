@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.sharding.ShardManager;
-import net.lindseybot.entities.profile.ServerProfile;
-import net.lindseybot.worker.services.ProfileService;
+import net.lindseybot.shared.entities.profile.ServerProfile;
+import net.lindseybot.shared.worker.services.ProfileService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 

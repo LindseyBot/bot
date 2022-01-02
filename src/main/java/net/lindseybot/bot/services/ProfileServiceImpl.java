@@ -3,11 +3,11 @@ package net.lindseybot.bot.services;
 import net.lindseybot.bot.repositories.sql.MemberRepository;
 import net.lindseybot.bot.repositories.sql.ServerRepository;
 import net.lindseybot.bot.repositories.sql.UserRepository;
-import net.lindseybot.entities.profile.MemberProfile;
-import net.lindseybot.entities.profile.ServerProfile;
-import net.lindseybot.entities.profile.UserProfile;
-import net.lindseybot.entities.profile.members.MemberId;
-import net.lindseybot.worker.services.ProfileService;
+import net.lindseybot.shared.entities.profile.MemberProfile;
+import net.lindseybot.shared.entities.profile.ServerProfile;
+import net.lindseybot.shared.entities.profile.UserProfile;
+import net.lindseybot.shared.entities.profile.members.MemberId;
+import net.lindseybot.shared.worker.services.ProfileService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
