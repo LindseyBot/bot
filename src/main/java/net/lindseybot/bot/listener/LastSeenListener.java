@@ -60,6 +60,7 @@ public class LastSeenListener extends ListenerAdapter {
         if (this.pending.isEmpty()) {
             return;
         }
+        // TODO: Save info
         //this.service.update(this.pending);
         this.pending.clear();
     }
