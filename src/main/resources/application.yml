@@ -1,0 +1,24 @@
+app:
+  bot:
+    token: ''
+    shards:
+      total: 2
+    gateway: 'ws://127.0.0.1:1234'
+    rest: 'http://rest:1235'
+    intents: 14031
+spring:
+  redis:
+    host: 127.0.0.1
+    password: password
+    port: 6379
+  datasource:
+    url: jdbc:mariadb://host:3306/database?UseUnicode=true&amp;characterEncoding=utf8
+    username: username
+    password: password
+    driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      max-lifetime: 480000
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    hibernate:
+      ddl-auto: validate

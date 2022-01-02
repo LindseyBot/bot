@@ -1,0 +1,80 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'net.lindseybot'
+version = '0.0.1'
+sourceCompatibility = targetCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name 'notfab'
+        url 'https://maven.notfab.net/Hosted'
+    }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven {
+        name 'lindsey'
+        url 'https://maven.lindseybot.net/repository/maven-lindsey/'
+    }
+    maven {
+        name 'jitpack'
+        url 'https://jitpack.io'
+    }
+}
+
+bootJar {
+    archiveFileName = "${project.name}.${archiveExtension.get()}"
+}
+
+dependencies {
+    implementation('net.lindseybot:worker-nsfw:0.0.1')
+    implementation('net.lindseybot:worker-economy:0.0.1')
+    implementation('net.lindseybot:worker-automod:0.0.1')
+    implementation('net.lindseybot:worker-moderation:0.0.1')
+    implementation('net.lindseybot:worker-fun:0.0.1')
+    implementation('net.lindseybot:worker-info:0.0.1')
+    implementation('net.lindseybot:worker-wiki:0.0.1')
+    implementation('net.lindseybot:worker-help:0.0.1')
+
+    // Dependencies
+    implementation('net.lindseybot:shared:0.3.2')
+    implementation('net.dv8tion:JDA:4.3.0_339') {
+        exclude module: 'opus-java'
+    }
+    implementation('net.jodah:expiringmap:0.5.10')
+    implementation('org.json:json:20190722')
+    implementation('com.squareup.okhttp3:okhttp:4.9.1')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.10.1')
+
+    // Spring
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-data-redis')
+
+    // Development
+    compileOnly 'org.projectlombok:lombok'
+
+    // Database
+    implementation('org.mariadb.jdbc:mariadb-java-client')
+    implementation('redis.clients:jedis:3.6.0')
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
