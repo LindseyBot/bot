@@ -86,7 +86,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     public void updateName(long user, String name) {
-        this.users.updateName(user, System.currentTimeMillis(), name);
+        this.users.updateName(name, System.currentTimeMillis(), user);
     }
 
 }
