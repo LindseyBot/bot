@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import net.lindseybot.bot.services.ProfileServiceImpl;
 import net.lindseybot.shared.entities.profile.ServerProfile;
-import net.lindseybot.shared.worker.services.ProfileService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +18,10 @@ import java.util.Set;
 @Component
 public class LastSeenListener extends ListenerAdapter {
 
-    private final ProfileService service;
+    private final ProfileServiceImpl service;
     private final Set<Long> pending = new HashSet<>();
 
-    public LastSeenListener(ShardManager api, ProfileService service) {
+    public LastSeenListener(ShardManager api, ProfileServiceImpl service) {
         this.service = service;
         api.addEventListener(this);
     }
@@ -60,15 +60,14 @@ public class LastSeenListener extends ListenerAdapter {
         if (this.pending.isEmpty()) {
             return;
         }
-        // TODO: Save info
-        //this.service.update(this.pending);
+        this.service.updateSeen(this.pending);
         this.pending.clear();
     }
 
     private synchronized void onSeen(Guild guild) {
         this.pending.add(guild.getIdLong());
         if (this.pending.size() > 500) {
-            //this.service.update(this.pending);
+            this.service.updateSeen(this.pending);
             this.pending.clear();
         }
     }

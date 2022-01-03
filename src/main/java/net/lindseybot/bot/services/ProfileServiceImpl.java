@@ -10,6 +10,9 @@ import net.lindseybot.shared.entities.profile.members.MemberId;
 import net.lindseybot.shared.worker.services.ProfileService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
@@ -75,6 +78,15 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public @NotNull MemberProfile save(@NotNull MemberProfile profile) {
         return this.members.save(profile);
+    }
+
+    @Transactional
+    public void updateSeen(Set<Long> guilds) {
+        this.servers.updateLastSeen(System.currentTimeMillis(), guilds);
+    }
+
+    public void updateName(long user, String name) {
+        this.users.updateName(user, System.currentTimeMillis(), name);
     }
 
 }
