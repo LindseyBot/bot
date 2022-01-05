@@ -52,7 +52,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .truncatedTo(ChronoUnit.DAYS)
                 .minus(15, ChronoUnit.DAYS)
                 .toEpochMilli();
-        long deleted = this.repository.deleteOutdated(time);
+        int deleted = this.repository.deleteOutdated(time);
         log.info("Deleted {} outdated log entries.", deleted);
     }
 

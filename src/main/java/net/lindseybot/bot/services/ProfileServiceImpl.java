@@ -91,7 +91,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .truncatedTo(ChronoUnit.DAYS)
                 .minus(3, ChronoUnit.DAYS)
                 .toEpochMilli();
-        long deleted = this.users.deleteOutdatedStreaks(time);
+        int deleted = this.users.deleteOutdatedStreaks(time);
         log.info("Reset {} outdated cookie streaks.", deleted);
     }
 

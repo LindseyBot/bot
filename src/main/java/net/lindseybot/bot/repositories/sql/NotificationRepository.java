@@ -17,6 +17,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @Modifying
     @Query("delete from Notification nt where nt.timestamp < ?1")
-    long deleteOutdated(long timestamp);
+    int deleteOutdated(long timestamp);
 
 }

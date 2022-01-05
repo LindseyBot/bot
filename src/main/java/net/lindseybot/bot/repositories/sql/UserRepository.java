@@ -15,6 +15,6 @@ public interface UserRepository extends JpaRepository<UserProfile, Long> {
 
     @Modifying
     @Query("update UserProfile pr set pr.cookieStreak = 0 where pr.cookieStreak > 0 and pr.lastDailyCookies < ?1")
-    long deleteOutdatedStreaks(long timestamp);
+    int deleteOutdatedStreaks(long timestamp);
 
 }
