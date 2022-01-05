@@ -17,8 +17,8 @@ public class UserNameListener extends ListenerAdapter implements ExpirationListe
 
     private final ProfileServiceImpl profiles;
     private final ExpiringMap<Long, String> users = ExpiringMap.builder()
-            .expirationPolicy(ExpirationPolicy.ACCESSED)
-            .expiration(5, TimeUnit.MINUTES)
+            .expirationPolicy(ExpirationPolicy.CREATED)
+            .expiration(1, TimeUnit.MINUTES)
             .asyncExpirationListener(this)
             .maxSize(15_000)
             .build();
@@ -30,7 +30,11 @@ public class UserNameListener extends ListenerAdapter implements ExpirationListe
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        users.put(event.getAuthor().getIdLong(), event.getAuthor().getAsTag());
+        long userId = event.getAuthor().getIdLong();
+        if (users.containsKey(userId)) {
+            return;
+        }
+        users.put(userId, event.getAuthor().getAsTag());
     }
 
     @Override

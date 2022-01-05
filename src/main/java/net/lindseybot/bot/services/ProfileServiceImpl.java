@@ -1,5 +1,6 @@
 package net.lindseybot.bot.services;
 
+import lombok.extern.slf4j.Slf4j;
 import net.lindseybot.bot.repositories.sql.MemberRepository;
 import net.lindseybot.bot.repositories.sql.ServerRepository;
 import net.lindseybot.bot.repositories.sql.UserRepository;
@@ -9,11 +10,15 @@ import net.lindseybot.shared.entities.profile.UserProfile;
 import net.lindseybot.shared.entities.profile.members.MemberId;
 import net.lindseybot.shared.worker.services.ProfileService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class ProfileServiceImpl implements ProfileService {
 
@@ -80,11 +85,22 @@ public class ProfileServiceImpl implements ProfileService {
         return this.members.save(profile);
     }
 
+    @Scheduled(cron = "0 0 * * *")
+    public void onDaily() {
+        long time = Instant.ofEpochMilli(System.currentTimeMillis())
+                .truncatedTo(ChronoUnit.DAYS)
+                .minus(3, ChronoUnit.DAYS)
+                .toEpochMilli();
+        long deleted = this.users.deleteOutdatedStreaks(time);
+        log.info("Reset {} outdated cookie streaks.", deleted);
+    }
+
     @Transactional
     public void updateSeen(Set<Long> guilds) {
         this.servers.updateLastSeen(System.currentTimeMillis(), guilds);
     }
 
+    @Transactional
     public void updateName(long user, String name) {
         this.users.updateName(name, System.currentTimeMillis(), user);
     }
