@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    @Query("select Notification from Notification nt where nt.guildId = ?1 order by nt.timestamp asc")
+    @Query("select nt from Notification nt where nt.guildId = ?1 order by nt.timestamp asc")
     List<Notification> findByGuild(long guildId);
 
-    @Query("select Notification from Notification nt where nt.userId = ?1 order by nt.timestamp asc")
+    @Query("select nt from Notification nt where nt.userId = ?1 order by nt.timestamp asc")
     List<Notification> findByUser(long userId);
 
     @Modifying

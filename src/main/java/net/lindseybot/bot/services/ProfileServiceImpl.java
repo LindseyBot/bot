@@ -85,7 +85,7 @@ public class ProfileServiceImpl implements ProfileService {
         return this.members.save(profile);
     }
 
-    @Scheduled(cron = "0 0 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void onDaily() {
         long time = Instant.ofEpochMilli(System.currentTimeMillis())
                 .truncatedTo(ChronoUnit.DAYS)

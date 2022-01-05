@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         this.repository.save(notification);
     }
 
-    @Scheduled(cron = "0 0 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void onDaily() {
         long time = Instant.ofEpochMilli(System.currentTimeMillis())
                 .truncatedTo(ChronoUnit.DAYS)
