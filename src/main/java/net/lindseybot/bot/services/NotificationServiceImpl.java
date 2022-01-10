@@ -10,6 +10,7 @@ import net.lindseybot.shared.worker.services.NotificationService;
 import net.lindseybot.shared.worker.services.Translator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -46,6 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
         this.repository.save(notification);
     }
 
+    @Transactional
     @Scheduled(cron = "0 0 * * * *")
     public void onDaily() {
         long time = Instant.ofEpochMilli(System.currentTimeMillis())
