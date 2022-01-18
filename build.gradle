@@ -42,7 +42,7 @@ bootJar {
 dependencies {
     implementation('net.lindseybot:worker-nsfw:0.0.4')
     implementation('net.lindseybot:worker-economy:0.0.3')
-    implementation('net.lindseybot:worker-automod:0.0.5')
+    implementation('net.lindseybot:worker-automod:0.0.6')
     implementation('net.lindseybot:worker-moderation:0.0.2')
     implementation('net.lindseybot:worker-fun:0.0.3')
     implementation('net.lindseybot:worker-info:0.0.4')
