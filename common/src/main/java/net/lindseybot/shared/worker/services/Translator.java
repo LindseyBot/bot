@@ -1,0 +1,99 @@
+package net.lindseybot.shared.worker.services;
+
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.lindseybot.shared.enums.Language;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+@Slf4j
+public class Translator {
+
+    private final ProfileService profiles;
+    private static final Map<Language, Properties> propertiesMap = new HashMap<>();
+
+    public Translator(ProfileService profiles) {
+        this.profiles = profiles;
+        log.info("Loaded " + this.reloadLanguages() + " language files.");
+    }
+
+    public String get(Member member, String message, Object... args) {
+        return get(member.getUser(), message, args);
+    }
+
+    public String get(User user, String message, Object... args) {
+        Language language = this.profiles.get(user)
+                .getLanguage();
+        return get(language, message, args);
+    }
+
+    public String get(Guild guild, String message, Object... args) {
+        if (guild.getOwner() == null) {
+            return message;
+        }
+        return this.get(guild.getOwner(), message, args);
+    }
+
+    public String get(Language language, String key, Object... args) {
+        String template = this.getTemplate(language, key);
+        if (template.equals(key)) {
+            return template;
+        }
+        String msg = template;
+        if (args != null && args.length > 0) {
+            for (int i = 0; i < args.length; i++) {
+                msg = msg.replace("{" + i + "}", String.valueOf(args[i]));
+            }
+        }
+        return msg;
+    }
+
+    private String getTemplate(Language language, String key) {
+        Properties properties = propertiesMap.get(language);
+        if (properties == null) {
+            return this.getTemplate(Language.en_US, key);
+        }
+        if (properties.containsKey(key)) {
+            return properties.getProperty(key);
+        } else if (language != Language.en_US) {
+            return this.getTemplate(Language.en_US, key);
+        } else {
+            return key;
+        }
+    }
+
+    public int reloadLanguages() {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+        for (Language language : Language.values()) {
+            Request request = new Request.Builder()
+                    .url("https://cdn.lindseybot.net/i18n/messages/" + language.name() + ".properties")
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful()) {
+                    ResponseBody body = response.body();
+                    if (body == null) {
+                        continue;
+                    }
+                    Properties properties = new Properties();
+                    properties.load(body.byteStream());
+                    propertiesMap.put(language, properties);
+                    body.close();
+                }
+            } catch (IOException ex) {
+                log.error("Failed to load language " + language.name(), ex);
+            }
+        }
+        return propertiesMap.size();
+    }
+
+}

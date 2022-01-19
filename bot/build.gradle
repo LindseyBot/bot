@@ -50,8 +50,8 @@ dependencies {
     implementation('net.lindseybot:worker-help:0.0.4')
 
     // Dependencies
-    implementation('net.lindseybot:shared:0.3.7')
-    implementation('net.dv8tion:JDA:4.3.0_339') {
+    implementation project(':common')
+    implementation("net.dv8tion:JDA:${JDA_VERSION}") {
         exclude module: 'opus-java'
     }
     implementation('net.jodah:expiringmap:0.5.10')

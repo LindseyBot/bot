@@ -1,0 +1,85 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java-library'
+    id 'maven-publish'
+    id 'io.freefair.lombok' version '6.1.0'
+}
+
+group = 'net.lindseybot'
+version = '0.3.8'
+sourceCompatibility = targetCompatibility = '17'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('bootJar') {
+    enabled = false
+}
+
+tasks.named('jar') {
+    enabled = true
+    setArchivesBaseName(project.name)
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.delombokTask
+    archiveClassifier.set('sources')
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Nexus"
+            url = "https://maven.lindseybot.net/repository/maven-lindsey/"
+            credentials {
+                username = project.findProperty("lindsey.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("lindsey.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        nexus(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven { url "https://maven.notfab.net/Hosted" }
+}
+
+dependencies {
+    implementation("net.dv8tion:JDA:${JDA_VERSION}") {
+        exclude module: 'opus-java'
+    }
+    implementation('redis.clients:jedis:3.4.0')
+    implementation("net.sf.trove4j:trove4j:3.0.3")
+    implementation('com.github.mpkorstanje:simmetrics-core:4.1.1')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.12.2')
+    implementation('net.jodah:expiringmap:0.5.8')
+    implementation('com.squareup.okhttp3:okhttp:3.14.9')
+    implementation('org.json:json:20190722')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-data-redis')
+    implementation('org.springframework.boot:spring-boot-starter')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+test {
+    useJUnitPlatform()
+}
