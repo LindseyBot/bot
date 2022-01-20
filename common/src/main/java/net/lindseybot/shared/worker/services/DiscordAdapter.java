@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
-import net.lindseybot.shared.entities.discord.MentionType;
 import net.lindseybot.shared.entities.discord.*;
 import net.lindseybot.shared.enums.Language;
 import net.lindseybot.shared.utils.StandardEmotes;
@@ -34,14 +33,6 @@ public class DiscordAdapter {
         this.DEFAULT_ALLOWED_MENTIONS = new ArrayList<>();
         this.DEFAULT_ALLOWED_MENTIONS.add(Message.MentionType.CHANNEL);
         this.DEFAULT_ALLOWED_MENTIONS.add(Message.MentionType.EMOTE);
-    }
-
-    public String getLabel(Label msg, Language language) {
-        if (msg.isLiteral()) {
-            return msg.getName();
-        } else {
-            return this.i18n.get(language, msg.getName());
-        }
     }
 
     public String getLabel(Label msg, ISnowflake snowflake) {
