@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import net.lindseybot.automod.services.AntiAdService;
@@ -37,10 +37,10 @@ public class AntiAdListener extends ListenerAdapter {
 
     private final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
-    public AntiAdListener(AntiAdService service, ShardManager jda, Translator i18n) {
+    public AntiAdListener(AntiAdService service, IEventManager api, Translator i18n) {
         this.service = service;
         this.i18n = i18n;
-        jda.addEventListener(this);
+        api.register(this);
         this.triggers = ExpiringMap.builder()
                 .maxSize(10_000)
                 .expiration(15, TimeUnit.MINUTES)

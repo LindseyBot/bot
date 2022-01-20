@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.shared.worker.reference.ButtonReference;
 import net.lindseybot.shared.worker.reference.CommandReference;
 import net.lindseybot.shared.worker.reference.SelectMenuReference;
@@ -22,9 +22,9 @@ public class DefaultInteractionListener extends ListenerAdapter {
     private final DefaultInteractionService service;
     private final ThreadPoolTaskExecutor taskExecutor;
 
-    public DefaultInteractionListener(DefaultInteractionService service, ShardManager api) {
+    public DefaultInteractionListener(DefaultInteractionService service, IEventManager api) {
         this.service = service;
-        api.addEventListener(this);
+        api.register(this);
         taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setThreadNamePrefix("commands-");
         taskExecutor.initialize();

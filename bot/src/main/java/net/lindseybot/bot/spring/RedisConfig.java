@@ -9,12 +9,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
 public class RedisConfig {
@@ -28,11 +26,12 @@ public class RedisConfig {
     @Bean
     @Primary
     public RedisConnectionFactory redisFactory(RedisProperties properties) {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(properties.getHost(), properties.getPort());
+        RedisStandaloneConfiguration config =
+                new RedisStandaloneConfiguration(properties.getHost(), properties.getPort());
         if (properties.getPassword() != null && !properties.getPassword().isBlank()) {
             config.setPassword(properties.getPassword());
         }
-        return new JedisConnectionFactory(config);
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
@@ -45,17 +44,6 @@ public class RedisConfig {
         RedisTemplate<?, ?> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
         return template;
-    }
-
-    @Bean
-    public JedisPool pool(RedisProperties properties) {
-        JedisPoolConfig config = new JedisPoolConfig();
-        config.setMaxTotal(128);
-        config.setMaxIdle(8);
-        config.setMinIdle(2);
-        config.setTestOnBorrow(true);
-        return new JedisPool(config, properties.getHost(), properties.getPort(),
-                15000, properties.getPassword());
     }
 
     @Bean

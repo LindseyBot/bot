@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import net.lindseybot.automod.services.AntiScamService;
@@ -34,9 +34,9 @@ public class AntiScamListener extends ListenerAdapter {
     private final AntiScamService service;
     private final ExpiringMap<Long, AtomicInteger> triggers;
 
-    public AntiScamListener(AntiScamService service, ShardManager jda) {
+    public AntiScamListener(AntiScamService service, IEventManager api) {
         this.service = service;
-        jda.addEventListener(this);
+        api.register(this);
         this.triggers = ExpiringMap.builder()
                 .maxSize(10_000)
                 .expiration(15, TimeUnit.MINUTES)

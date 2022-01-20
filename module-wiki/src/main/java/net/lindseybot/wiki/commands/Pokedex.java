@@ -34,7 +34,7 @@ public class Pokedex extends InteractionHandler {
                 .url("https://pokeapi.co/api/v2/pokemon/" + search)
                 .get().build();
         String str;
-        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body();) {
+        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (body == null || !resp.isSuccessful()) {
                 this.msg.error(event, Label.of("commands.pokedex.unknown"));
                 return;

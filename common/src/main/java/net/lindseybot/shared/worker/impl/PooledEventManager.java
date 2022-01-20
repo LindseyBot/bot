@@ -3,19 +3,19 @@ package net.lindseybot.shared.worker.impl;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
-import net.dv8tion.jda.api.hooks.InterfacedEventManager;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.internal.utils.concurrent.CountingThreadFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
-public class PooledEventManager extends InterfacedEventManager {
+public class PooledEventManager implements IEventManager {
 
-    private List<Object> listeners = new ArrayList<>();
+    private final CopyOnWriteArrayList<Object> listeners = new CopyOnWriteArrayList<>();
     private final ThreadPoolExecutor threadExecutor;
 
     public PooledEventManager() {
@@ -26,20 +26,24 @@ public class PooledEventManager extends InterfacedEventManager {
 
     @Override
     public void register(@NotNull Object listener) {
-        super.register(listener);
-        this.listeners = this.getRegisteredListeners();
+        if (!(listener instanceof EventListener)) {
+            throw new IllegalArgumentException("Listener must implement EventListener");
+        }
+        listeners.add(listener);
     }
 
     @Override
     public void unregister(@NotNull Object listener) {
-        super.unregister(listener);
-        this.listeners = this.getRegisteredListeners();
+        if (!(listener instanceof EventListener)) {
+            return;
+        }
+        listeners.remove(listener);
     }
 
     @Override
     public void handle(@NotNull GenericEvent event) {
         threadExecutor.submit(() -> {
-            List<Object> listeners = this.getListeners();
+            List<Object> listeners = this.listeners;
             for (Object listener : listeners) {
                 try {
                     ((EventListener) listener).onEvent(event);
@@ -50,8 +54,10 @@ public class PooledEventManager extends InterfacedEventManager {
         });
     }
 
-    private List<Object> getListeners() {
-        return this.listeners;
+    @NotNull
+    @Override
+    public List<Object> getRegisteredListeners() {
+        return List.copyOf(listeners);
     }
 
 }

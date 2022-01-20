@@ -2,8 +2,8 @@ package net.lindseybot.info.listeners;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.info.repositories.sql.WelcomeRepository;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -25,12 +25,12 @@ public class WelcomeListener extends ListenerAdapter {
     private final WelcomeRepository repository;
     private final NotificationService notifications;
 
-    public WelcomeListener(ShardManager api, Messenger msg,
+    public WelcomeListener(IEventManager api, Messenger msg,
                            WelcomeRepository repository, NotificationService notifications) {
         this.msg = msg;
         this.repository = repository;
         this.notifications = notifications;
-        api.addEventListener(this);
+        api.register(this);
     }
 
     @Override

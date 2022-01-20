@@ -96,7 +96,7 @@ public class DefaultWorker {
     }
 
     @Bean
-    public DefaultInteractionListener interactionListener(DefaultInteractionService service, ShardManager api) {
+    public DefaultInteractionListener interactionListener(DefaultInteractionService service, IEventManager api) {
         return new DefaultInteractionListener(service, api);
     }
 

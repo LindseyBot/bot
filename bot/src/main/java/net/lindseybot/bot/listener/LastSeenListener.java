@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.bot.services.ProfileServiceImpl;
 import net.lindseybot.shared.entities.profile.ServerProfile;
 import org.jetbrains.annotations.NotNull;
@@ -21,9 +21,9 @@ public class LastSeenListener extends ListenerAdapter {
     private final ProfileServiceImpl service;
     private final Set<Long> pending = new HashSet<>();
 
-    public LastSeenListener(ShardManager api, ProfileServiceImpl service) {
+    public LastSeenListener(IEventManager api, ProfileServiceImpl service) {
         this.service = service;
-        api.addEventListener(this);
+        api.register(this);
     }
 
     @Override

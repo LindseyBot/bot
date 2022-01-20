@@ -25,6 +25,6 @@ public enum MentionType {
     /**
      * Everyone mentions.
      */
-    EVERYONE;
+    EVERYONE
 
 }

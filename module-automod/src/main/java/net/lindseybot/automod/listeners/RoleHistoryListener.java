@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.automod.services.RoleHistoryService;
 import net.lindseybot.shared.entities.profile.members.RoleHistory;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +25,9 @@ public class RoleHistoryListener extends ListenerAdapter {
 
     private final RoleHistoryService service;
 
-    public RoleHistoryListener(ShardManager api, RoleHistoryService service) {
+    public RoleHistoryListener(IEventManager api, RoleHistoryService service) {
         this.service = service;
-        api.addEventListener(this);
+        api.register(this);
     }
 
     @Override

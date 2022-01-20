@@ -52,7 +52,6 @@ dependencies {
     implementation('com.fasterxml.jackson.core:jackson-databind:2.13.1')
 
     // Spring
-    implementation('redis.clients:jedis:3.6.0')
     implementation('org.mariadb.jdbc:mariadb-java-client')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-data-redis')

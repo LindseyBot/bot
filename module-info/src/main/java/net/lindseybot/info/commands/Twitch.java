@@ -43,7 +43,7 @@ public class Twitch extends InteractionHandler {
                 .addHeader("Client-Id", properties.getTwitchClient())
                 .addHeader("Authorization", "Bearer " + properties.getTwitchKey())
                 .get().build();
-        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body();) {
+        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (!resp.isSuccessful() || body == null) {
                 this.msg.error(event, Label.of("internal.error"));
                 return;
@@ -85,7 +85,7 @@ public class Twitch extends InteractionHandler {
                 .addHeader("Authorization", "Bearer " + properties.getTwitchKey())
                 .get().build();
         JSONObject obj;
-        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body();) {
+        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (!resp.isSuccessful() || body == null) {
                 return FMessage.of(Label.of("internal.error"), true);
             }

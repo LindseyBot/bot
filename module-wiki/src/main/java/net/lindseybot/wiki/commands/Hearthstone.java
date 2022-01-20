@@ -41,7 +41,7 @@ public class Hearthstone extends InteractionHandler {
                 .addHeader("x-rapidapi-key", this.properties.getRapidApi())
                 .build();
         String str;
-        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body();) {
+        try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (!resp.isSuccessful() || body == null) {
                 this.msg.error(event, Label.of("internal.error"));
                 return;

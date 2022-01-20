@@ -87,7 +87,7 @@ public class ProfileCommand extends InteractionHandler {
                 .post(reqBody)
                 .build();
         Call call = client.newCall(request);
-        try (Response response = call.execute(); ResponseBody body = response.body();) {
+        try (Response response = call.execute(); ResponseBody body = response.body()) {
             if (!response.isSuccessful() || body == null) {
                 this.msg.error(event, Label.of("internal.error"));
                 return;

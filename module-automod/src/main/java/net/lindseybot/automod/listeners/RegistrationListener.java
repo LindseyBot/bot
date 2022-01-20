@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.automod.services.RegistrationService;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.profile.servers.Registration;
@@ -27,12 +27,13 @@ public class RegistrationListener extends ListenerAdapter {
     private final Messenger msg;
     private final NotificationService notifications;
 
-    public RegistrationListener(RegistrationService service, Messenger msg, ShardManager jda,
+    public RegistrationListener(RegistrationService service,
+                                Messenger msg, IEventManager api,
                                 NotificationService notifications) {
         this.service = service;
         this.msg = msg;
         this.notifications = notifications;
-        jda.addEventListener(this);
+        api.register(this);
     }
 
     @Override

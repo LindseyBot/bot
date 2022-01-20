@@ -3,6 +3,7 @@ package net.lindseybot.economy.listeners;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.jodah.expiringmap.ExpirationListener;
@@ -30,11 +31,11 @@ public class ScrambleListener extends ListenerAdapter implements ExpirationListe
     private final Messenger msg;
     private final EconomyService service;
 
-    public ScrambleListener(Messenger msg, EconomyService service, ShardManager jda) {
+    public ScrambleListener(Messenger msg, EconomyService service, ShardManager jda, IEventManager api) {
         this.msg = msg;
         this.service = service;
         this.jda = jda;
-        jda.addEventListener(this);
+        api.register(this);
     }
 
     @Override

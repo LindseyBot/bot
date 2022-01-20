@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.fun.entities.StarboardMessage;
 import net.lindseybot.fun.services.StarboardService;
 import net.lindseybot.shared.entities.profile.servers.Starboard;
@@ -27,9 +27,9 @@ public class StarboardListener extends ListenerAdapter {
 
     private final StarboardService service;
 
-    public StarboardListener(ShardManager api, StarboardService service) {
+    public StarboardListener(IEventManager api, StarboardService service) {
         this.service = service;
-        api.addEventListener(this);
+        api.register(this);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package net.lindseybot.bot.listener;
 
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.jodah.expiringmap.ExpirationListener;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
@@ -23,9 +23,9 @@ public class UserNameListener extends ListenerAdapter implements ExpirationListe
             .maxSize(15_000)
             .build();
 
-    public UserNameListener(ShardManager api, ProfileServiceImpl profiles) {
+    public UserNameListener(IEventManager api, ProfileServiceImpl profiles) {
         this.profiles = profiles;
-        api.addEventListener(this);
+        api.register(this);
     }
 
     @Override
