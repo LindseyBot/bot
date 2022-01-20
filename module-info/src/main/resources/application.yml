@@ -1,0 +1,5 @@
+app:
+  api:
+    kitsu: ''
+    twitchKey: ''
+    twitchClient: ''
