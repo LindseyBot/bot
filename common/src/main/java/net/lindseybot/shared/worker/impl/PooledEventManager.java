@@ -22,6 +22,7 @@ public class PooledEventManager implements IEventManager {
         CountingThreadFactory factory = new CountingThreadFactory(() -> "JDA", "EventManager", false);
         this.threadExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         this.threadExecutor.setThreadFactory(factory);
+        this.threadExecutor.setMaximumPoolSize(1024);
     }
 
     @Override
