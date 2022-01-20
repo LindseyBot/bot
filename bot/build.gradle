@@ -47,8 +47,7 @@ dependencies {
     implementation project(':module-info')
     implementation project(':module-moderation')
     implementation project(':module-nsfw')
-
-    implementation('net.lindseybot:worker-wiki:0.0.2')
+    implementation project(':module-wiki')
 
     // Dependencies
     implementation project(':common')
