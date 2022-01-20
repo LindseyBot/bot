@@ -1,0 +1,109 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java-library'
+    id 'maven-publish'
+    id 'io.freefair.lombok' version '6.1.0'
+}
+
+group = 'net.lindseybot'
+version = '0.0.4'
+sourceCompatibility = targetCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name 'notfab'
+        url 'https://maven.notfab.net/Hosted'
+    }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven {
+        name 'lindsey'
+        url 'https://maven.lindseybot.net/repository/maven-lindsey/'
+    }
+    maven {
+        name 'jitpack'
+        url 'https://jitpack.io'
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('bootJar') {
+    enabled = false
+}
+
+tasks.named('jar') {
+    enabled = true
+    setArchivesBaseName(project.name)
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.delombokTask
+    archiveClassifier.set('sources')
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Nexus"
+            url = "https://maven.lindseybot.net/repository/maven-lindsey/"
+            credentials {
+                username = project.findProperty("lindsey.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("lindsey.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        nexus(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+dependencies {
+    // Dependencies
+    api('com.github.Kodehawa:imageboard-api:bddeedab56')
+
+    // Shared dependencies
+    implementation project(':common')
+    implementation("net.dv8tion:JDA:${JDA_VERSION}") {
+        exclude module: 'opus-java'
+    }
+    implementation('org.json:json:20190722')
+    implementation('com.squareup.okhttp3:okhttp:4.9.3')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.13.0')
+
+    // Spring
+    implementation('redis.clients:jedis:3.6.3')
+    implementation('org.springframework.boot:spring-boot-starter-data-redis')
+
+    // Development
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+test {
+    useJUnitPlatform()
+}
