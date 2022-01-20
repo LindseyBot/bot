@@ -81,7 +81,7 @@ public class ProfileCommand extends InteractionHandler {
                 .stream().map(UserItem::getItemId).toList();
         object.put("badges", badges);
 
-        RequestBody reqBody = RequestBody.create(object.toString(), MediaType.parse("application/json"));
+        RequestBody reqBody = RequestBody.create(MediaType.parse("application/json"), object.toString());
         Request request = new Request.Builder()
                 .url(this.endpoint)
                 .post(reqBody)

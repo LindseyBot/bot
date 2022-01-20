@@ -111,7 +111,7 @@ public class AntiScamListener extends ListenerAdapter {
     private JSONObject fetchScam(Message message) {
         JSONObject object = new JSONObject();
         object.put("message", message.getContentRaw());
-        RequestBody body = RequestBody.create(object.toString(), JSON);
+        RequestBody body = RequestBody.create(JSON, object.toString());
         Request request = new Request.Builder().url("https://anti-fish.bitflow.dev/check")
                 .header("User-Agent", "Lindsey/1.0 (https://lindseybot.net)")
                 .post(body)

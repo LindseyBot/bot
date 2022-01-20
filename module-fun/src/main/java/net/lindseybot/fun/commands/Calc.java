@@ -43,7 +43,7 @@ public class Calc extends InteractionHandler {
         object.put("precision", 14);
         Request request = new Request.Builder()
                 .url("https://api.mathjs.org/v4/")
-                .post(RequestBody.create(object.toString(), MediaType.parse("application/json")))
+                .post(RequestBody.create(MediaType.parse("application/json"), object.toString()))
                 .addHeader("Content-Type", "application/json; charset=utf-8")
                 .build();
         JSONObject data;
