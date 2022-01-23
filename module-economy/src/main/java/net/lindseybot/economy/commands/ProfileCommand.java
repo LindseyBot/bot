@@ -21,7 +21,6 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -92,12 +91,12 @@ public class ProfileCommand extends InteractionHandler {
                 this.msg.error(event, Label.of("internal.error"));
                 return;
             }
-            InputStream stream = body.byteStream();
+            byte[] bytes = body.bytes();
             if (event.isAcknowledged()) {
-                event.getHook().editOriginal(stream, "profile.png")
+                event.getHook().editOriginal(bytes, "profile.png")
                         .queue();
             } else {
-                event.getHook().sendFile(stream, "profile.png")
+                event.getHook().sendFile(bytes, "profile.png")
                         .queue();
             }
         } catch (IOException ex) {
