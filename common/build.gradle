@@ -35,7 +35,7 @@ tasks.named('jar') {
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:${JDA_VERSION}") {
+    implementation("${JDA_SLUG}:${JDA_VERSION}") {
         exclude module: 'opus-java'
     }
     implementation("org.json:json:${ORG_JSON_VERSION}")
