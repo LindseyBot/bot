@@ -2,8 +2,11 @@ package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.internal.utils.concurrent.CountingThreadFactory;
@@ -48,6 +51,12 @@ public class PooledEventManager implements IEventManager {
         if (event instanceof GenericInteractionCreateEvent) {
             threadExecutor.submit(() -> this.execute(event));
         } else if (event instanceof MessageReceivedEvent) {
+            threadExecutor.submit(() -> this.execute(event));
+        } else if (event instanceof GuildMemberJoinEvent) {
+            threadExecutor.submit(() -> this.execute(event));
+        } else if (event instanceof MessageReactionAddEvent) {
+            threadExecutor.submit(() -> this.execute(event));
+        } else if (event instanceof MessageReactionRemoveEvent) {
             threadExecutor.submit(() -> this.execute(event));
         } else {
             this.execute(event);
