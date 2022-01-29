@@ -1,10 +1,12 @@
 package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.lindseybot.shared.worker.*;
+import net.lindseybot.shared.worker.reference.AutoCompleteReference;
 import net.lindseybot.shared.worker.reference.ButtonReference;
 import net.lindseybot.shared.worker.reference.CommandReference;
 import net.lindseybot.shared.worker.reference.SelectMenuReference;
@@ -20,6 +22,7 @@ public class DefaultInteractionService implements InteractionService {
     private final Map<String, CommandReference> commands = new HashMap<>();
     private final Map<String, ButtonReference> buttons = new HashMap<>();
     private final Map<String, SelectMenuReference> selects = new HashMap<>();
+    private final Map<String, AutoCompleteReference> autoCompletes = new HashMap<>();
 
     public DefaultInteractionService(List<InteractionHandler> handlers) {
         handlers.forEach(this::register);
@@ -31,6 +34,7 @@ public class DefaultInteractionService implements InteractionService {
             this.registerCommands(method, handler);
             this.registerButtons(method, handler);
             this.registerSelects(method, handler);
+            this.registerAutoCompletes(method, handler);
         }
     }
 
@@ -50,6 +54,11 @@ public class DefaultInteractionService implements InteractionService {
     }
 
     @Override
+    public boolean hasAutoComplete(String path) {
+        return this.autoCompletes.containsKey(path);
+    }
+
+    @Override
     public CommandReference getCommand(String path) {
         return this.commands.get(path);
     }
@@ -62,6 +71,11 @@ public class DefaultInteractionService implements InteractionService {
     @Override
     public SelectMenuReference getSelectMenu(String path) {
         return this.selects.get(path);
+    }
+
+    @Override
+    public AutoCompleteReference getAutoComplete(String path) {
+        return this.autoCompletes.get(path);
     }
 
     private void registerCommands(Method method, InteractionHandler handler) {
@@ -120,6 +134,30 @@ public class DefaultInteractionService implements InteractionService {
         reference.setEdit(menu.edit());
         reference.setEphemeral(menu.ephemeral());
         selects.put(menu.value(), reference);
+    }
+
+    private void registerAutoCompletes(Method method, InteractionHandler handler) {
+        AutoComplete ac = method.getDeclaredAnnotation(AutoComplete.class);
+        if (ac == null) {
+            return;
+        } else if (method.getParameterCount() == 0) {
+            log.warn("Invalid auto complete listener declaration: " + ac.value());
+            return;
+        }
+        if (!ac.command()
+                && !GenericAutoCompleteInteractionEvent.class.equals(method.getParameterTypes()[0])) {
+            log.warn("Invalid auto complete listener declaration: " + ac.value());
+            return;
+        } else if (ac.command() &&
+                !GenericAutoCompleteInteractionEvent.class.isAssignableFrom(method.getParameterTypes()[0])) {
+            log.warn("Invalid command auto complete listener declaration: " + ac.value());
+            return;
+        }
+        AutoCompleteReference reference = new AutoCompleteReference();
+        reference.setInstance(handler);
+        reference.setMethod(method);
+        reference.setCommand(ac.command());
+        autoCompletes.put(ac.value(), reference);
     }
 
 }

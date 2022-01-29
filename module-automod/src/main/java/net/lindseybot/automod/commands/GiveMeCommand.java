@@ -1,20 +1,29 @@
 package net.lindseybot.automod.commands;
 
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.lindseybot.automod.services.GiveMeService;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.profile.servers.GiveMe;
+import net.lindseybot.shared.worker.AutoComplete;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -53,7 +62,12 @@ public class GiveMeCommand extends InteractionHandler {
                 || event.getGuild() == null) {
             return;
         }
-        Role role = this.getOption("name", event, Role.class);
+        String roleId = this.getOption("name", event, String.class);
+        if (roleId == null || !roleId.matches("[0-9]+")) {
+            this.msg.error(event, Label.of("search.role"));
+            return;
+        }
+        Role role = event.getGuild().getRoleById(roleId);
         if (role == null) {
             this.msg.error(event, Label.of("search.role"));
             return;
@@ -117,6 +131,43 @@ public class GiveMeCommand extends InteractionHandler {
         giveMe.getRoles().remove(role.getIdLong());
         this.service.save(giveMe);
         this.msg.reply(event, Label.of("commands.giveme.removed", role.getName()));
+    }
+
+    @AutoComplete("giveme.get.name")
+    public void onGetAutoComplete(CommandAutoCompleteInteractionEvent event) {
+        Guild guild = event.getGuild();
+        if (!event.isFromGuild() || guild == null) {
+            event.replyChoices()
+                    .queue();
+            return;
+        }
+        AutoCompleteQuery query = event.getFocusedOption();
+
+        List<Command.Choice> choices = new ArrayList<>();
+        GiveMe giveMe = this.service.find(guild);
+        for (Long roleId : giveMe.getRoles()) {
+            Role role = guild.getRoleById(roleId);
+            if (role != null) {
+                choices.add(new Command.Choice(role.getName(), role.getId()));
+            }
+        }
+
+        if (choices.isEmpty() || query.getValue().isBlank()) {
+            if (choices.size() > 25) {
+                event.replyChoices(choices.subList(0, 24))
+                        .queue();
+            } else {
+                event.replyChoices(choices)
+                        .queue();
+            }
+        } else {
+            event.replyChoices(FuzzySearch.extractSorted(query.getValue(), choices, Command.Choice::getName, 45)
+                    .stream()
+                    .map(BoundExtractedResult::getReferent)
+                    .limit(25)
+                    .toList()
+            ).queue();
+        }
     }
 
     private boolean hasPermission(Member member) {

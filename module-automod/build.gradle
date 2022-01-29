@@ -41,6 +41,7 @@ tasks.named('jar') {
 dependencies {
     api("net.jodah:expiringmap:${EXPIRING_MAP_VERSION}")
     api("org.json:json:${ORG_JSON_VERSION}")
+    api('me.xdrop:fuzzywuzzy:1.4.0')
 
     // Shared dependencies
     implementation project(':common')

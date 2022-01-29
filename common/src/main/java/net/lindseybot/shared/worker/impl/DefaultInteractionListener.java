@@ -4,11 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.lindseybot.shared.worker.reference.AutoCompleteReference;
 import net.lindseybot.shared.worker.reference.ButtonReference;
 import net.lindseybot.shared.worker.reference.CommandReference;
 import net.lindseybot.shared.worker.reference.SelectMenuReference;
@@ -130,6 +133,30 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 event.deferReply(reference.isEdit())
                         .queue();
             }
+        }
+    }
+
+    @Override
+    public void onGenericAutoCompleteInteraction(@NotNull GenericAutoCompleteInteractionEvent event) {
+        if (event instanceof
+                CommandAutoCompleteInteractionEvent commandEvent) {
+            String cmdPath = commandEvent.getCommandPath();
+            String optName = commandEvent.getFocusedOption().getName();
+            String path = (cmdPath + "/" + optName).replace("/", ".");
+            if (!this.service.hasAutoComplete(path)) {
+                return;
+            }
+            AutoCompleteReference reference = this.service.getAutoComplete(path);
+            if (!reference.isCommand()) {
+                return;
+            }
+            try {
+                reference.invoke(commandEvent);
+            } catch (Exception ex) {
+                log.error("Failed to execute autocomplete", ex);
+            }
+        } else {
+            log.warn("Invalid autocomplete event: " + event.getClass().getSimpleName());
         }
     }
 
