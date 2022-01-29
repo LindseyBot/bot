@@ -1,5 +1,6 @@
 package net.lindseybot.shared.worker.legacy;
 
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.utils.data.DataObject;
 import net.lindseybot.shared.worker.legacy.proxy.ProxyRestAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class FakeSlashCommand extends SlashCommandInteractionEvent {
 
@@ -85,6 +88,14 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
     @Override
     public ReplyCallbackAction reply(@NotNull Message message) {
         return new ProxyRestAction(this).withMessage(message);
+    }
+
+    @NotNull
+    @Override
+    public ReplyCallbackAction reply(@NotNull String content) {
+        return new ProxyRestAction(this).withMessage(new MessageBuilder(content)
+                .setAllowedMentions(List.of(Message.MentionType.EMOTE, Message.MentionType.CHANNEL))
+                .build());
     }
 
     @Override
