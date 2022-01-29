@@ -1,5 +1,5 @@
 ext {
-    BOT_VERSION = '1.0.0'
+    BOT_VERSION = '1.1.0'
     JDA_VERSION = '0899a4483f'
     JDA_SLUG = 'com.github.DV8FromtheWorld:JDA'
     ORG_JSON_VERSION = '20190722'
