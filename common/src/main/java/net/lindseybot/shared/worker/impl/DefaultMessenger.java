@@ -53,7 +53,11 @@ public class DefaultMessenger implements Messenger {
         } else if (message.getSelfDestruct() != null) {
             event.reply(content)
                     .allowedMentions(this.adapter.allowed(message))
-                    .queue(h -> h.deleteOriginal().queueAfter(message.getSelfDestruct(), TimeUnit.MILLISECONDS));
+                    .queue(h -> {
+                        if (h != null) {
+                            h.deleteOriginal().queueAfter(message.getSelfDestruct(), TimeUnit.MILLISECONDS);
+                        }
+                    });
         } else {
             event.reply(content)
                     .allowedMentions(this.adapter.allowed(message))
