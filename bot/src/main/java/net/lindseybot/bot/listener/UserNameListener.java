@@ -1,6 +1,6 @@
 package net.lindseybot.bot.listener;
 
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.jodah.expiringmap.ExpirationListener;
@@ -29,7 +29,7 @@ public class UserNameListener extends ListenerAdapter implements ExpirationListe
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
         if (users.containsKey(userId)) {
             return;

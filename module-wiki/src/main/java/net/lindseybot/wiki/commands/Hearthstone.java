@@ -1,7 +1,7 @@
 package net.lindseybot.wiki.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
@@ -31,7 +31,7 @@ public class Hearthstone extends InteractionHandler {
     }
 
     @SlashCommand("hearthstone")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String card = this.getOption("card", event, String.class);
         boolean gold = Boolean.TRUE.equals(this.getOption("gold", event, Boolean.class));
         Request request = new Request.Builder()
@@ -43,12 +43,12 @@ public class Hearthstone extends InteractionHandler {
         String str;
         try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (!resp.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             str = body.string();
         } catch (IOException ex) {
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         String result = "";

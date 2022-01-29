@@ -1,7 +1,7 @@
 package net.lindseybot.wiki.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
@@ -24,7 +24,7 @@ public class Define extends InteractionHandler {
     }
 
     @SlashCommand("define")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String word = this.getOption("word", event, String.class);
         if (word == null) {
             return;

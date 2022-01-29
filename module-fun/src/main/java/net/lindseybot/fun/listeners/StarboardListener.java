@@ -3,12 +3,12 @@ package net.lindseybot.fun.listeners;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.lindseybot.fun.entities.StarboardMessage;
 import net.lindseybot.fun.services.StarboardService;
 import net.lindseybot.shared.entities.profile.servers.Starboard;
@@ -33,18 +33,22 @@ public class StarboardListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
         if (!emote.getName().equals("\u2B50")) {
+            return;
+        } else if (!event.isFromGuild()) {
             return;
         }
         this.handleStarboard(event.getReaction(), event.getGuild());
     }
 
     @Override
-    public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
+    public void onMessageReactionRemove(@NotNull MessageReactionRemoveEvent event) {
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
         if (!emote.getName().equals("\u2B50")) {
+            return;
+        } else if (!event.isFromGuild()) {
             return;
         }
         this.handleStarboard(event.getReaction(), event.getGuild());

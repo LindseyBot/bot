@@ -16,6 +16,10 @@ repositories {
         name 'm2-dv8tion'
         url 'https://m2.dv8tion.net/releases'
     }
+    maven {
+        name 'jitpack'
+        url 'https://jitpack.io'
+    }
 }
 
 tasks.withType(JavaCompile) {

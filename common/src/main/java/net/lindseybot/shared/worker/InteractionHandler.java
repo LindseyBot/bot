@@ -1,9 +1,10 @@
 package net.lindseybot.shared.worker;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ public abstract class InteractionHandler {
         this.msg = msg;
     }
 
-    protected @Nullable String getData(ButtonClickEvent event) {
+    protected @Nullable String getData(ButtonInteractionEvent event) {
         String id = event.getComponentId();
         if (!id.contains(":")) {
             return null;
@@ -26,7 +27,7 @@ public abstract class InteractionHandler {
 
     @SuppressWarnings("unchecked")
     protected @Nullable <T> T getOption(@NotNull String name,
-                                        @NotNull SlashCommandEvent event,
+                                        @NotNull SlashCommandInteractionEvent event,
                                         @NotNull Class<T> tClass) {
         OptionMapping mapping = event.getOption(name);
         if (mapping == null) {

@@ -30,4 +30,11 @@ public @interface SlashCommand {
      */
     boolean ephemeral() default false;
 
+    /**
+     * If this command is only usable in guilds.
+     *
+     * @return guild flag.
+     */
+    boolean guildOnly() default false;
+
 }

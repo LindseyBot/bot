@@ -1,16 +1,16 @@
 package net.lindseybot.shared.worker.legacy;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.lindseybot.shared.worker.legacy.proxy.ProxyRestAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FakeSlashCommand extends SlashCommandEvent {
+public class FakeSlashCommand extends SlashCommandInteractionEvent {
 
     private final ShardManager api;
     private final FakeSlashData data;
@@ -83,19 +83,17 @@ public class FakeSlashCommand extends SlashCommandEvent {
 
     @NotNull
     @Override
-    public ReplyAction reply(@NotNull Message message) {
+    public ReplyCallbackAction reply(@NotNull Message message) {
         return new ProxyRestAction(this).withMessage(message);
     }
 
-    @NotNull
     @Override
-    public ReplyAction deferReply() {
+    public ReplyCallbackAction deferReply() {
         return new ProxyRestAction(this);
     }
 
-    @NotNull
     @Override
-    public ReplyAction deferReply(boolean ephemeral) {
+    public ReplyCallbackAction deferReply(boolean ephemeral) {
         return this.deferReply();
     }
 

@@ -1,7 +1,7 @@
 package net.lindseybot.economy.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.economy.listeners.ScrambleListener;
 import net.lindseybot.economy.models.ScrambleModel;
 import net.lindseybot.shared.entities.discord.Label;
@@ -36,8 +36,8 @@ public class Scramble extends InteractionHandler {
         this.listener = listener;
     }
 
-    @SlashCommand("scramble")
-    public void onCommand(SlashCommandEvent event) {
+    @SlashCommand(value = "scramble", guildOnly = true)
+    public void onCommand(SlashCommandInteractionEvent event) {
         if (event.getGuild() == null) {
             return;
         } else if (this.listener.has(event.getGuild())) {
@@ -47,7 +47,7 @@ public class Scramble extends InteractionHandler {
         }
         String word = this.getWord(Language.en_US);
         if (word == null) {
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         ScrambleModel model = new ScrambleModel();

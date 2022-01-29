@@ -2,7 +2,7 @@ package net.lindseybot.info.commands;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.info.properties.ApiProperties;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -36,7 +36,7 @@ public class Twitch extends InteractionHandler {
     }
 
     @SlashCommand("twitch")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String query = this.getOption("name", event, String.class);
         Request request = new Request.Builder()
                 .url("https://api.twitch.tv/helix/streams?user_login=" + query)
@@ -45,13 +45,13 @@ public class Twitch extends InteractionHandler {
                 .get().build();
         try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (!resp.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             array = new JSONObject(body.string()).getJSONArray("data");
         } catch (IOException ex) {
             log.error("Failed to fetch streamer information", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         FMessage message;
@@ -87,12 +87,12 @@ public class Twitch extends InteractionHandler {
         JSONObject obj;
         try (Response resp = client.newCall(request).execute(); ResponseBody body = resp.body()) {
             if (!resp.isSuccessful() || body == null) {
-                return FMessage.of(Label.of("internal.error"), true);
+                return FMessage.of(Label.of("error.internal"), true);
             }
             obj = new JSONObject(body.string()).getJSONArray("data").getJSONObject(0);
         } catch (IOException ex) {
             log.error("Failed to fetch streamer information", ex);
-            return FMessage.of(Label.of("internal.error"), true);
+            return FMessage.of(Label.of("error.internal"), true);
         }
         String name = obj.getString("display_name");
         EmbedBuilder embed = new EmbedBuilder()

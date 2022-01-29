@@ -1,7 +1,7 @@
 package net.lindseybot.info.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.EmbedBuilder;
@@ -30,7 +30,7 @@ public class Apoiase extends InteractionHandler {
     }
 
     @SlashCommand("apoiase")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OkHttpClient client = new OkHttpClient();
         JSONObject obj;
         try {
@@ -42,7 +42,7 @@ public class Apoiase extends InteractionHandler {
                     .execute();
             ResponseBody body = response.body();
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             obj = new JSONObject(body.string());
@@ -59,13 +59,13 @@ public class Apoiase extends InteractionHandler {
             response = client.newCall(request).execute();
             body = response.body();
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             obj = new JSONObject(body.string());
         } catch (IOException ex) {
             log.error("Failed to fetch information from apoia.se", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         JSONObject campaigns = obj.getJSONArray("campaigns").getJSONObject(0);

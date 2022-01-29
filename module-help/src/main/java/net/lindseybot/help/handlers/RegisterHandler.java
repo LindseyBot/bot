@@ -2,8 +2,8 @@ package net.lindseybot.help.handlers;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.lindseybot.help.models.ModuleHandler;
 import net.lindseybot.help.services.HelpRegisterService;
@@ -120,11 +120,10 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
     }
 
     @SelectMenu("setup.register.1")
-    public void onStep1(SelectionMenuEvent event) {
+    public void onStep1(SelectMenuInteractionEvent event) {
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions() == null
                 || event.getSelectedOptions().isEmpty()) {
             return;
         }
@@ -136,7 +135,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
             this.msg.error(event, Label.of("search.channel"));
             return;
         } else if (!event.getGuild().getSelfMember()
-                .hasPermission(target, Permission.MESSAGE_READ)) {
+                .hasPermission(target, Permission.VIEW_CHANNEL)) {
             this.msg.error(event, Label.of("permissions.read"));
             return;
         }
@@ -162,11 +161,10 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
     }
 
     @SelectMenu("setup.register.2")
-    public void onStep2(SelectionMenuEvent event) {
+    public void onStep2(SelectMenuInteractionEvent event) {
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions() == null
                 || event.getSelectedOptions().isEmpty()) {
             return;
         }
@@ -203,7 +201,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
     }
 
     @Button("setup.register.3")
-    public void onStep3(ButtonClickEvent event) {
+    public void onStep3(ButtonInteractionEvent event) {
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null) {
@@ -220,7 +218,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
                     .retrievePast(5)
                     .complete();
         } catch (Exception ex) {
-            this.msg.error(event, Label.of("discord.error", ex.getMessage()));
+            this.msg.error(event, Label.of("error.discord", ex.getMessage()));
             return;
         }
         Message message = past.stream()

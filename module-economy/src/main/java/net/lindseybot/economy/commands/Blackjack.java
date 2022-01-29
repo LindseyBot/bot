@@ -1,8 +1,8 @@
 package net.lindseybot.economy.commands;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.lindseybot.economy.models.BlackjackModel;
 import net.lindseybot.economy.repositories.redis.BlackjackRepository;
 import net.lindseybot.economy.services.EconomyService;
@@ -39,7 +39,7 @@ public class Blackjack extends InteractionHandler {
     }
 
     @SlashCommand("blackjack")
-    public void onStart(SlashCommandEvent event) {
+    public void onStart(SlashCommandInteractionEvent event) {
         Long userId = event.getUser().getIdLong();
         if (!this.service.has(event.getUser(), COST)) {
             this.msg.error(event, Label.of("economy.not_enough"));
@@ -60,7 +60,7 @@ public class Blackjack extends InteractionHandler {
     }
 
     @Button("blackjack.draw")
-    public void draw(ButtonClickEvent event) {
+    public void draw(ButtonInteractionEvent event) {
         long userId = event.getUser().getIdLong();
 
         String target = event.getComponentId().split(":")[1];
@@ -99,7 +99,7 @@ public class Blackjack extends InteractionHandler {
     }
 
     @Button("blackjack.stop")
-    public void stop(ButtonClickEvent event) {
+    public void stop(ButtonInteractionEvent event) {
         long userId = event.getUser().getIdLong();
 
         String target = event.getComponentId().split(":")[1];

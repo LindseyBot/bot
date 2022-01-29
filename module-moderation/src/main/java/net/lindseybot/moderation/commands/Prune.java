@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -26,8 +26,8 @@ public class Prune extends InteractionHandler {
         super(messenger);
     }
 
-    @SlashCommand("prune")
-    public void onCommand(SlashCommandEvent event) {
+    @SlashCommand(value = "prune", guildOnly = true)
+    public void onCommand(SlashCommandInteractionEvent event) {
         Long count = this.getOption("count", event, Long.class);
         if (count == null || count < 1) {
             this.msg.error(event, Label.of("commands.prune.invalid"));
@@ -70,7 +70,7 @@ public class Prune extends InteractionHandler {
         }, this.noop());
     }
 
-    private void deleteMessages(SlashCommandEvent event, List<Message> messages) {
+    private void deleteMessages(SlashCommandInteractionEvent event, List<Message> messages) {
         try {
             int size = messages.size();
             if (size == 0) {
@@ -82,7 +82,7 @@ public class Prune extends InteractionHandler {
                     msg.setSelfDestruct(5000L);
                     this.msg.reply(event, msg);
                 }, throwable -> {
-                    this.msg.error(event, Label.of("discord.error", throwable.getMessage()));
+                    this.msg.error(event, Label.of("error.discord", throwable.getMessage()));
                 });
                 return;
             }
@@ -91,7 +91,7 @@ public class Prune extends InteractionHandler {
                 msg.setSelfDestruct(5000L);
                 this.msg.reply(event, msg);
             }, throwable -> {
-                this.msg.error(event, Label.of("discord.error", throwable.getMessage()));
+                this.msg.error(event, Label.of("error.discord", throwable.getMessage()));
             });
         } catch (InsufficientPermissionException ex) {
             this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));

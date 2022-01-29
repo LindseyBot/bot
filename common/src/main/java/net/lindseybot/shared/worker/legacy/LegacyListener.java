@@ -45,7 +45,7 @@ public class LegacyListener implements MessageListener {
             log.warn("Received a legacy command but no listener was found.");
             return;
         }
-        listener.onSlashCommand(command);
+        listener.onSlashCommandInteraction(command);
     }
 
     private void resolve(Guild guild, Map<String, FakeOptionMapping> options) {

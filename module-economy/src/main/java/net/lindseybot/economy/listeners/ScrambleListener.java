@@ -2,7 +2,7 @@ package net.lindseybot.economy.listeners;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -39,7 +39,7 @@ public class ScrambleListener extends ListenerAdapter implements ExpirationListe
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getMember() == null
                 || event.getAuthor().isBot()
                 || event.getMember().isPending()
@@ -59,7 +59,7 @@ public class ScrambleListener extends ListenerAdapter implements ExpirationListe
         int cookies = calculateCookies(data.getWord(), timeDiff);
         this.service.pay(event.getAuthor(), cookies);
 
-        this.msg.send(event.getChannel(),
+        this.msg.send(event.getGuildChannel(),
                 Label.of("commands.scramble.correct", event.getMember().getAsMention(), cookies));
         this.guilds.remove(event.getGuild().getIdLong());
     }

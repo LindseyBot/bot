@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -29,7 +29,7 @@ public class VoiceMove extends InteractionHandler {
 
     @SlashCommand("voice.move")
     @SuppressWarnings("CodeBlock2Expr")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping from = event.getOption("from");
         if (from == null) {
             return;
@@ -72,7 +72,7 @@ public class VoiceMove extends InteractionHandler {
                 RestAction.allOf(actions).queue((aVoid) -> {
                     this.msg.reply(event, Label.of("commands.voice.move.success"));
                 }, throwable -> {
-                    this.msg.error(event, Label.of("discord.error", throwable.getMessage()));
+                    this.msg.error(event, Label.of("error.discord", throwable.getMessage()));
                 });
             } catch (InsufficientPermissionException ex) {
                 this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));

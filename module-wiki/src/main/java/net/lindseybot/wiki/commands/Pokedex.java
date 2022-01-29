@@ -1,7 +1,7 @@
 package net.lindseybot.wiki.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.EmbedBuilder;
@@ -27,7 +27,7 @@ public class Pokedex extends InteractionHandler {
     }
 
     @SlashCommand("pokedex")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String search = this.getOption("search", event, String.class);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -45,7 +45,7 @@ public class Pokedex extends InteractionHandler {
                 return;
             }
         } catch (IOException ex) {
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         JSONObject obj = new JSONObject(str);

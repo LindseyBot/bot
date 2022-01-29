@@ -1,7 +1,7 @@
 package net.lindseybot.fun.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.FEmbed;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -22,7 +22,7 @@ public class ColorCmd extends InteractionHandler {
     }
 
     @SlashCommand("color")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String color = this.getOption("hex", event, String.class);
         if (color == null) {
             return;

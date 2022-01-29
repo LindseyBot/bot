@@ -1,8 +1,7 @@
 package net.lindseybot.economy.commands;
 
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.lindseybot.economy.services.CustomizationService;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.profile.UserProfile;
 import net.lindseybot.shared.worker.InteractionHandler;
@@ -22,7 +21,7 @@ public class CookiesBalance extends InteractionHandler {
     }
 
     @SlashCommand("cookies.balance")
-    public void onBalance(SlashCommandEvent event) {
+    public void onBalance(SlashCommandInteractionEvent event) {
         UserProfile self = this.profiles.get(event.getUser());
         User target = this.getOption("user", event, User.class);
         if (target == null) {

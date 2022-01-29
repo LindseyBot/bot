@@ -1,10 +1,10 @@
 package net.lindseybot.shared.worker.impl;
 
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.worker.services.DiscordAdapter;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -25,7 +25,7 @@ public class DefaultMessenger implements Messenger {
     }
 
     @Override
-    public void reply(@NotNull SlashCommandEvent event, @NotNull FMessage message) {
+    public void reply(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message) {
         Message content = getContent(message, event.getMember());
         if (event.isAcknowledged()) {
             if (message.isEphemeral()) {
@@ -62,7 +62,7 @@ public class DefaultMessenger implements Messenger {
     }
 
     @Override
-    public void edit(@NotNull SlashCommandEvent event, @NotNull FMessage message) {
+    public void edit(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message) {
         Message content = getContent(message, event.getMember());
         if (event.isAcknowledged()) {
             event.getHook()
@@ -104,7 +104,7 @@ public class DefaultMessenger implements Messenger {
     }
 
     @Override
-    public void send(TextChannel channel, FMessage message) {
+    public void send(GuildMessageChannel channel, FMessage message) {
         Message content = this.adapter.getMessage(message, channel);
         if (message.getSelfDestruct() != null) {
             channel.sendMessage(content)

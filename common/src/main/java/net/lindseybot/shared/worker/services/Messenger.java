@@ -1,12 +1,12 @@
 package net.lindseybot.shared.worker.services;
 
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
 import org.jetbrains.annotations.NotNull;
@@ -16,20 +16,20 @@ public interface Messenger {
     /**
      * Replies to a slash command with an ephemeral message.
      *
-     * @param event SlashCommandEvent.
+     * @param event SlashCommandInteractionEvent.
      * @param label Message content.
      */
-    default void error(@NotNull SlashCommandEvent event, @NotNull Label label) {
+    default void error(@NotNull SlashCommandInteractionEvent event, @NotNull Label label) {
         this.reply(event, FMessage.of(label, true));
     }
 
     /**
      * Replies to a button click with an ephemeral message.
      *
-     * @param event ButtonClickEvent.
+     * @param event ButtonInteractionEvent.
      * @param label Message content.
      */
-    default void error(@NotNull ButtonClickEvent event, @NotNull Label label) {
+    default void error(@NotNull ButtonInteractionEvent event, @NotNull Label label) {
         this.reply(event, FMessage.of(label, true));
     }
 
@@ -39,31 +39,31 @@ public interface Messenger {
      * @param event SelectionMenuEvent.
      * @param label Message content.
      */
-    default void error(@NotNull SelectionMenuEvent event, @NotNull Label label) {
+    default void error(@NotNull SelectMenuInteractionEvent event, @NotNull Label label) {
         this.reply(event, FMessage.of(label, true));
     }
 
     /**
      * Replies to a slash command.
      *
-     * @param event   SlashCommandEvent.
+     * @param event   SlashCommandInteractionEvent.
      * @param message Message response.
      */
-    void reply(@NotNull SlashCommandEvent event, @NotNull FMessage message);
+    void reply(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message);
 
     /**
      * Replies to a slash command.
      *
-     * @param event SlashCommandEvent.
+     * @param event SlashCommandInteractionEvent.
      * @param label Message content.
      */
-    default void reply(@NotNull SlashCommandEvent event, @NotNull Label label) {
+    default void reply(@NotNull SlashCommandInteractionEvent event, @NotNull Label label) {
         this.reply(event, FMessage.of(label));
     }
 
-    void edit(@NotNull SlashCommandEvent event, @NotNull FMessage message);
+    void edit(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message);
 
-    default void edit(@NotNull SlashCommandEvent event, @NotNull Label label) {
+    default void edit(@NotNull SlashCommandInteractionEvent event, @NotNull Label label) {
         this.edit(event, FMessage.of(label));
     }
 
@@ -85,7 +85,7 @@ public interface Messenger {
      * @param channel Channel.
      * @param message Message.
      */
-    void send(TextChannel channel, FMessage message);
+    void send(GuildMessageChannel channel, FMessage message);
 
     /**
      * Sends a message to a text-channel.
@@ -93,7 +93,7 @@ public interface Messenger {
      * @param channel Channel.
      * @param label   Message content.
      */
-    default void send(TextChannel channel, Label label) {
+    default void send(GuildMessageChannel channel, Label label) {
         this.send(channel, FMessage.of(label));
     }
 
@@ -121,7 +121,7 @@ public interface Messenger {
      * @param event Original message.
      * @param reply Message content.
      */
-    default void reply(GuildMessageReceivedEvent event, FMessage reply) {
+    default void reply(MessageReceivedEvent event, FMessage reply) {
         this.reply(event.getMessage(), reply);
     }
 
@@ -131,7 +131,7 @@ public interface Messenger {
      * @param event Original message.
      * @param label Message content.
      */
-    default void reply(GuildMessageReceivedEvent event, Label label) {
+    default void reply(MessageReceivedEvent event, Label label) {
         this.reply(event.getMessage(), label);
     }
 

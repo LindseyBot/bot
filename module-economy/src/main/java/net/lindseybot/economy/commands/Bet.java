@@ -1,7 +1,7 @@
 package net.lindseybot.economy.commands;
 
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.lindseybot.economy.models.BetModel;
 import net.lindseybot.economy.repositories.redis.BetRepository;
 import net.lindseybot.economy.services.EconomyService;
@@ -34,7 +34,7 @@ public class Bet extends InteractionHandler {
     }
 
     @SlashCommand("bet")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         if (!this.service.has(event.getUser(), 5)) {
             this.msg.error(event, Label.of("economy.not_enough"));
             return;
@@ -55,7 +55,7 @@ public class Bet extends InteractionHandler {
     }
 
     @Button("bet.bet")
-    public void onBet(ButtonClickEvent event) {
+    public void onBet(ButtonInteractionEvent event) {
         String target = event.getComponentId().split(":")[1];
         if (!target.equals(event.getUser().getId())) {
             this.msg.error(event, Label.of("commands.bet.owned"));
@@ -78,7 +78,7 @@ public class Bet extends InteractionHandler {
     }
 
     @Button("bet.fold")
-    public void onFold(ButtonClickEvent event) {
+    public void onFold(ButtonInteractionEvent event) {
         String target = event.getComponentId().split(":")[1];
         if (!target.equals(event.getUser().getId())) {
             this.msg.error(event, Label.of("commands.bet.owned"));

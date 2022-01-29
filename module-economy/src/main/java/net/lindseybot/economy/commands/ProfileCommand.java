@@ -2,7 +2,7 @@ package net.lindseybot.economy.commands;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.economy.properties.ImageGenProperties;
 import net.lindseybot.economy.repositories.sql.BadgeRepository;
 import net.lindseybot.economy.repositories.sql.InventoryRepository;
@@ -51,7 +51,7 @@ public class ProfileCommand extends InteractionHandler {
     }
 
     @SlashCommand("profile")
-    public void onProfile(SlashCommandEvent event) {
+    public void onProfile(SlashCommandInteractionEvent event) {
         User target = this.getOption("target", event, User.class);
         if (target == null) {
             target = event.getUser();
@@ -88,7 +88,7 @@ public class ProfileCommand extends InteractionHandler {
         Call call = client.newCall(request);
         try (Response response = call.execute(); ResponseBody body = response.body()) {
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             byte[] bytes = body.bytes();

@@ -1,7 +1,7 @@
 package net.lindseybot.economy.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.economy.repositories.sql.UserProfileRepository;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -29,9 +29,10 @@ public class Leaderboard extends InteractionHandler {
     }
 
     @SlashCommand("leaderboard")
-    @SuppressWarnings("ConstantConditions")
-    public void onCommand(SlashCommandEvent event) {
-        LeaderboardType type = LeaderboardType.fromString(event.getOption("name").getAsString());
+    public void onCommand(SlashCommandInteractionEvent event) {
+        LeaderboardType type = LeaderboardType.fromString(
+                this.getOption("name", event, String.class)
+        );
         StringBuilder msg = new StringBuilder("```\n");
         int pos = 1;
         for (UserProfile profile : this.getPage(type, 0)) {

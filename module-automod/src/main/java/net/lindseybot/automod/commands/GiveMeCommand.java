@@ -3,7 +3,7 @@ package net.lindseybot.automod.commands;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.lindseybot.automod.services.GiveMeService;
@@ -28,8 +28,8 @@ public class GiveMeCommand extends InteractionHandler {
         this.service = service;
     }
 
-    @SlashCommand("giveme.list")
-    public void onList(SlashCommandEvent event) {
+    @SlashCommand(value = "giveme.list", guildOnly = true)
+    public void onList(SlashCommandInteractionEvent event) {
         if (event.getMember() == null
                 || event.getGuild() == null) {
             return;
@@ -47,8 +47,8 @@ public class GiveMeCommand extends InteractionHandler {
         this.msg.reply(event, FMessage.of(Label.of("commands.giveme.all", roles), true));
     }
 
-    @SlashCommand("giveme.get")
-    public void onGet(SlashCommandEvent event) {
+    @SlashCommand(value = "giveme.get", guildOnly = true)
+    public void onGet(SlashCommandInteractionEvent event) {
         if (event.getMember() == null
                 || event.getGuild() == null) {
             return;
@@ -67,7 +67,7 @@ public class GiveMeCommand extends InteractionHandler {
             event.getGuild().addRoleToMember(event.getMember(), role).queue((s) -> {
                 this.msg.reply(event, FMessage.of(Label.of("commands.giveme.success", role.getName()), true));
             }, (e) -> {
-                this.msg.error(event, Label.of("discord.error", e.getMessage()));
+                this.msg.error(event, Label.of("error.discord", e.getMessage()));
             });
         } catch (InsufficientPermissionException ex) {
             this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));
@@ -76,8 +76,8 @@ public class GiveMeCommand extends InteractionHandler {
         }
     }
 
-    @SlashCommand("giveme.add")
-    public void onAdd(SlashCommandEvent event) {
+    @SlashCommand(value = "giveme.add", guildOnly = true)
+    public void onAdd(SlashCommandInteractionEvent event) {
         if (event.getMember() == null
                 || event.getGuild() == null) {
             return;
@@ -99,8 +99,8 @@ public class GiveMeCommand extends InteractionHandler {
         this.msg.reply(event, Label.of("commands.giveme.added", role.getName()));
     }
 
-    @SlashCommand("giveme.remove")
-    public void onRemove(SlashCommandEvent event) {
+    @SlashCommand(value = "giveme.remove", guildOnly = true)
+    public void onRemove(SlashCommandInteractionEvent event) {
         if (event.getMember() == null
                 || event.getGuild() == null) {
             return;

@@ -15,6 +15,7 @@ public class CommandReference {
 
     private boolean nsfw;
     private boolean ephemeral;
+    private boolean guildOnly;
 
     public void invoke(Object... args) throws InvocationTargetException, IllegalAccessException {
         this.method.invoke(instance, args);

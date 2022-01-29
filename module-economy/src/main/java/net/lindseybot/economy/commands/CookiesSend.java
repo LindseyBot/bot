@@ -2,7 +2,7 @@ package net.lindseybot.economy.commands;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.economy.services.EconomyService;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionHandler;
@@ -21,15 +21,14 @@ public class CookiesSend extends InteractionHandler {
     }
 
     @SlashCommand("cookies.send")
-    @SuppressWarnings("ConstantConditions")
-    public void onCommand(SlashCommandEvent event) {
-        Member target = event.getOption("target").getAsMember();
+    public void onCommand(SlashCommandInteractionEvent event) {
+        Member target = this.getOption("target", event, Member.class);
         if (target == null) {
             this.msg.error(event, Label.of("search.member"));
             return;
         }
-        long amount = event.getOption("amount").getAsLong();
-        if (amount <= 0) {
+        Long amount = this.getOption("amount", event, Long.class);
+        if (amount == null || amount <= 0) {
             this.msg.error(event, Label.of("commands.cookies.send.invalid"));
             return;
         }

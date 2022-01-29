@@ -1,7 +1,7 @@
 package net.lindseybot.fun.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
@@ -21,7 +21,7 @@ public class Flip extends InteractionHandler {
     }
 
     @SlashCommand("flip")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         if (random.nextBoolean()) {
             this.msg.reply(event, Label.of("commands.flip.heads", getAsMention(event.getMember())));
         } else {

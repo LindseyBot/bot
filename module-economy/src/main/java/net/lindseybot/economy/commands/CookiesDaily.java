@@ -1,6 +1,6 @@
 package net.lindseybot.economy.commands;
 
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.economy.services.EconomyService;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.profile.UserProfile;
@@ -26,7 +26,7 @@ public class CookiesDaily extends InteractionHandler {
     }
 
     @SlashCommand("cookies.daily")
-    public void onDaily(SlashCommandEvent event) {
+    public void onDaily(SlashCommandInteractionEvent event) {
         UserProfile profile = this.profiles.get(event.getUser());
         if (this.isSameDay(profile.getLastDailyCookies(), System.currentTimeMillis())) {
             long next = Instant.ofEpochMilli(System.currentTimeMillis())

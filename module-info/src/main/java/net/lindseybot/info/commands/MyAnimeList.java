@@ -1,7 +1,7 @@
 package net.lindseybot.info.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.EmbedBuilder;
@@ -28,7 +28,7 @@ public class MyAnimeList extends InteractionHandler {
     }
 
     @SlashCommand("mal")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String name = this.getOption("name", event, String.class);
         Request request = new Request.Builder()
                 .url("https://api.jikan.moe/v3/search/anime?q=" + name)
@@ -36,7 +36,7 @@ public class MyAnimeList extends InteractionHandler {
         JSONObject anime;
         try (Response response = client.newCall(request).execute(); ResponseBody body = response.body()) {
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             JSONObject obj = new JSONObject(body.string());
@@ -47,7 +47,7 @@ public class MyAnimeList extends InteractionHandler {
             anime = obj.getJSONArray("results").getJSONObject(0);
         } catch (IOException ex) {
             log.error("Failed to fetch anime information", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         EmbedBuilder embed = new EmbedBuilder();

@@ -1,7 +1,7 @@
 package net.lindseybot.info.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.info.properties.ApiProperties;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -31,12 +31,12 @@ public class Kitsu extends InteractionHandler {
     }
 
     @SlashCommand("anime")
-    public void onAnime(SlashCommandEvent event) {
+    public void onAnime(SlashCommandInteractionEvent event) {
         this.onCommand(event);
     }
 
     @SlashCommand("kitsu")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String name = this.getOption("name", event, String.class);
         Request request = new Request.Builder()
                 .url("https://kitsu.io/api/edge/anime?filter[text]=" + name)
@@ -46,7 +46,7 @@ public class Kitsu extends InteractionHandler {
         JSONObject data;
         try (Response response = client.newCall(request).execute(); ResponseBody body = response.body()) {
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             JSONObject obj = new JSONObject(body.string());
@@ -62,7 +62,7 @@ public class Kitsu extends InteractionHandler {
                     .split("anime/")[1];
         } catch (IOException ex) {
             log.error("Failed to fetch anime data", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         EmbedBuilder embed = new EmbedBuilder();

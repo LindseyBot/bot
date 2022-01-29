@@ -1,9 +1,12 @@
 package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.lindseybot.shared.worker.reference.ButtonReference;
@@ -31,14 +34,14 @@ public class DefaultInteractionListener extends ListenerAdapter {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!this.service.hasCommand(event.getCommandPath())) {
             return;
         }
-        // TODO: Permission check
-        // TODO: Module check
         CommandReference reference = this.service.getCommand(event.getCommandPath());
-        if (reference.isNsfw() && !event.getTextChannel().isNSFW()) {
+        if (reference.isGuildOnly() && !event.isFromGuild()) {
+            return;
+        } else if (reference.isNsfw() && !this.isNSFW(event.getChannel())) {
             event.reply("This command is NSFW. It can only be executed in NSFW channels.")
                     .setEphemeral(true)
                     .queue();
@@ -65,7 +68,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
     }
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String id = event.getComponentId();
         if (id.contains(":")) {
             id = id.split(":")[0];
@@ -100,7 +103,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!this.service.hasSelectMenu(event.getComponentId())) {
             return;
         }
@@ -127,6 +130,16 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 event.deferReply(reference.isEdit())
                         .queue();
             }
+        }
+    }
+
+    private boolean isNSFW(MessageChannel channel) {
+        if (channel instanceof BaseGuildMessageChannel guild) {
+            return guild.isNSFW();
+        } else if (channel instanceof ThreadChannel thread) {
+            return ((BaseGuildMessageChannel) thread.getParentMessageChannel()).isNSFW();
+        } else {
+            return false;
         }
     }
 

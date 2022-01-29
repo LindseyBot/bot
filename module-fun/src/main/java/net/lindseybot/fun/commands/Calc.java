@@ -1,7 +1,7 @@
 package net.lindseybot.fun.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
@@ -24,7 +24,7 @@ public class Calc extends InteractionHandler {
     }
 
     @SlashCommand("calc")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         String expr = this.getOption("expression", event, String.class);
         if (expr == null) {
             return;
@@ -55,7 +55,7 @@ public class Calc extends InteractionHandler {
             data = new JSONObject(body.string());
         } catch (IOException ex) {
             log.error("Failed to execute math expression", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         if (!data.isNull("error")) {

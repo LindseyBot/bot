@@ -1,6 +1,7 @@
 package net.lindseybot.shared.enums;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 public enum LeaderboardType {
 
@@ -13,7 +14,7 @@ public enum LeaderboardType {
         this.prettyName = prettyName;
     }
 
-    public static LeaderboardType fromString(String arg) {
+    public static @NotNull LeaderboardType fromString(String arg) {
         for (LeaderboardType type : LeaderboardType.values()) {
             if (type.name().equalsIgnoreCase(arg)) {
                 return type;
@@ -28,7 +29,7 @@ public enum LeaderboardType {
                 return type;
             }
         }
-        return null;
+        return LeaderboardType.COOKIES;
     }
 
 }

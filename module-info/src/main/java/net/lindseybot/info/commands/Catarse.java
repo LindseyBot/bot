@@ -1,7 +1,7 @@
 package net.lindseybot.info.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.EmbedBuilder;
@@ -29,7 +29,7 @@ public class Catarse extends InteractionHandler {
     }
 
     @SlashCommand("catarse.user")
-    public void onUser(SlashCommandEvent event) {
+    public void onUser(SlashCommandInteractionEvent event) {
         JSONObject obj;
         try {
             String term = this.getOption("name", event, String.class);
@@ -40,7 +40,7 @@ public class Catarse extends InteractionHandler {
             Response response = client.newCall(request).execute();
             ResponseBody body = response.body();
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             JSONArray array = new JSONArray(body.string());
@@ -51,7 +51,7 @@ public class Catarse extends InteractionHandler {
             obj = array.getJSONObject(0);
         } catch (IOException ex) {
             log.error("Failed to fetch user data", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         EmbedBuilder embed = new EmbedBuilder();
@@ -89,7 +89,7 @@ public class Catarse extends InteractionHandler {
     }
 
     @SlashCommand("catarse.project")
-    public void onProject(SlashCommandEvent event) {
+    public void onProject(SlashCommandInteractionEvent event) {
         String term = this.getOption("name", event, String.class);
         if (term == null) {
             return;
@@ -105,7 +105,7 @@ public class Catarse extends InteractionHandler {
         JSONObject obj;
         try (Response response = client.newCall(request).execute(); ResponseBody body = response.body()) {
             if (!response.isSuccessful() || body == null) {
-                this.msg.error(event, Label.of("internal.error"));
+                this.msg.error(event, Label.of("error.internal"));
                 return;
             }
             JSONArray array = new JSONArray(body.string());
@@ -116,7 +116,7 @@ public class Catarse extends InteractionHandler {
             obj = array.getJSONObject(0);
         } catch (IOException ex) {
             log.error("Failed to fetch user data", ex);
-            this.msg.error(event, Label.of("internal.error"));
+            this.msg.error(event, Label.of("error.internal"));
             return;
         }
         boolean nsfw = obj.getBoolean("is_adult_content");

@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.lindseybot.shared.entities.discord.*;
 import net.lindseybot.shared.enums.Language;
 import net.lindseybot.shared.utils.StandardEmotes;
@@ -74,7 +74,7 @@ public class DiscordAdapter {
         }
         if (!fake.getComponents().isEmpty()) {
             List<ActionRow> rows = new ArrayList<>();
-            List<Component> components = new ArrayList<>();
+            List<ItemComponent> components = new ArrayList<>();
             int i = 0;
             for (MessageComponent component : fake.getComponents()) {
                 if (component instanceof FButton button) {
@@ -128,9 +128,9 @@ public class DiscordAdapter {
         }
     }
 
-    private SelectionMenu createSelectMenu(FSelectMenu model, ISnowflake snowflake) {
+    private SelectMenu createSelectMenu(FSelectMenu model, ISnowflake snowflake) {
         List<SelectOption> options = this.createSelectOptions(model.getOptions(), snowflake);
-        SelectionMenu.Builder builder = SelectionMenu.create(model.getId())
+        SelectMenu.Builder builder = SelectMenu.create(model.getId())
                 .setRequiredRange(model.getMin(), model.getMax())
                 .addOptions(options)
                 .setDisabled(model.isDisabled());

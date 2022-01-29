@@ -1,7 +1,7 @@
 package net.lindseybot.fun.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionHandler;
@@ -22,7 +22,7 @@ public class Roll extends InteractionHandler {
     }
 
     @SlashCommand("roll")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         int sides;
         OptionMapping opt = event.getOption("sides");
         if (opt != null) {

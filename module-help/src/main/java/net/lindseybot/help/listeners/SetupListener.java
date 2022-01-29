@@ -2,8 +2,8 @@ package net.lindseybot.help.listeners;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import net.lindseybot.help.models.ModuleHandler;
 import net.lindseybot.shared.entities.Notification;
@@ -37,18 +37,19 @@ public class SetupListener extends InteractionHandler {
     }
 
     @SlashCommand("lindsey.modules.list")
-    public void onList(SlashCommandEvent event) {
+    public void onList(SlashCommandInteractionEvent event) {
         this.msg.reply(event, FMessage.of(
                 Label.raw("Modules: antiad, antiscam, keeproles, registration, starboard, welcome"), true
         ));
     }
 
-    @SlashCommand("lindsey.modules.status")
-    public void onStatus(SlashCommandEvent event) {
+    @SlashCommand(value = "lindsey.modules.status", guildOnly = true)
+    public void onStatus(SlashCommandInteractionEvent event) {
         String name = this.getOption("name", event, String.class);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -62,12 +63,13 @@ public class SetupListener extends InteractionHandler {
         this.msg.reply(event, handler.onStatus(event.getMember(), event.getGuild(), false));
     }
 
-    @SlashCommand("lindsey.modules.configure")
-    public void onSlashConfigure(SlashCommandEvent event) {
+    @SlashCommand(value = "lindsey.modules.configure", guildOnly = true)
+    public void onSlashConfigure(SlashCommandInteractionEvent event) {
         String name = this.getOption("name", event, String.class);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -81,12 +83,13 @@ public class SetupListener extends InteractionHandler {
         this.msg.reply(event, handler.onSetupStart(event.getMember(), event.getGuild()));
     }
 
-    @SlashCommand("lindsey.modules.enable")
-    public void onSlashEnable(SlashCommandEvent event) {
+    @SlashCommand(value = "lindsey.modules.enable", guildOnly = true)
+    public void onSlashEnable(SlashCommandInteractionEvent event) {
         String name = this.getOption("name", event, String.class);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -100,12 +103,13 @@ public class SetupListener extends InteractionHandler {
         this.msg.reply(event, handler.enable(event.getMember(), event.getGuild()));
     }
 
-    @SlashCommand("lindsey.modules.disable")
-    public void onSlashDisable(SlashCommandEvent event) {
+    @SlashCommand(value = "lindsey.modules.disable", guildOnly = true)
+    public void onSlashDisable(SlashCommandInteractionEvent event) {
         String name = this.getOption("name", event, String.class);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -119,9 +123,10 @@ public class SetupListener extends InteractionHandler {
         this.msg.reply(event, handler.disable(event.getMember(), event.getGuild()));
     }
 
-    @SlashCommand("lindsey.modules.logs")
-    public void onSlashLogs(SlashCommandEvent event) {
+    @SlashCommand(value = "lindsey.modules.logs", guildOnly = true)
+    public void onSlashLogs(SlashCommandInteractionEvent event) {
         if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -144,11 +149,12 @@ public class SetupListener extends InteractionHandler {
     }
 
     @Button("module-disable")
-    public void onButtonDisable(ButtonClickEvent event) {
+    public void onButtonDisable(ButtonInteractionEvent event) {
         String name = this.getData(event);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -163,11 +169,12 @@ public class SetupListener extends InteractionHandler {
     }
 
     @Button("module-enable")
-    public void onButtonEnable(ButtonClickEvent event) {
+    public void onButtonEnable(ButtonInteractionEvent event) {
         String name = this.getData(event);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -182,11 +189,12 @@ public class SetupListener extends InteractionHandler {
     }
 
     @Button("module-configure")
-    public void onButtonConfigure(ButtonClickEvent event) {
+    public void onButtonConfigure(ButtonInteractionEvent event) {
         String name = this.getData(event);
         if (name == null || name.isBlank()) {
             return;
         } else if (event.getGuild() == null || event.getMember() == null) {
+            this.msg.error(event, Label.of("error.guild"));
             return;
         } else if (!hasPermission(event.getMember())) {
             this.msg.error(event, Label.of("permissions.user"));

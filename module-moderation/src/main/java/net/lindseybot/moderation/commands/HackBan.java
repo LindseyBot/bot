@@ -3,7 +3,7 @@ package net.lindseybot.moderation.commands;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.lindseybot.shared.entities.discord.Label;
@@ -21,13 +21,14 @@ public class HackBan extends InteractionHandler {
         super(messenger);
     }
 
-    @SlashCommand("hackban")
+    @SlashCommand(value = "hackban", guildOnly = true)
     @SuppressWarnings("CodeBlock2Expr")
-    public void onCommand(SlashCommandEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         Long userId = this.getOption("user", event, Long.class);
         String reason = this.getOption("reason", event, String.class);
         Member member = event.getMember();
         if (member == null) {
+
             return;
         } else if (!member.hasPermission(Permission.BAN_MEMBERS)) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -42,7 +43,7 @@ public class HackBan extends InteractionHandler {
                 guild.ban(String.valueOf(userId), 7, reason).queue((aVoid) -> {
                     this.msg.reply(event, Label.of("commands.hackban.success"));
                 }, throwable -> {
-                    this.msg.reply(event, Label.of("discord.error", throwable.getMessage()));
+                    this.msg.reply(event, Label.of("error.discord", throwable.getMessage()));
                 });
             } catch (InsufficientPermissionException ex) {
                 this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));

@@ -18,7 +18,7 @@ public class GatewayController extends ConcurrentSessionController {
 
     @NotNull
     @Override
-    public String getGateway(@NotNull JDA api) {
+    public String getGateway() {
         return config.getGateway();
     }
 

@@ -1,9 +1,9 @@
 package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.lindseybot.shared.worker.*;
 import net.lindseybot.shared.worker.reference.ButtonReference;
 import net.lindseybot.shared.worker.reference.CommandReference;
@@ -71,7 +71,7 @@ public class DefaultInteractionService implements InteractionService {
         } else if (method.getParameterCount() == 0) {
             log.warn("Invalid command listener declaration: " + cmd.value());
             return;
-        } else if (!SlashCommandEvent.class.equals(method.getParameterTypes()[0])) {
+        } else if (!SlashCommandInteractionEvent.class.equals(method.getParameterTypes()[0])) {
             log.warn("Invalid command listener declaration: " + cmd.value());
             return;
         }
@@ -80,6 +80,7 @@ public class DefaultInteractionService implements InteractionService {
         reference.setMethod(method);
         reference.setNsfw(cmd.nsfw());
         reference.setEphemeral(cmd.ephemeral());
+        reference.setGuildOnly(cmd.guildOnly());
         commands.put(cmd.value().replace(".", "/"), reference);
     }
 
@@ -90,7 +91,7 @@ public class DefaultInteractionService implements InteractionService {
         } else if (method.getParameterCount() == 0) {
             log.warn("Invalid button listener declaration: " + btn.value());
             return;
-        } else if (!ButtonClickEvent.class.equals(method.getParameterTypes()[0])) {
+        } else if (!ButtonInteractionEvent.class.equals(method.getParameterTypes()[0])) {
             log.warn("Invalid button listener declaration: " + btn.value());
             return;
         }
@@ -109,7 +110,7 @@ public class DefaultInteractionService implements InteractionService {
         } else if (method.getParameterCount() == 0) {
             log.warn("Invalid select menu listener declaration: " + menu.value());
             return;
-        } else if (!SelectionMenuEvent.class.equals(method.getParameterTypes()[0])) {
+        } else if (!SelectMenuInteractionEvent.class.equals(method.getParameterTypes()[0])) {
             log.warn("Invalid select menu listener declaration: " + menu.value());
             return;
         }

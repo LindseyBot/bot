@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-public class ProxyRestAction implements ReplyAction {
+public class ProxyRestAction implements ReplyCallbackAction {
 
     private Message response;
     private EnumSet<Message.MentionType> mentions;
@@ -32,7 +32,7 @@ public class ProxyRestAction implements ReplyAction {
         this.mentions = EnumSet.of(Message.MentionType.EMOTE, Message.MentionType.CHANNEL);
     }
 
-    public ReplyAction withMessage(Message message) {
+    public ReplyCallbackAction withMessage(Message message) {
         this.response = message;
         return this;
     }
@@ -59,13 +59,13 @@ public class ProxyRestAction implements ReplyAction {
 
     @NotNull
     @Override
-    public ReplyAction setEphemeral(boolean ephemeral) {
+    public ReplyCallbackAction setEphemeral(boolean ephemeral) {
         return this;
     }
 
     @NotNull
     @Override
-    public ReplyAction allowedMentions(@Nullable Collection<Message.MentionType> allowedMentions) {
+    public ReplyCallbackAction allowedMentions(@Nullable Collection<Message.MentionType> allowedMentions) {
         if (allowedMentions != null) {
             this.mentions = EnumSet.copyOf(allowedMentions);
         }
@@ -81,19 +81,19 @@ public class ProxyRestAction implements ReplyAction {
 
     @NotNull
     @Override
-    public ReplyAction setCheck(@Nullable BooleanSupplier checks) {
+    public ReplyCallbackAction setCheck(@Nullable BooleanSupplier checks) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction timeout(long timeout, @NotNull TimeUnit unit) {
+    public ReplyCallbackAction timeout(long timeout, @NotNull TimeUnit unit) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction deadline(long timestamp) {
+    public ReplyCallbackAction deadline(long timestamp) {
         return null;
     }
 
@@ -110,55 +110,55 @@ public class ProxyRestAction implements ReplyAction {
 
     @NotNull
     @Override
-    public ReplyAction addEmbeds(@NotNull Collection<? extends MessageEmbed> embeds) {
+    public ReplyCallbackAction addEmbeds(@NotNull Collection<? extends MessageEmbed> embeds) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction addActionRows(@NotNull ActionRow... rows) {
+    public ReplyCallbackAction addActionRows(@NotNull ActionRow... rows) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction setContent(@Nullable String content) {
+    public ReplyCallbackAction setContent(@Nullable String content) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction setTTS(boolean isTTS) {
+    public ReplyCallbackAction setTTS(boolean isTTS) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction addFile(@NotNull InputStream data, @NotNull String name, @NotNull AttachmentOption... options) {
+    public ReplyCallbackAction addFile(@NotNull InputStream data, @NotNull String name, @NotNull AttachmentOption... options) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction mentionRepliedUser(boolean mention) {
+    public ReplyCallbackAction mentionRepliedUser(boolean mention) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction mention(@NotNull IMentionable... mentions) {
+    public ReplyCallbackAction mention(@NotNull IMentionable... mentions) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction mentionUsers(@NotNull String... userIds) {
+    public ReplyCallbackAction mentionUsers(@NotNull String... userIds) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReplyAction mentionRoles(@NotNull String... roleIds) {
+    public ReplyCallbackAction mentionRoles(@NotNull String... roleIds) {
         return null;
     }
 
