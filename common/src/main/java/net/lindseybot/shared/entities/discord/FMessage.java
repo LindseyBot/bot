@@ -16,6 +16,7 @@ public class FMessage {
     private FEmbed embed;
     private List<MentionType> allowedMentions = new ArrayList<>();
     private List<MessageComponent> components = new ArrayList<>();
+    private List<FAttachment> attachments = new ArrayList<>();
 
     /**
      * Starts a builder to create a message.

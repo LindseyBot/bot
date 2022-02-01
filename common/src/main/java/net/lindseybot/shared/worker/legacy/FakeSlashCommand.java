@@ -15,16 +15,17 @@ import java.util.List;
 
 public class FakeSlashCommand extends SlashCommandInteractionEvent {
 
-    private final ShardManager api;
     private final FakeSlashData data;
+    private final Message message;
 
-    private User user;
-    private Member member;
-
-    public FakeSlashCommand(@NotNull ShardManager api, @NotNull FakeSlashData data) {
+    public FakeSlashCommand(@NotNull ShardManager api, @NotNull FakeSlashData data, @NotNull Message message) {
         super(api.getShards().get(0), data.getResponseNumber(), null);
-        this.api = api;
         this.data = data;
+        this.message = message;
+    }
+
+    public @NotNull Message getMessage() {
+        return this.message;
     }
 
     @NotNull
@@ -36,41 +37,31 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
     @Nullable
     @Override
     public Guild getGuild() {
-        return this.api.getGuildById(data.getGuildId());
+        return this.message.getGuild();
     }
 
     @NotNull
     @Override
     public TextChannel getTextChannel() {
-        return this.getGuild().getTextChannelById(data.getChannelId());
+        return this.message.getTextChannel();
     }
 
     @Nullable
     @Override
     public Member getMember() {
-        if (this.member != null) {
-            return this.member;
-        }
-        this.member = this.getGuild().retrieveMemberById(data.getMemberId())
-                .complete();
-        return this.member;
+        return this.message.getMember();
     }
 
     @NotNull
     @Override
     public User getUser() {
-        if (this.user != null) {
-            return this.user;
-        }
-        this.user = this.api.retrieveUserById(data.getMemberId())
-                .complete();
-        return this.user;
+        return this.message.getAuthor();
     }
 
     @NotNull
     @Override
     public MessageChannel getChannel() {
-        return (MessageChannel) this.getGuild().getGuildChannelById(data.getChannelId());
+        return this.message.getChannel();
     }
 
     @Override

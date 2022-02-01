@@ -13,10 +13,13 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.lindseybot.shared.entities.discord.Label;
+import net.lindseybot.shared.worker.InteractionService;
 import net.lindseybot.shared.worker.reference.AutoCompleteReference;
 import net.lindseybot.shared.worker.reference.ButtonReference;
 import net.lindseybot.shared.worker.reference.CommandReference;
 import net.lindseybot.shared.worker.reference.SelectMenuReference;
+import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -27,11 +30,13 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 public class DefaultInteractionListener extends ListenerAdapter {
 
-    private final DefaultInteractionService service;
+    private final Messenger msg;
+    private final InteractionService service;
     private final ThreadPoolTaskExecutor taskExecutor;
 
-    public DefaultInteractionListener(DefaultInteractionService service, IEventManager api) {
+    public DefaultInteractionListener(InteractionService service, IEventManager api, Messenger msg) {
         this.service = service;
+        this.msg = msg;
         api.register(this);
         taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setThreadNamePrefix("commands-");
@@ -47,9 +52,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
         if (reference.isGuildOnly() && !event.isFromGuild()) {
             return;
         } else if (reference.isNsfw() && !this.isNSFW(event.getChannel())) {
-            event.reply("This command is NSFW. It can only be executed in NSFW channels.")
-                    .setEphemeral(true)
-                    .queue();
+            this.msg.error(event, Label.of("error.nsfw"));
             return;
         } else if (event.isFromGuild()) {
             Guild guild = event.getGuild();

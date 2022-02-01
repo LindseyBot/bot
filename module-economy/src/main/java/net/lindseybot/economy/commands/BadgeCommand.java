@@ -1,19 +1,21 @@
 package net.lindseybot.economy.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.lindseybot.economy.properties.ImageGenProperties;
 import net.lindseybot.economy.repositories.sql.BadgeRepository;
 import net.lindseybot.economy.services.InventoryService;
+import net.lindseybot.shared.entities.discord.FAttachment;
+import net.lindseybot.shared.entities.discord.FButton;
+import net.lindseybot.shared.entities.discord.FMessage;
+import net.lindseybot.shared.entities.discord.Label;
+import net.lindseybot.shared.entities.discord.builders.ButtonBuilder;
+import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.items.Badge;
 import net.lindseybot.shared.entities.items.UserItem;
+import net.lindseybot.shared.worker.Button;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -52,62 +53,51 @@ public class BadgeCommand extends InteractionHandler {
     public void onList(SlashCommandInteractionEvent event) {
         List<Badge> badges = this.badges.findAll();
         // --
-        Message message = new MessageBuilder()
-                .setContent("\n")
-                .setActionRows(ActionRow.of(
-                        Button.secondary("badge.next:1", "Next")
-                )).build();
-        // --
         Badge badge = badges.get(0);
-        byte[] info = this.getInfo(event.getUser(), badge, this.inventory.hasBadge(event.getUser().getIdLong(), badge.getId()));
-        if (event.isAcknowledged()) {
-            event.getHook().editOriginal(message)
-                    .addFile(info, "badge.png")
-                    .queue();
-        } else {
-            event.reply(message)
-                    .addFile(info, "badge.png")
-                    .queue();
-        }
+        byte[] info = this.getInfo(
+                event.getUser(), badge,
+                this.inventory.hasBadge(event.getUser().getIdLong(), badge.getId())
+        );
+        // --
+        FMessage message = new MessageBuilder()
+                .content(Label.raw("\n"))
+                .addComponent(new ButtonBuilder().secondary("badge.next:1", Label.raw("Next")).build())
+                .attach(new FAttachment("badge.png", info))
+                .build();
+        this.msg.reply(event, message);
     }
 
-    @net.lindseybot.shared.worker.Button("badge.next")
+    @Button("badge.next")
     public void onNext(ButtonInteractionEvent event) {
         int next = Integer.parseInt(this.getData(event));
         // --
-
-        boolean exhausted;
-        List<ItemComponent> items = new ArrayList<>();
+        List<FButton> buttons = new ArrayList<>();
         List<Badge> badges = this.badges.findAll();
         if (next > 0) {
-            items.add(Button.secondary("badge.next:" + (next - 1), "Previous"));
+            buttons.add(new ButtonBuilder()
+                    .secondary("badge.next", Label.raw("Previous"))
+                    .withData(String.valueOf(next - 1))
+                    .build());
         }
         if ((next + 1) < badges.size()) {
-            items.add(Button.secondary("badge.next:" + (next + 1), "Next"));
+            buttons.add(new ButtonBuilder()
+                    .secondary("badge.next", Label.raw("Next"))
+                    .withData(String.valueOf(next + 1))
+                    .build());
         }
-
-        // --
-        Message message = new MessageBuilder()
-                .setContent("\n")
-                .setActionRows(ActionRow.of(
-                        items.toArray(new ItemComponent[0])
-                )).build();
         // --
         Badge badge = badges.get(next);
         byte[] info = this.getInfo(
-                event.getUser(), badge, this.inventory.hasBadge(event.getUser().getIdLong(), badge.getId())
+                event.getUser(), badge,
+                this.inventory.hasBadge(event.getUser().getIdLong(), badge.getId())
         );
-        if (event.isAcknowledged()) {
-            event.getHook().editOriginal(message)
-                    .retainFiles(Collections.emptyList())
-                    .addFile(info, "badge.png")
-                    .queue();
-        } else {
-            event.editMessage(message)
-                    .retainFiles()
-                    .addFile(info, "badge.png")
-                    .queue();
-        }
+        // --
+        FMessage message = new MessageBuilder()
+                .content(Label.raw("\n"))
+                .components(buttons.toArray(new FButton[0]))
+                .attach(new FAttachment("badge.png", info))
+                .build();
+        this.msg.edit(event, message);
     }
 
     @SlashCommand("badge.equip")

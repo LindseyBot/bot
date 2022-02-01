@@ -96,13 +96,16 @@ public class DefaultWorker {
     }
 
     @Bean
-    public DefaultInteractionListener interactionListener(DefaultInteractionService service, IEventManager api) {
-        return new DefaultInteractionListener(service, api);
+    public DefaultInteractionListener interactionListener(
+            InteractionService service,
+            IEventManager api,
+            Messenger msg) {
+        return new DefaultInteractionListener(service, api, msg);
     }
 
     @Bean
     public Messenger messenger(DiscordAdapter adapter) {
-        return new DefaultMessenger(adapter);
+        return new MessengerImpl(adapter);
     }
 
     @Bean

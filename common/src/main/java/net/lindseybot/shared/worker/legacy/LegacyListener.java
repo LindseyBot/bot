@@ -39,7 +39,19 @@ public class LegacyListener implements MessageListener {
             return;
         }
         this.resolve(guild, data.getOptions());
-        FakeSlashCommand command = new FakeSlashCommand(this.api, data);
+        // --
+        GuildChannel channel = guild.getGuildChannelById(data.getChannelId());
+        if (!(channel instanceof GuildMessageChannel msgChannel)) {
+            return;
+        } else if (!msgChannel.canTalk()) {
+            return;
+        }
+        var msg = msgChannel.retrieveMessageById(data.getMessageId())
+                .complete();
+        if (msg == null) {
+            return;
+        }
+        FakeSlashCommand command = new FakeSlashCommand(this.api, data, msg);
         DefaultInteractionListener listener = this.getListener();
         if (listener == null) {
             log.warn("Received a legacy command but no listener was found.");

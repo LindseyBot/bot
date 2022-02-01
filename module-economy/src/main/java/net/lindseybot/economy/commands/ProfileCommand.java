@@ -7,7 +7,10 @@ import net.lindseybot.economy.properties.ImageGenProperties;
 import net.lindseybot.economy.repositories.sql.BadgeRepository;
 import net.lindseybot.economy.repositories.sql.InventoryRepository;
 import net.lindseybot.economy.services.CustomizationService;
+import net.lindseybot.shared.entities.discord.FAttachment;
+import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
+import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.items.Item;
 import net.lindseybot.shared.entities.items.UserItem;
 import net.lindseybot.shared.entities.profile.UserProfile;
@@ -92,13 +95,11 @@ public class ProfileCommand extends InteractionHandler {
                 return;
             }
             byte[] bytes = body.bytes();
-            if (event.isAcknowledged()) {
-                event.getHook().editOriginal(bytes, "profile.png")
-                        .queue();
-            } else {
-                event.getHook().sendFile(bytes, "profile.png")
-                        .queue();
-            }
+            FMessage message = new MessageBuilder()
+                    .content(Label.raw("\n"))
+                    .attach(new FAttachment("profile.png", bytes))
+                    .build();
+            this.msg.reply(event, message);
         } catch (IOException ex) {
             log.error("Failed to request profile", ex);
         }

@@ -1,10 +1,6 @@
 package net.lindseybot.shared.entities.discord.builders;
 
-import net.lindseybot.shared.entities.discord.FEmbed;
-import net.lindseybot.shared.entities.discord.FMessage;
-import net.lindseybot.shared.entities.discord.Label;
-import net.lindseybot.shared.entities.discord.MessageComponent;
-import net.lindseybot.shared.entities.discord.MentionType;
+import net.lindseybot.shared.entities.discord.*;
 
 import java.util.Arrays;
 
@@ -92,6 +88,17 @@ public class MessageBuilder {
      */
     public MessageBuilder ephemeral() {
         this.message.setEphemeral(true);
+        return this;
+    }
+
+    /**
+     * Attaches a file to this message.
+     *
+     * @param attachment Attachment.
+     * @return Builder for chaining.
+     */
+    public MessageBuilder attach(FAttachment attachment) {
+        this.message.getAttachments().add(attachment);
         return this;
     }
 
