@@ -1,7 +1,9 @@
 package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
@@ -49,6 +51,12 @@ public class DefaultInteractionListener extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue();
             return;
+        } else if (event.isFromGuild()) {
+            Guild guild = event.getGuild();
+            if (guild != null && !guild.getSelfMember()
+                    .hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
+                return;
+            }
         }
         try {
             this.taskExecutor.submit(() -> {

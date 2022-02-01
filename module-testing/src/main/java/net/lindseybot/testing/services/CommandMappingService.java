@@ -46,8 +46,26 @@ public class CommandMappingService {
         commands.put("define", this.define());
         commands.put("hearthstone", this.hearthstone());
         commands.put("pokedex", this.pokedex());
+        commands.put("badge", this.badge());
 
         commands.put("dev", this.dev());
+    }
+
+    private SlashCommandData badge() {
+
+        SlashCommandData command = Commands.slash("badge", "badge root");
+
+        SubcommandData list = new SubcommandData("list", "Lists all available badges");
+        command.addSubcommands(list);
+
+        SubcommandData equip = new SubcommandData("equip", "Equips badges");
+        command.addSubcommands(equip);
+
+        SubcommandData info = new SubcommandData("info", "Display's a badge's information");
+        info.addOption(OptionType.STRING, "name", "Name of the badge", true, true);
+        command.addSubcommands(info);
+
+        return command;
     }
 
     public SlashCommandData getByName(String name) {

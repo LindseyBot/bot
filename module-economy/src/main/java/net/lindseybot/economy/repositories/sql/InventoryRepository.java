@@ -10,4 +10,6 @@ public interface InventoryRepository extends JpaRepository<UserItem, UserItemId>
 
     List<UserItem> findAllByUserIdAndItemIdIn(long user, List<Long> items);
 
+    long countByUserIdAndItemId(long user, long item);
+
 }
