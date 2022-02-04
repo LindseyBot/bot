@@ -1,5 +1,6 @@
 package net.lindseybot.shared.worker.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.URL;
 
+@Slf4j
 public class DiscordInterceptor implements Interceptor {
 
     private volatile String host;
@@ -67,8 +69,32 @@ public class DiscordInterceptor implements Interceptor {
         if (this.scheme != null) {
             builder.scheme(scheme);
         }
-        return chain.proceed(request.newBuilder().url(builder.build()).build())
-                .newBuilder()
+        Response response = chain.proceed(request.newBuilder()
+                .url(builder.build()).build());
+        if (response.code() == 429) {
+            if (response.body() != null) {
+                response.close();
+            }
+            log.warn("Encountered 429 on route: " + request.url().pathSegments() + ".. retrying.");
+            response = chain.proceed(request.newBuilder()
+                    .url(builder.build()).build());
+            if (response.code() == 429) {
+                log.warn("Encountered another 429 on route: " + request.url().pathSegments() + ". Failing request.");
+                return replaceStatus(response);
+            } else {
+                return stripHeaders(response);
+            }
+        } else {
+            return this.stripHeaders(response);
+        }
+    }
+
+    private Response replaceStatus(Response response) {
+        return stripHeaders(response.newBuilder().code(400).build());
+    }
+
+    private Response stripHeaders(Response response) {
+        return response.newBuilder()
                 .removeHeader("X-RateLimit-Global")
                 .removeHeader("X-RateLimit-Global".toLowerCase())
                 .removeHeader("X-RateLimit-Limit")
