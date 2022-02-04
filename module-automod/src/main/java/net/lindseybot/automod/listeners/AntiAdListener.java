@@ -17,7 +17,6 @@ import net.lindseybot.automod.services.AntiAdService;
 import net.lindseybot.shared.entities.profile.servers.AntiAd;
 import net.lindseybot.shared.worker.services.Translator;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -33,9 +32,8 @@ public class AntiAdListener extends ListenerAdapter {
     private final Translator i18n;
     private final AntiAdService service;
     private final ExpiringMap<Long, AtomicInteger> triggers;
+    private final ExpiringMap<String, Invite> cache;
     private final Set<String> officialInvites = new HashSet<>();
-
-    private final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     public AntiAdListener(AntiAdService service, IEventManager api, Translator i18n) {
         this.service = service;
@@ -46,13 +44,16 @@ public class AntiAdListener extends ListenerAdapter {
                 .expiration(15, TimeUnit.MINUTES)
                 .expirationPolicy(ExpirationPolicy.ACCESSED)
                 .build();
+        this.cache = ExpiringMap.builder()
+                .maxSize(250_000)
+                .expirationPolicy(ExpirationPolicy.CREATED)
+                .expiration(30, TimeUnit.MINUTES)
+                .build();
         this.officialInvites.add("hypesquad");
         this.officialInvites.add("discord-api");
         this.officialInvites.add("discord-townhall");
         this.officialInvites.add("discord-developers");
         this.officialInvites.add("jake");
-        this.executor.setThreadNamePrefix("antiad-");
-        this.executor.initialize();
     }
 
     @Override
@@ -67,51 +68,76 @@ public class AntiAdListener extends ListenerAdapter {
         if (message.getInvites().isEmpty()) {
             return;
         }
-        this.executor.submit(() -> {
-            boolean found = false;
-            for (String inviteCode : message.getInvites()) {
-                Invite invite;
-                try {
-                    invite = Invite.resolve(event.getJDA(), inviteCode).complete();
-                } catch (ErrorResponseException ex) {
-                    continue;
-                }
-                if (!this.isOffense(invite, event.getGuild())) {
-                    continue;
-                }
-                found = true;
-                break;
+        AntiAd settings = this.service.find(event.getGuild());
+        if (!settings.isEnabled()) {
+            return;
+        }
+        boolean found = false;
+        for (String code : message.getInvites()) {
+            if (this.officialInvites.contains(code)) {
+                continue;
             }
-            if (!found) {
+            Invite invite = this.retrieve(event.getGuild(), code);
+            if (!this.isOffense(invite, event.getGuild())) {
+                continue;
+            }
+            found = true;
+            break;
+        }
+        if (!found) {
+            return;
+        }
+        AtomicInteger integer = this.triggers.compute(event.getAuthor().getIdLong(), ((k, v) -> {
+            if (v == null) {
+                return new AtomicInteger(0);
+            }
+            return v;
+        }));
+        try {
+            if (integer.incrementAndGet() > settings.getStrikes()) {
+                event.getMember().ban(7, "Advertising")
+                        .queue();
                 return;
             }
-            AntiAd settings = this.service.find(event.getGuild());
-            if (!settings.isEnabled()) {
-                return;
-            }
-            AtomicInteger integer = this.triggers.compute(event.getAuthor().getIdLong(), ((k, v) -> {
-                if (v == null) {
-                    return new AtomicInteger(0);
+            message.delete()
+                    .reason("Advertising")
+                    .flatMap(aVoid -> message.getChannel()
+                            .sendMessage(i18n.get(author, "automod.antiad.warn", author.getAsMention())))
+                    .delay(10, TimeUnit.SECONDS)
+                    .flatMap(Message::delete)
+                    .queue(this.noop(), this.noop());
+        } catch (InsufficientPermissionException ex) {
+            // Ignored
+        }
+    }
+
+    public Invite retrieve(Guild guild, String code) {
+        if (this.cache.containsKey(code)) {
+            return this.cache.get(code);
+        }
+        try {
+            Invite local = null;
+            for (Invite invite : guild.retrieveInvites().complete()) {
+                this.cache.put(invite.getCode(), invite);
+                if (code.equals(invite.getCode())) {
+                    local = invite;
                 }
-                return v;
-            }));
-            try {
-                if (integer.incrementAndGet() > settings.getStrikes()) {
-                    event.getMember().ban(7, "Advertising")
-                            .queue();
-                    return;
-                }
-                message.delete()
-                        .reason("Advertising")
-                        .flatMap(aVoid -> message.getChannel()
-                                .sendMessage(i18n.get(author, "automod.antiad.warn", author.getAsMention())))
-                        .delay(10, TimeUnit.SECONDS)
-                        .flatMap(Message::delete)
-                        .queue(this.noop(), this.noop());
-            } catch (InsufficientPermissionException ex) {
-                // Ignored
             }
-        });
+            if (local != null) {
+                this.cache.put(code, local);
+                return local;
+            }
+        } catch (ErrorResponseException | InsufficientPermissionException ex) {
+            // Ignored
+        }
+        Invite invite;
+        try {
+            invite = Invite.resolve(guild.getJDA(), code).complete();
+        } catch (ErrorResponseException ex) {
+            return null;
+        }
+        this.cache.put(code, invite);
+        return invite;
     }
 
     private boolean isOffense(Invite invite, Guild guild) {
