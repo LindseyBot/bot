@@ -68,14 +68,16 @@ public class MessageBuilder {
     }
 
     /**
-     * Adds a component to this message.
+     * Adds components to this message.
      * See {@link ButtonBuilder}.
      *
-     * @param component The component to add.
+     * @param components The component to add.
      * @return Builder for chaining.
      */
-    public MessageBuilder addComponent(MessageComponent component) {
-        this.message.getComponents().add(component);
+    public MessageBuilder addComponent(MessageComponent... components) {
+        for (MessageComponent component : components) {
+            this.message.getComponents().add(component);
+        }
         return this;
     }
 

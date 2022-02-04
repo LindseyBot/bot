@@ -21,7 +21,7 @@ public class LongListJsonConverter implements AttributeConverter<List<Long>, Str
     @Override
     public List<Long> convertToEntityAttribute(String dbData) {
         if (dbData == null) {
-            return null;
+            return new ArrayList<>();
         }
         List<Long> items = new ArrayList<>();
         JSONArray array = new JSONArray(dbData);

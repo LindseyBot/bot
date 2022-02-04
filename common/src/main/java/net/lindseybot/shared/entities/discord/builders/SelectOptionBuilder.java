@@ -4,6 +4,8 @@ import net.lindseybot.shared.entities.discord.FEmote;
 import net.lindseybot.shared.entities.discord.FSelectOption;
 import net.lindseybot.shared.entities.discord.Label;
 
+import java.util.function.BooleanSupplier;
+
 public class SelectOptionBuilder {
 
     private final FSelectOption option;
@@ -16,6 +18,11 @@ public class SelectOptionBuilder {
 
     public SelectOptionBuilder asDefault() {
         this.option.setDefault(true);
+        return this;
+    }
+
+    public SelectOptionBuilder asDefault(boolean bool) {
+        this.option.setDefault(bool);
         return this;
     }
 

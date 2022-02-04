@@ -130,7 +130,8 @@ public class DiscordAdapter {
 
     private SelectMenu createSelectMenu(FSelectMenu model, ISnowflake snowflake) {
         List<SelectOption> options = this.createSelectOptions(model.getOptions(), snowflake);
-        SelectMenu.Builder builder = SelectMenu.create(model.getId())
+        String id = model.getId() + (model.getData() != null ? (":" + model.getData()) : "");
+        SelectMenu.Builder builder = SelectMenu.create(id)
                 .setRequiredRange(model.getMin(), model.getMax())
                 .addOptions(options)
                 .setDisabled(model.isDisabled());

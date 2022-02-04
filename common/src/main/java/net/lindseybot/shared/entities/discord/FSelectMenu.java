@@ -9,6 +9,7 @@ import java.util.List;
 public class FSelectMenu implements MessageComponent {
 
     private String id;
+    private String data;
     private Label label;
     private int min = 1;
     private int max = 1;

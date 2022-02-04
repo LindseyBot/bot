@@ -3,11 +3,14 @@ package net.lindseybot.shared.worker;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class InteractionHandler {
 
@@ -23,6 +26,22 @@ public abstract class InteractionHandler {
             return null;
         }
         return id.substring(id.indexOf(":") + 1);
+    }
+
+    protected @Nullable String getData(SelectMenuInteractionEvent event) {
+        String id = event.getComponentId();
+        if (!id.contains(":")) {
+            return null;
+        }
+        return id.substring(id.indexOf(":") + 1);
+    }
+
+    protected @Nullable String getSelected(SelectMenuInteractionEvent event) {
+        List<SelectOption> option = event.getSelectedOptions();
+        if (option.isEmpty()) {
+            return null;
+        }
+        return option.get(0).getValue();
     }
 
     @SuppressWarnings("unchecked")

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteract
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
@@ -162,6 +163,10 @@ public class MessengerImpl implements Messenger {
         } else if (restAction instanceof WebhookMessageUpdateAction hook) {
             //noinspection unchecked
             hook.retainFiles(Collections.emptyList());
+            for (FAttachment attachment : data.getAttachments()) {
+                hook.addFile(attachment.getStream(), attachment.getName(), attachment.getFlags());
+            }
+        } else if (restAction instanceof WebhookMessageAction hook) {
             for (FAttachment attachment : data.getAttachments()) {
                 hook.addFile(attachment.getStream(), attachment.getName(), attachment.getFlags());
             }

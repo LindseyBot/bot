@@ -43,6 +43,11 @@ public class SelectMenuBuilder {
         return this;
     }
 
+    public SelectMenuBuilder withData(String data) {
+        this.menu.setData(data);
+        return this;
+    }
+
     public FSelectMenu build() {
         return this.menu;
     }

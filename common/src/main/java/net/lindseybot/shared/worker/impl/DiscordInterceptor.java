@@ -70,11 +70,17 @@ public class DiscordInterceptor implements Interceptor {
         return chain.proceed(request.newBuilder().url(builder.build()).build())
                 .newBuilder()
                 .removeHeader("X-RateLimit-Global")
+                .removeHeader("X-RateLimit-Global".toLowerCase())
                 .removeHeader("X-RateLimit-Limit")
+                .removeHeader("X-RateLimit-Limit".toLowerCase())
                 .removeHeader("X-RateLimit-Remaining")
+                .removeHeader("X-RateLimit-Remaining".toLowerCase())
                 .removeHeader("X-RateLimit-Reset")
+                .removeHeader("X-RateLimit-Reset".toLowerCase())
                 .removeHeader("X-RateLimit-Reset-After")
+                .removeHeader("X-RateLimit-Reset-After".toLowerCase())
                 .removeHeader("X-RateLimit-Bucket")
+                .removeHeader("X-RateLimit-Bucket".toLowerCase())
                 .build();
     }
 

@@ -118,10 +118,14 @@ public class DefaultInteractionListener extends ListenerAdapter {
 
     @Override
     public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
-        if (!this.service.hasSelectMenu(event.getComponentId())) {
+        String id = event.getComponentId();
+        if (id.contains(":")) {
+            id = id.split(":")[0];
+        }
+        if (!this.service.hasSelectMenu(id)) {
             return;
         }
-        SelectMenuReference reference = this.service.getSelectMenu(event.getComponentId());
+        SelectMenuReference reference = this.service.getSelectMenu(id);
         try {
             this.taskExecutor.submit(() -> {
                 try {
