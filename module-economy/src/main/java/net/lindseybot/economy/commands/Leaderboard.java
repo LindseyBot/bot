@@ -7,7 +7,10 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.economy.properties.ImageGenProperties;
 import net.lindseybot.economy.repositories.sql.UserProfileRepository;
 import net.lindseybot.economy.services.CustomizationService;
+import net.lindseybot.shared.entities.discord.FAttachment;
+import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
+import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.profile.UserProfile;
 import net.lindseybot.shared.entities.profile.users.Customization;
 import net.lindseybot.shared.enums.Flags;
@@ -101,15 +104,13 @@ public class Leaderboard extends InteractionHandler {
                 return;
             }
             byte[] bytes = body.bytes();
-            if (event.isAcknowledged()) {
-                event.getHook().editOriginal(bytes, "profile.png")
-                        .queue();
-            } else {
-                event.getHook().sendFile(bytes, "profile.png")
-                        .queue();
-            }
+            FMessage message = new MessageBuilder()
+                    .content(Label.raw("\n"))
+                    .attach(new FAttachment("leaderboard.png", bytes))
+                    .build();
+            this.msg.reply(event, message);
         } catch (IOException ex) {
-            log.error("Failed to request profile", ex);
+            log.error("Failed to request leaderboard", ex);
         }
     }
 
