@@ -79,12 +79,23 @@ public class Kitsu extends InteractionHandler {
             this.msg.error(event, Label.of("commands.kitsu.nsfw"));
             return;
         }
-        if (data.getJSONObject("titles").has("en")) {
-            embed.title(Label.raw(data.getJSONObject("titles").getString("en")
-                    + " - " + data.getJSONObject("titles").getString("ja_jp")));
+        JSONObject titles = data.getJSONObject("titles");
+        if (titles.has("en")) {
+            if (titles.has("ja_jp")) {
+                embed.title(Label.raw(titles.getString("en") + " - " + titles.getString("ja_jp")));
+            } else {
+                embed.title(Label.raw(titles.getString("en")));
+            }
+        } else if (titles.has("en_jp")) {
+            if (titles.has("ja_jp")) {
+                embed.title(Label.raw(titles.getString("en_jp") + " - " + titles.getString("ja_jp")));
+            } else {
+                embed.title(Label.raw(titles.getString("en_jp")));
+            }
+        } else if (titles.has("ja_jp")) {
+            embed.title(Label.raw(titles.getString("ja_jp")));
         } else {
-            embed.title(Label.raw(data.getJSONObject("titles").getString("en_jp")
-                    + " - " + data.getJSONObject("titles").getString("ja_jp")));
+            log.warn("Anime " + name + " does not have a title.");
         }
         embed.url(link);
         embed.footer(Label.raw(event.getUser().getName()), event.getUser().getEffectiveAvatarUrl());
