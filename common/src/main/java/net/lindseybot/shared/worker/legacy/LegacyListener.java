@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gnu.trove.map.TLongObjectMap;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.MiscUtil;
 import net.lindseybot.shared.worker.impl.DefaultInteractionListener;
@@ -46,18 +47,22 @@ public class LegacyListener implements MessageListener {
         } else if (!msgChannel.canTalk()) {
             return;
         }
-        var msg = msgChannel.retrieveMessageById(data.getMessageId())
-                .complete();
-        if (msg == null) {
-            return;
+        try {
+            var msg = msgChannel.retrieveMessageById(data.getMessageId())
+                    .complete();
+            if (msg == null) {
+                return;
+            }
+            FakeSlashCommand command = new FakeSlashCommand(this.api, data, msg);
+            DefaultInteractionListener listener = this.getListener();
+            if (listener == null) {
+                log.warn("Received a legacy command but no listener was found.");
+                return;
+            }
+            listener.onSlashCommandInteraction(command);
+        } catch (InsufficientPermissionException ex) {
+            // Ignored
         }
-        FakeSlashCommand command = new FakeSlashCommand(this.api, data, msg);
-        DefaultInteractionListener listener = this.getListener();
-        if (listener == null) {
-            log.warn("Received a legacy command but no listener was found.");
-            return;
-        }
-        listener.onSlashCommandInteraction(command);
     }
 
     private void resolve(Guild guild, Map<String, FakeOptionMapping> options) {
