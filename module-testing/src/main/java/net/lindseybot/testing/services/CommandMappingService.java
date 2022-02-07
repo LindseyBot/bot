@@ -257,6 +257,14 @@ public class CommandMappingService {
                 .addOption(OptionType.STRING, "search", i18n("commands.pokedex.search"), true);
     }
 
+    private SlashCommandData help() {
+        return Commands.slash("help", i18n("commands.help.description"))
+                .addOptions(new OptionData(OptionType.STRING, "topic", i18n("commands.help.topic"), false)
+                        .addChoice("Automod", "automod")
+                        .addChoice("Economy", "economy")
+                        .addChoice("Moderation", "moderation"));
+    }
+
     // ------------------------------
 
     private SlashCommandData dev() {
