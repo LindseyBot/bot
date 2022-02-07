@@ -47,6 +47,7 @@ public class CommandMappingService {
         commands.put("hearthstone", this.hearthstone());
         commands.put("pokedex", this.pokedex());
         commands.put("badge", this.badge());
+        commands.put("help", this.help());
 
         commands.put("dev", this.dev());
     }
@@ -140,17 +141,24 @@ public class CommandMappingService {
     }
 
     private SlashCommandData lindsey() {
+        OptionData modules = new OptionData(OptionType.STRING, "name", i18n("commands.lindsey.modules.status.name"), true);
+        modules.addChoice("Anti-Advertising", "antiad");
+        modules.addChoice("AntiScam", "antiscam");
+        modules.addChoice("KeepRoles", "keeproles");
+        modules.addChoice("registration", "Registration");
+        modules.addChoice("Starboard", "Starboard");
+        modules.addChoice("Welcomer", "welcome");
         return Commands.slash("lindsey", i18n("commands.lindsey.description"))
                 .addSubcommandGroups(new SubcommandGroupData("modules", i18n("commands.lindsey.modules"))
                         .addSubcommands(new SubcommandData("list", i18n("commands.lindsey.modules.list")))
                         .addSubcommands(new SubcommandData("enable", i18n("commands.lindsey.modules.enable"))
-                                .addOption(OptionType.STRING, "name", i18n("commands.lindsey.modules.enable.name"), true))
+                                .addOptions(modules))
                         .addSubcommands(new SubcommandData("disable", i18n("commands.lindsey.modules.disable"))
-                                .addOption(OptionType.STRING, "name", i18n("commands.lindsey.modules.disable.name"), true))
+                                .addOptions(modules))
                         .addSubcommands(new SubcommandData("status", i18n("commands.lindsey.modules.status"))
-                                .addOption(OptionType.STRING, "name", i18n("commands.lindsey.modules.status.name"), true))
+                                .addOptions(modules))
                         .addSubcommands(new SubcommandData("configure", i18n("commands.lindsey.modules.configure"))
-                                .addOption(OptionType.STRING, "name", i18n("commands.lindsey.modules.configure.name"), true))
+                                .addOptions(modules))
                         .addSubcommands(new SubcommandData("logs", i18n("commands.lindsey.modules.logs"))));
     }
 
