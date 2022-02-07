@@ -155,7 +155,7 @@ public class Catarse extends InteractionHandler {
                 embed.field(Label.of("commands.wiki.crowdfunding.remaining"), Label.raw(obj.getJSONObject("remaining_time").getInt("total") +
                         " " + obj.getJSONObject("remaining_time").getString("unit")), true);
             } else {
-                embed.field(Label.of("commands.wiki.crowdfunding.remaining"), Label.raw("commands.wiki.crowdfunding.noDate"), true);
+                embed.field(Label.of("commands.wiki.crowdfunding.remaining"), Label.of("commands.wiki.crowdfunding.noDate"), true);
             }
         }
         if (!obj.getJSONObject("elapsed_time").isNull("total")) {

@@ -73,7 +73,7 @@ public class Picarto extends InteractionHandler {
                     true
             );
             embed.field(
-                    Label.raw("commands.streamers.viewers"),
+                    Label.of("commands.streamers.viewers"),
                     Label.raw(String.valueOf(obj.getInt("viewers"))),
                     true
             );
