@@ -1,4 +1,4 @@
-package net.lindseybot.help.listeners;
+package net.lindseybot.help.commands;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class SetupListener extends InteractionHandler {
+public class SetupCommand extends InteractionHandler {
 
     private final NotificationService notifications;
     private final Map<String, ModuleHandler> handlers = new HashMap<>();
 
-    public SetupListener(Messenger msg, List<ModuleHandler> handlers, NotificationService notifications) {
+    public SetupCommand(Messenger msg, List<ModuleHandler> handlers, NotificationService notifications) {
         super(msg);
         this.notifications = notifications;
         handlers.forEach(h -> this.handlers.put(h.getSlug(), h));
