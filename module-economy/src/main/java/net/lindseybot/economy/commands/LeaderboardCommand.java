@@ -58,9 +58,10 @@ public class LeaderboardCommand extends InteractionHandler {
         LeaderboardType type = LeaderboardType.fromString(
                 this.getOption("name", event, String.class)
         );
+        long rank = this.findRank(type, event.getUser().getIdLong());
         int pos = 0;
         JSONArray data = new JSONArray();
-        for (UserProfile profile : this.getPage(type, 0)) {
+        for (UserProfile profile : this.getPage(type, rank < 11 ? 10 : 9)) {
             pos++;
             User user = this.getUser(profile.getUser());
 
@@ -74,22 +75,14 @@ public class LeaderboardCommand extends InteractionHandler {
                 avatar = user.getEffectiveAvatarUrl();
             }
 
-            JSONObject object = new JSONObject();
-            object.put("position", pos);
-            object.put("username", name == null ? "Anonymous" : name);
-            object.put("image", avatar);
-            Customization customization = this.customizations.getCustomization(profile.getUser());
-            if (customization.getBackground() != null) {
-                JSONObject bg = new JSONObject();
-                bg.put("id", customization.getBackground().getId());
-                bg.put("fontColor", customization.getBackground().getFontColor());
-                object.put("background", bg);
-            }
-            if (profile.getCountry() != null
-                    && profile.getCountry() != Flags.Unknown) {
-                object.put("country", profile.getCountry().name().toLowerCase(Locale.ROOT));
-            }
-            object.put("value", this.getValue(type, profile));
+            JSONObject object = this.getUserData(type, profile, pos, name, avatar);
+            data.put(object);
+        }
+        if (rank > 10) {
+            User user = event.getUser();
+            UserProfile profile = this.repository.findById(user.getIdLong())
+                    .orElse(new UserProfile());
+            JSONObject object = this.getUserData(type, profile, rank, user.getName(), user.getEffectiveAvatarUrl());
             data.put(object);
         }
         RequestBody reqBody = RequestBody.create(MediaType.parse("application/json"), data.toString());
@@ -124,6 +117,26 @@ public class LeaderboardCommand extends InteractionHandler {
         }
     }
 
+    private JSONObject getUserData(LeaderboardType type, UserProfile profile, long rank, String name, String avatar) {
+        JSONObject object = new JSONObject();
+        object.put("position", rank);
+        object.put("username", name == null ? "Anonymous" : name);
+        object.put("image", avatar);
+        Customization customization = this.customizations.getCustomization(profile.getUser());
+        if (customization.getBackground() != null) {
+            JSONObject bg = new JSONObject();
+            bg.put("id", customization.getBackground().getId());
+            bg.put("fontColor", customization.getBackground().getFontColor());
+            object.put("background", bg);
+        }
+        if (profile.getCountry() != null
+                && profile.getCountry() != Flags.Unknown) {
+            object.put("country", profile.getCountry().name().toLowerCase(Locale.ROOT));
+        }
+        object.put("value", this.getValue(type, profile));
+        return object;
+    }
+
     private String getValue(LeaderboardType type, UserProfile profile) {
         return "" + switch (type) {
             case COOKIES -> profile.getCookies();
@@ -132,14 +145,24 @@ public class LeaderboardCommand extends InteractionHandler {
         };
     }
 
-    public Page<UserProfile> getPage(LeaderboardType type, int number) {
+    private Page<UserProfile> getPage(LeaderboardType type, int limit) {
         Sort sort = switch (type) {
             case COOKIES -> Sort.by(Sort.Direction.DESC, "cookies");
             case SLOT_WINS -> Sort.by(Sort.Direction.DESC, "slotWins");
             case DAILY_STREAK -> Sort.by(Sort.Direction.DESC, "cookieStreak");
         };
-        Pageable pageable = PageRequest.of(number, 10, sort);
+        Pageable pageable = PageRequest.of(0, limit, sort);
         return this.repository.findAll(pageable);
+    }
+
+    private long findRank(LeaderboardType type, long user) {
+        if (type == LeaderboardType.COOKIES) {
+            return this.repository.findCookieRank(user);
+        } else if (type == LeaderboardType.SLOT_WINS) {
+            return this.repository.findSlotRank(user);
+        } else {
+            return this.repository.findStreakRank(user);
+        }
     }
 
 }
