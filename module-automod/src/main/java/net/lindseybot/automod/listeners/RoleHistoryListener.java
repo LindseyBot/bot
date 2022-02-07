@@ -5,11 +5,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberUpdateEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.lindseybot.automod.services.RoleHistoryService;
+import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.profile.members.RoleHistory;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -31,15 +32,7 @@ public class RoleHistoryListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
-        if (!this.service.isActive(event.getGuild())) {
-            return;
-        }
-        this.saveRoles(event.getMember());
-    }
-
-    @Override
-    public void onGuildMemberRoleRemove(@NotNull GuildMemberRoleRemoveEvent event) {
+    public void onGuildMemberUpdate(@NotNull GuildMemberUpdateEvent event) {
         if (!this.service.isActive(event.getGuild())) {
             return;
         }
@@ -66,14 +59,18 @@ public class RoleHistoryListener extends ListenerAdapter {
         if (history == null) {
             return;
         }
-        Set<Role> roles = history.getRoles()
-                .stream()
-                .map(roleId -> event.getGuild().getRoleById(roleId))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        event.getGuild().modifyMemberRoles(event.getMember(), roles)
-                .reason("KeepRoles")
-                .queue(noop(), noop());
+        try {
+            Set<Role> roles = history.getRoles().stream()
+                    .map(roleId -> event.getGuild().getRoleById(roleId))
+                    .filter(Objects::nonNull)
+                    .filter(role -> event.getGuild().getSelfMember().canInteract(role))
+                    .collect(Collectors.toSet());
+            event.getGuild().modifyMemberRoles(event.getMember(), roles)
+                    .reason("KeepRoles")
+                    .queue(noop(), noop());
+        } catch (InsufficientPermissionException ex) {
+            this.service.disable(event.getGuild(), Label.of("logs.module.permission", "KeepRoles"));
+        }
     }
 
     private <T> Consumer<T> noop() {
