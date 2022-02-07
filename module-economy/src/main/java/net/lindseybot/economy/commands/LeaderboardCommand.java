@@ -32,7 +32,7 @@ import java.util.Locale;
 
 @Slf4j
 @Component
-public class Leaderboard extends InteractionHandler {
+public class LeaderboardCommand extends InteractionHandler {
 
 
     private final ShardManager jda;
@@ -41,10 +41,10 @@ public class Leaderboard extends InteractionHandler {
     private final UserProfileRepository repository;
     private final CustomizationService customizations;
 
-    public Leaderboard(Messenger msg, ShardManager jda,
-                       UserProfileRepository repository,
-                       ImageGenProperties properties,
-                       CustomizationService customizations) {
+    public LeaderboardCommand(Messenger msg, ShardManager jda,
+                              UserProfileRepository repository,
+                              ImageGenProperties properties,
+                              CustomizationService customizations) {
         super(msg);
         this.jda = jda;
         this.repository = repository;
