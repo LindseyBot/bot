@@ -10,7 +10,6 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.ButtonBuilder;
 import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.profile.servers.KeepRoles;
-import net.lindseybot.shared.utils.StandardEmotes;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
@@ -32,12 +31,12 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
 
     @Override
     public Label getName() {
-        return Label.raw("KeepRoles");
+        return Label.of("commands.modules.keeproles");
     }
 
     @Override
     public Label description() {
-        return Label.raw("Adds roles to users back after they rejoin the server.");
+        return Label.of("commands.modules.keeproles.text");
     }
 
     @Override
@@ -49,7 +48,7 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
         KeepRoles keepRoles = this.service.get(guild);
         keepRoles.setEnabled(true);
         this.service.save(keepRoles);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
@@ -57,25 +56,25 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
         KeepRoles keepRoles = this.service.get(guild);
         keepRoles.setEnabled(false);
         this.service.save(keepRoles);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
-    public FMessage onStatus(Member member, Guild guild, boolean setup) {
+    public FMessage onStatus(Member member, Guild guild) {
         KeepRoles keepRoles = this.service.get(guild);
         MessageBuilder builder = new MessageBuilder();
         if (keepRoles.isEnabled()) {
-            builder.content(Label.raw(StandardEmotes.CHECK.asMention() + " KeepRoles is ENABLED and will re-add roles to users if they leave/join the server."));
+            builder.content(Label.of("commands.modules.keeproles.enabled"));
         } else {
-            builder.content(Label.raw(StandardEmotes.XCHECK.asMention() + " KeepRoles is DISABLED and will NOT keep track of role changes."));
+            builder.content(Label.of("commands.modules.keeproles.disabled"));
         }
         builder.addComponent(new ButtonBuilder()
-                .success("module-enable", Label.raw("Enable"))
+                .success("module-enable", Label.of("labels.enable"))
                 .withData(this.getSlug())
                 .disabled(keepRoles.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .danger("module-disable", Label.raw("Disable"))
+                .danger("module-disable", Label.of("labels.disable"))
                 .withData(this.getSlug())
                 .disabled(!keepRoles.isEnabled())
                 .build());
@@ -86,14 +85,14 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
     public FMessage onSetupStart(Member member, Guild guild) {
         KeepRoles keepRoles = this.service.get(guild);
         MessageBuilder builder = new MessageBuilder();
-        builder.content(Label.raw("No configuration exists for this module. But you can still toggle it below."));
+        builder.content(Label.of("commands.lindsey.modules.configure.none"));
         builder.addComponent(new ButtonBuilder()
-                .success("module-enable", Label.raw("Enable"))
+                .success("module-enable", Label.of("labels.enable"))
                 .withData(this.getSlug())
                 .disabled(keepRoles.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .danger("module-disable", Label.raw("Disable"))
+                .danger("module-disable", Label.of("labels.disable"))
                 .withData(this.getSlug())
                 .disabled(!keepRoles.isEnabled())
                 .build());

@@ -141,7 +141,7 @@ public class CommandMappingService {
     }
 
     private SlashCommandData lindsey() {
-        OptionData modules = new OptionData(OptionType.STRING, "name", i18n("commands.lindsey.modules.status.name"), true);
+        OptionData modules = new OptionData(OptionType.STRING, "name", i18n("commands.lindsey.modules.name"), true);
         modules.addChoice("Anti-Advertising", "antiad");
         modules.addChoice("AntiScam", "antiscam");
         modules.addChoice("KeepRoles", "keeproles");

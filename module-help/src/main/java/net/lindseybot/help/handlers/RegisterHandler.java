@@ -15,7 +15,6 @@ import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.discord.builders.SelectMenuBuilder;
 import net.lindseybot.shared.entities.profile.servers.Registration;
 import net.lindseybot.shared.utils.GFXUtils;
-import net.lindseybot.shared.utils.StandardEmotes;
 import net.lindseybot.shared.worker.Button;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SelectMenu;
@@ -41,12 +40,12 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
 
     @Override
     public Label getName() {
-        return Label.raw("Registration");
+        return Label.of("commands.modules.register");
     }
 
     @Override
     public Label description() {
-        return Label.raw("Require users to register before using the server.");
+        return Label.of("commands.modules.register.text");
     }
 
     @Override
@@ -54,7 +53,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(guild);
         registration.setEnabled(true);
         this.service.save(registration);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
@@ -62,39 +61,36 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(guild);
         registration.setEnabled(false);
         this.service.save(registration);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
-    public FMessage onStatus(Member member, Guild guild, boolean setup) {
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.title(this.getName());
-        if (setup) {
-            embed.description(Label.raw(StandardEmotes.CHECK.asMention() + " **Setup Finished!**\n\nRegistration " +
-                    "forces users to register by typing a message in a channel before they can access the server"));
-        } else {
-            embed.description(Label.raw("Registration forces users to register by typing a message in a channel " +
-                    "before they can access the server."));
-        }
-        embed.color(GFXUtils.BLUE);
-        embed.image("https://cdn.lindseybot.net/showcases/registration.gif");
-
+    public FMessage onStatus(Member member, Guild guild) {
         Registration registration = this.service.get(guild);
-
         MessageBuilder builder = new MessageBuilder();
-        builder.embed(embed.build());
+        if (registration.isEnabled()) {
+            TextChannel channel = guild.getTextChannelById(registration.getChannelId());
+            if (channel == null) {
+                registration.setEnabled(false);
+                this.service.save(registration);
+                return this.onStatus(member, guild);
+            }
+            builder.content(Label.of("commands.modules.register.enabled", channel.getAsMention()));
+        } else {
+            builder.content(Label.of("commands.modules.register.disabled"));
+        }
         builder.addComponent(new ButtonBuilder()
-                .danger("module-disable", Label.raw("Disable"))
+                .danger("module-disable", Label.of("labels.disable"))
                 .withData(this.getSlug())
                 .disabled(!registration.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .success("module-enable", Label.raw("Enable"))
+                .success("module-enable", Label.of("labels.enable"))
                 .withData(this.getSlug())
                 .disabled(registration.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .secondary("module-configure", Label.raw("Configure"))
+                .secondary("module-configure", Label.of("labels.configure"))
                 .withData(this.getSlug())
                 .disabled(!registration.isEnabled())
                 .build());
@@ -234,7 +230,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         registration.setPhrase(content);
         this.service.save(registration);
 
-        this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild(), true));
+        this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild()));
         message.delete()
                 .reason("Registration Setup")
                 .queue(noop(), noop());

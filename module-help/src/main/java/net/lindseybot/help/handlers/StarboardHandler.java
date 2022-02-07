@@ -13,7 +13,6 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.*;
 import net.lindseybot.shared.entities.profile.servers.Starboard;
 import net.lindseybot.shared.utils.GFXUtils;
-import net.lindseybot.shared.utils.StandardEmotes;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SelectMenu;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -36,12 +35,12 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
 
     @Override
     public Label getName() {
-        return Label.raw("Starboard");
+        return Label.of("commands.modules.starboard");
     }
 
     @Override
     public Label description() {
-        return Label.raw("Star messages to bookmark them!");
+        return Label.of("commands.modules.starboard.text");
     }
 
     @Override
@@ -49,7 +48,7 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
         Starboard starboard = this.service.get(guild);
         starboard.setEnabled(true);
         this.service.save(starboard);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
@@ -57,37 +56,36 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
         Starboard starboard = this.service.get(guild);
         starboard.setEnabled(false);
         this.service.save(starboard);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
-    public FMessage onStatus(Member member, Guild guild, boolean setup) {
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.title(this.getName());
-        if (setup) {
-            embed.description(Label.raw(StandardEmotes.CHECK.asMention() + " Setup Finished!\n\nStarboard allows users to bookmark messages in a special channel."));
-        } else {
-            embed.description(Label.raw("Starboard allows users to bookmark messages in a special channel."));
-        }
-        embed.color(GFXUtils.YELLOW);
-        embed.image("https://cdn.lindseybot.net/showcases/starboard.gif");
-
+    public FMessage onStatus(Member member, Guild guild) {
         Starboard starboard = this.service.get(guild);
-
         MessageBuilder builder = new MessageBuilder();
-        builder.embed(embed.build());
+        if (starboard.isEnabled()) {
+            TextChannel channel = guild.getTextChannelById(starboard.getChannel());
+            if (channel == null) {
+                starboard.setEnabled(false);
+                this.service.save(starboard);
+                return this.onStatus(member, guild);
+            }
+            builder.content(Label.of("commands.modules.starboard.enabled", channel.getAsMention(), starboard.getMinStars()));
+        } else {
+            builder.content(Label.of("commands.modules.starboard.disabled"));
+        }
         builder.addComponent(new ButtonBuilder()
-                .danger("module-disable", Label.raw("Disable"))
+                .danger("module-disable", Label.of("labels.disable"))
                 .withData(this.getSlug())
                 .disabled(!starboard.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .success("module-enable", Label.raw("Enable"))
+                .success("module-enable", Label.of("labels.enable"))
                 .withData(this.getSlug())
                 .disabled(starboard.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .secondary("module-configure", Label.raw("Configure"))
+                .secondary("module-configure", Label.of("labels.configure"))
                 .withData(this.getSlug())
                 .disabled(!starboard.isEnabled())
                 .build());
@@ -168,7 +166,7 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
         starboard.setMinStars(stars);
         this.service.save(starboard);
 
-        this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild(), true));
+        this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild()));
     }
 
 }

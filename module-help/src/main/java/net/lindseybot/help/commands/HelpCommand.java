@@ -94,14 +94,14 @@ public class HelpCommand extends InteractionHandler {
                 .field(Label.raw("**Anti-Scam** - /lindsey configure antiscam"),
                         Label.of("commands.help.automod.antiscam"), false)
                 .field(Label.raw("**Keep Roles** - /lindsey configure keeproles"),
-                        Label.of("commands.help.automod.keeproles"), false)
+                        Label.of("commands.modules.keeproles.text"), false)
                 .build();
         return new MessageBuilder()
                 .ephemeral()
                 .embed(embed)
                 .addComponent(this.getSelectMenu())
                 .addComponent(new ButtonBuilder()
-                        .secondary("module-configure", Label.raw("Anti-Advertising"))
+                        .secondary("module-configure", Label.of("commands.modules.antiad"))
                         .withEmote(FEmote.ofUnicode("\uD83D\uDCE2"))
                         .withData("antiad")
                         .build())

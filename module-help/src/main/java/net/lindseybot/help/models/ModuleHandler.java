@@ -27,7 +27,7 @@ public interface ModuleHandler {
 
     FMessage disable(Member member, Guild guild);
 
-    FMessage onStatus(Member member, Guild guild, boolean setup);
+    FMessage onStatus(Member member, Guild guild);
 
     FMessage onSetupStart(Member member, Guild guild);
 

@@ -17,7 +17,6 @@ import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.discord.builders.SelectMenuBuilder;
 import net.lindseybot.shared.entities.profile.servers.Welcome;
 import net.lindseybot.shared.utils.GFXUtils;
-import net.lindseybot.shared.utils.StandardEmotes;
 import net.lindseybot.shared.worker.Button;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SelectMenu;
@@ -43,12 +42,12 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
 
     @Override
     public Label getName() {
-        return Label.raw("Welcome");
+        return Label.of("commands.modules.welcomer");
     }
 
     @Override
     public Label description() {
-        return Label.raw("Send welcome messages to new users!");
+        return Label.of("commands.modules.welcomer.text");
     }
 
     @Override
@@ -56,7 +55,7 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
         Welcome welcome = this.service.get(guild);
         welcome.setEnabled(true);
         this.service.save(welcome);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
@@ -64,37 +63,30 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
         Welcome welcome = this.service.get(guild);
         welcome.setEnabled(false);
         this.service.save(welcome);
-        return this.onStatus(member, guild, false);
+        return this.onStatus(member, guild);
     }
 
     @Override
-    public FMessage onStatus(Member member, Guild guild, boolean setup) {
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.title(this.getName());
-        if (setup) {
-            embed.description(Label.raw(StandardEmotes.CHECK.asMention() + " **Setup Finished!**\n\nSend welcome messages to new users when they join the server."));
-        } else {
-            embed.description(Label.raw("Send welcome messages to new users when they join the server."));
-        }
-        embed.color(GFXUtils.GREEN);
-        embed.image("https://cdn.lindseybot.net/showcases/welcome.gif");
-
+    public FMessage onStatus(Member member, Guild guild) {
         Welcome welcome = this.service.get(guild);
-
         MessageBuilder builder = new MessageBuilder();
-        builder.embed(embed.build());
+        if (welcome.isEnabled()) {
+            builder.content(Label.of("commands.modules.welcomer.enabled"));
+        } else {
+            builder.content(Label.of("commands.modules.welcomer.disabled"));
+        }
         builder.addComponent(new ButtonBuilder()
-                .danger("module-disable", Label.raw("Disable"))
+                .danger("module-disable", Label.of("labels.disable"))
                 .withData(this.getSlug())
                 .disabled(!welcome.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .success("module-enable", Label.raw("Enable"))
+                .success("module-enable", Label.of("labels.enable"))
                 .withData(this.getSlug())
                 .disabled(welcome.isEnabled())
                 .build());
         builder.addComponent(new ButtonBuilder()
-                .secondary("module-configure", Label.raw("Configure"))
+                .secondary("module-configure", Label.of("labels.configure"))
                 .withData(this.getSlug())
                 .disabled(!welcome.isEnabled())
                 .build());
@@ -193,7 +185,7 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
         welcome.setMessage(content);
         this.service.save(welcome);
 
-        this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild(), true));
+        this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild()));
         message.delete()
                 .reason("Welcome Message Setup")
                 .queue(noop(), noop());

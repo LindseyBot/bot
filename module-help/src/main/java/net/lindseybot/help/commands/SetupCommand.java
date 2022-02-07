@@ -60,7 +60,7 @@ public class SetupCommand extends InteractionHandler {
             this.msg.error(event, Label.raw("Unknown module!"));
             return;
         }
-        this.msg.reply(event, handler.onStatus(event.getMember(), event.getGuild(), false));
+        this.msg.reply(event, handler.onStatus(event.getMember(), event.getGuild()));
     }
 
     @SlashCommand(value = "lindsey.modules.configure", guildOnly = true)
