@@ -42,6 +42,10 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
 
     @Override
     public FMessage enable(Member member, Guild guild) {
+        if (!guild.getSelfMember()
+                .hasPermission(Permission.MANAGE_ROLES)) {
+            return FMessage.of(Label.of("permissions.bot", Permission.MANAGE_ROLES.getName()), true);
+        }
         KeepRoles keepRoles = this.service.get(guild);
         keepRoles.setEnabled(true);
         this.service.save(keepRoles);
@@ -80,10 +84,6 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
 
     @Override
     public FMessage onSetupStart(Member member, Guild guild) {
-        if (!guild.getSelfMember()
-                .hasPermission(Permission.MANAGE_ROLES)) {
-            return FMessage.of(Label.of("permissions.bot", Permission.MANAGE_ROLES.getName()), true);
-        }
         KeepRoles keepRoles = this.service.get(guild);
         MessageBuilder builder = new MessageBuilder();
         builder.content(Label.raw("No configuration exists for this module. But you can still toggle it below."));
