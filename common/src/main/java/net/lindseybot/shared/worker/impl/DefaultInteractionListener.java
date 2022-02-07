@@ -59,6 +59,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                     reference.invoke(event);
                 } catch (Exception ex) {
                     log.error("Failed to execute command: " + event.getCommandPath(), ex);
+                    this.msg.error(event, Label.of("error.internal"));
                 }
             }).get(1500, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | InterruptedException e) {
@@ -89,6 +90,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                     reference.invoke(event);
                 } catch (Exception ex) {
                     log.error("Failed to execute button: " + event.getComponentId(), ex);
+                    this.msg.error(event, Label.of("error.internal"));
                 }
             }).get(1500, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | InterruptedException e) {
@@ -124,6 +126,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                     reference.invoke(event);
                 } catch (Exception ex) {
                     log.error("Failed to execute select menu: " + event.getComponentId(), ex);
+                    this.msg.error(event, Label.of("error.internal"));
                 }
             }).get(1500, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | InterruptedException e) {
