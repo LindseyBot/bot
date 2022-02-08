@@ -24,6 +24,13 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
         this.message = message;
     }
 
+    @NotNull
+    @Override
+    public String getName() {
+        String[] data = this.data.getPath().split("\\.");
+        return data[0];
+    }
+
     public @NotNull Message getMessage() {
         return this.message;
     }
