@@ -63,7 +63,7 @@ public class BadgeCommand extends InteractionHandler {
                 .addComponent(this.getSelectMenu(badge))
                 .addComponent(new ButtonBuilder().secondary("badge.next:1", Label.raw("Next")).build())
                 .attach(this.getInfo(event.getUser(), badge,
-                        this.inventory.hasBadge(event.getUser().getIdLong(), badge.getId())))
+                        this.inventory.hasItem(event.getUser().getIdLong(), badge.getId())))
                 .build();
         this.msg.reply(event, message);
     }
@@ -89,7 +89,7 @@ public class BadgeCommand extends InteractionHandler {
                 .addComponent(this.getSelectMenu(badge))
                 .addComponent(new ButtonBuilder().secondary("badge.next:1", Label.raw("Next")).build())
                 .attach(this.getInfo(event.getUser(), badge,
-                        this.inventory.hasBadge(event.getUser().getIdLong(), badge.getId())))
+                        this.inventory.hasItem(event.getUser().getIdLong(), badge.getId())))
                 .build();
         this.msg.reply(event, message);
     }

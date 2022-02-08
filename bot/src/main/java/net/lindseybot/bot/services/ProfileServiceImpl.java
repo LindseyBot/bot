@@ -1,6 +1,8 @@
 package net.lindseybot.bot.services;
 
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import net.lindseybot.bot.repositories.sql.MemberRepository;
 import net.lindseybot.bot.repositories.sql.ServerRepository;
 import net.lindseybot.bot.repositories.sql.UserRepository;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -25,6 +28,12 @@ public class ProfileServiceImpl implements ProfileService {
     private final UserRepository users;
     private final MemberRepository members;
     private final ServerRepository servers;
+
+    private final ExpiringMap<Long, UserProfile> userCache = ExpiringMap.builder()
+            .expirationPolicy(ExpirationPolicy.ACCESSED)
+            .expiration(15, TimeUnit.MINUTES)
+            .maxSize(10_000)
+            .build();
 
     public ProfileServiceImpl(UserRepository users,
                               MemberRepository members,
@@ -42,8 +51,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public @NotNull UserProfile getUser(long id) {
-        return this.users.findById(id)
+        if (this.userCache.containsKey(id)) {
+            return this.userCache.get(id);
+        }
+        UserProfile profile = this.users.findById(id)
                 .orElse(new UserProfile(id));
+        this.userCache.put(id, profile);
+        return profile;
     }
 
     @Override
@@ -77,6 +91,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public @NotNull UserProfile save(@NotNull UserProfile profile) {
+        this.userCache.put(profile.getUser(), profile);
         return this.users.save(profile);
     }
 

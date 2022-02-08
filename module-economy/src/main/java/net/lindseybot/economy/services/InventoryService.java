@@ -19,8 +19,8 @@ public class InventoryService {
         this.repository = repository;
     }
 
-    public boolean hasBadge(long userId, long badgeId) {
-        return this.repository.countByUserIdAndItemId(userId, badgeId) > 0;
+    public boolean hasItem(long userId, long itemId) {
+        return this.repository.countByUserIdAndItemId(userId, itemId) > 0;
     }
 
     public List<UserItem> findBadges(long userId) {
