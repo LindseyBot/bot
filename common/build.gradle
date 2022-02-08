@@ -47,6 +47,10 @@ dependencies {
     implementation('net.sf.trove4j:trove4j:3.0.3')
     implementation('com.fasterxml.jackson.core:jackson-databind:2.13.1')
 
+    // Prometheus
+    api('io.prometheus:simpleclient_pushgateway:0.15.0')
+    api('io.prometheus:simpleclient:0.15.0')
+
     // Spring
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-data-redis')

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.internal.utils.concurrent.CountingThreadFactory;
 import net.lindseybot.shared.properties.BotProperties;
+import net.lindseybot.shared.properties.PrometheusProperties;
 import net.lindseybot.shared.properties.ShardProperties;
 import net.lindseybot.shared.worker.impl.*;
 import net.lindseybot.shared.worker.services.DiscordAdapter;
@@ -96,11 +97,14 @@ public class DefaultWorker {
     }
 
     @Bean
+    public Metrics metrics(PrometheusProperties config) {
+        return new Metrics(config);
+    }
+
+    @Bean
     public DefaultInteractionListener interactionListener(
-            InteractionService service,
-            IEventManager api,
-            Messenger msg) {
-        return new DefaultInteractionListener(service, api, msg);
+            InteractionService service, IEventManager api, Messenger msg, Metrics metrics) {
+        return new DefaultInteractionListener(service, api, msg, metrics);
     }
 
     @Bean

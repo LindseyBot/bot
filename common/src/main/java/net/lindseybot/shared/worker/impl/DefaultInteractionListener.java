@@ -1,5 +1,6 @@
 package net.lindseybot.shared.worker.impl;
 
+import io.prometheus.client.Summary;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -13,6 +14,8 @@ import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionService;
+import net.lindseybot.shared.worker.Metrics;
+import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
 import net.lindseybot.shared.worker.reference.AutoCompleteReference;
 import net.lindseybot.shared.worker.reference.ButtonReference;
 import net.lindseybot.shared.worker.reference.CommandReference;
@@ -29,16 +32,21 @@ import java.util.concurrent.TimeoutException;
 public class DefaultInteractionListener extends ListenerAdapter {
 
     private final Messenger msg;
+    private final Metrics metrics;
     private final InteractionService service;
     private final ThreadPoolTaskExecutor taskExecutor;
 
-    public DefaultInteractionListener(InteractionService service, IEventManager api, Messenger msg) {
+    public DefaultInteractionListener(InteractionService service,
+                                      IEventManager api,
+                                      Messenger msg,
+                                      Metrics metrics) {
         this.service = service;
         this.msg = msg;
         api.register(this);
         taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setThreadNamePrefix("commands-");
         taskExecutor.initialize();
+        this.metrics = metrics;
     }
 
     @Override
@@ -54,14 +62,15 @@ public class DefaultInteractionListener extends ListenerAdapter {
             return;
         }
         try {
-            this.taskExecutor.submit(() -> {
+            Summary.Child timer = this.metrics.commands(event.getName(), !(event instanceof FakeSlashCommand));
+            this.taskExecutor.submit(() -> timer.observe(timer.time(() -> {
                 try {
                     reference.invoke(event);
                 } catch (Exception ex) {
                     log.error("Failed to execute command: " + event.getCommandPath(), ex);
                     this.msg.error(event, Label.of("error.internal"));
                 }
-            }).get(1500, TimeUnit.MILLISECONDS);
+            }))).get(1500, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | InterruptedException e) {
             log.error("Failed to schedule command execution", e);
         } catch (TimeoutException e) {
