@@ -76,12 +76,15 @@ public class ProfileCommand extends InteractionHandler {
         if (profile.getCountry() != null) {
             object.put("country", profile.getCountry().name().toLowerCase(Locale.ROOT));
         }
-
-        List<Long> ids = this.badges.findAll()
-                .stream().map(Item::getId).toList();
-        List<Long> badges = this.items.findAllByUserIdAndItemIdIn(target.getIdLong(), ids)
-                .stream().map(UserItem::getItemId).toList();
-        object.put("badges", badges);
+        if (!customization.getBadges().isEmpty()) {
+            object.put("badges", customization.getBadges());
+        } else {
+            List<Long> ids = this.badges.findAll()
+                    .stream().map(Item::getId).toList();
+            List<Long> badges = this.items.findAllByUserIdAndItemIdIn(target.getIdLong(), ids)
+                    .stream().map(UserItem::getItemId).toList();
+            object.put("badges", badges);
+        }
 
         RequestBody reqBody = RequestBody.create(MediaType.parse("application/json"), object.toString());
         Request request = new Request.Builder()
