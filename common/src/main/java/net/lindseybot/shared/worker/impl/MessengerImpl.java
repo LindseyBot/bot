@@ -120,6 +120,7 @@ public class MessengerImpl implements Messenger {
     public void reply(Message message, FMessage reply) {
         Message content = this.adapter.getMessage(reply, message.getChannel());
         var hook = message.reply(content)
+                .mentionRepliedUser(false)
                 .allowedMentions(this.adapter.allowed(reply));
         this.addFiles(hook, reply);
         hook.queue(m -> this.selfDestruct(m, reply));
