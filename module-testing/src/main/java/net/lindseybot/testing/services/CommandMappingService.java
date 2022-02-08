@@ -53,19 +53,6 @@ public class CommandMappingService {
         commands.put("dev", this.dev());
     }
 
-    private SlashCommandData store() {
-        return Commands.slash("store", "Purchase items")
-                //.addSubcommands(new SubcommandData("info", "Displays info about an item."))
-                .addSubcommandGroups(new SubcommandGroupData("list", "Lists all items in a category")
-                        .addSubcommands(new SubcommandData("badges", "Lists all available badges.")));
-    }
-
-    private SlashCommandData inventory() {
-        return Commands.slash("inventory", "Manage your inventory")
-                .addSubcommandGroups(new SubcommandGroupData("equip", "Equip items on your profile")
-                        .addSubcommands(new SubcommandData("badges", "Equip your badges")));
-    }
-
     public SlashCommandData getByName(String name) {
         return this.commands.get(name);
     }
@@ -269,6 +256,19 @@ public class CommandMappingService {
                         .addChoice("Automod", "automod")
                         .addChoice("Economy", "economy")
                         .addChoice("Moderation", "moderation"));
+    }
+
+    private SlashCommandData store() {
+        return Commands.slash("store", i18n("commands.store"))
+                //.addSubcommands(new SubcommandData("info", i18n("commands.store.info"))
+                .addSubcommandGroups(new SubcommandGroupData("list", i18n("commands.store.list"))
+                        .addSubcommands(new SubcommandData("badges", i18n("commands.store.list.badges"))));
+    }
+
+    private SlashCommandData inventory() {
+        return Commands.slash("inventory", i18n("commands.inventory"))
+                .addSubcommandGroups(new SubcommandGroupData("equip", i18n("commands.inventory.equip"))
+                        .addSubcommands(new SubcommandData("badges", i18n("commands.inventory.equip.badges"))));
     }
 
     // ------------------------------

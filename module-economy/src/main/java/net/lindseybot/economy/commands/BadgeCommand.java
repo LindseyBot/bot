@@ -10,7 +10,6 @@ import net.lindseybot.economy.repositories.sql.BadgeRepository;
 import net.lindseybot.economy.services.CustomizationService;
 import net.lindseybot.economy.services.InventoryService;
 import net.lindseybot.shared.entities.discord.*;
-import net.lindseybot.shared.entities.discord.builders.ButtonBuilder;
 import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.discord.builders.SelectMenuBuilder;
 import net.lindseybot.shared.entities.discord.builders.SelectOptionBuilder;
@@ -28,6 +27,10 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,14 +64,13 @@ public class BadgeCommand extends InteractionHandler {
         FMessage message = new MessageBuilder()
                 .content(Label.raw("\n"))
                 .addComponent(this.getSelectMenu(badge))
-                .addComponent(new ButtonBuilder().secondary("badge.next:1", Label.raw("Next")).build())
                 .attach(this.getInfo(event.getUser(), badge,
-                        this.inventory.hasItem(event.getUser().getIdLong(), badge.getId())))
+                        this.inventory.getItem(event.getUser().getIdLong(), badge.getId())))
                 .build();
         this.msg.reply(event, message);
     }
 
-    @SelectMenu("badge.select")
+    @SelectMenu("badge.picker")
     public void onListSelect(SelectMenuInteractionEvent event) {
         if (event.getSelectedOptions().isEmpty()) {
             return;
@@ -87,11 +89,10 @@ public class BadgeCommand extends InteractionHandler {
         FMessage message = new MessageBuilder()
                 .content(Label.raw("\n"))
                 .addComponent(this.getSelectMenu(badge))
-                .addComponent(new ButtonBuilder().secondary("badge.next:1", Label.raw("Next")).build())
                 .attach(this.getInfo(event.getUser(), badge,
-                        this.inventory.hasItem(event.getUser().getIdLong(), badge.getId())))
+                        this.inventory.getItem(event.getUser().getIdLong(), badge.getId())))
                 .build();
-        this.msg.reply(event, message);
+        this.msg.edit(event, message);
     }
 
     @SlashCommand("inventory.equip.badges")
@@ -115,7 +116,7 @@ public class BadgeCommand extends InteractionHandler {
             menu.addOption(option);
         }
         FMessage message = new MessageBuilder()
-                .content(Label.raw("Please select which badges you want to display below."))
+                .content(Label.of("commands.inventory.equip.badges.text"))
                 .addComponent(menu.build())
                 .attach(this.getList(equipped))
                 .build();
@@ -165,7 +166,7 @@ public class BadgeCommand extends InteractionHandler {
             menu.addOption(option);
         }
         FMessage message = new MessageBuilder()
-                .content(Label.raw("Please select which badges you want to display below."))
+                .content(Label.of("commands.inventory.equip.badges.text"))
                 .addComponent(menu.build())
                 .attach(this.getList(equipped))
                 .build();
@@ -184,12 +185,19 @@ public class BadgeCommand extends InteractionHandler {
         return menu.build();
     }
 
-    public FAttachment getInfo(User user, Badge badge, boolean hasItem) {
+    public FAttachment getInfo(User user, Badge badge, UserItem item) {
         JSONObject object = new JSONObject();
         object.put("id", badge.getId());
         object.put("name", badge.getName());
         object.put("description", this.i18n.get(user, badge.getDescription()));
-        object.put("unlocked", hasItem ? "2022-01-31" : null);
+        if (item != null) {
+            String date = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    .withZone(ZoneId.from(ZoneOffset.UTC))
+                    .format(Instant.ofEpochMilli(item.getPurchased()));
+            object.put("unlocked", date);
+        } else {
+            object.put("unlocked", JSONObject.NULL);
+        }
 
         RequestBody reqBody = RequestBody.create(MediaType.parse("application/json"), object.toString());
         Request request = new Request.Builder()

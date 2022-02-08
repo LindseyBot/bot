@@ -23,7 +23,8 @@ public class UserItem {
     @Id
     private long itemId;
 
-    private long count;
+    private long purchased;
+    private int count;
 
     public UserItem(long userId, long itemId) {
         this.userId = userId;
