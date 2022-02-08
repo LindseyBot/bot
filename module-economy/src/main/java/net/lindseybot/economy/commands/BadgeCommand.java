@@ -54,7 +54,7 @@ public class BadgeCommand extends InteractionHandler {
         this.customization = customization;
     }
 
-    @SlashCommand("badge.list")
+    @SlashCommand("store.list.badges")
     public void onList(SlashCommandInteractionEvent event) {
         List<Badge> badges = this.badges.findAll();
         Badge badge = badges.get(0);
@@ -94,7 +94,7 @@ public class BadgeCommand extends InteractionHandler {
         this.msg.reply(event, message);
     }
 
-    @SlashCommand("badge.equip")
+    @SlashCommand("inventory.equip.badges")
     public void onEquip(SlashCommandInteractionEvent event) {
         List<Long> items = this.inventory.findBadges(event.getUser().getIdLong())
                 .stream().map(UserItem::getItemId)
@@ -170,11 +170,6 @@ public class BadgeCommand extends InteractionHandler {
                 .attach(this.getList(equipped))
                 .build();
         this.msg.edit(event, message);
-    }
-
-    @SlashCommand("badge.info")
-    public void onInfo(SlashCommandInteractionEvent event) {
-        List<UserItem> items = inventory.findBadges(event.getUser().getIdLong());
     }
 
     public FSelectMenu getSelectMenu(Badge selected) {

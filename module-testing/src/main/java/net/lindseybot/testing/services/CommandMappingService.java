@@ -46,18 +46,24 @@ public class CommandMappingService {
         commands.put("define", this.define());
         commands.put("hearthstone", this.hearthstone());
         commands.put("pokedex", this.pokedex());
-        commands.put("badge", this.badge());
         commands.put("help", this.help());
+        commands.put("inventory", this.inventory());
+        commands.put("store", this.store());
 
         commands.put("dev", this.dev());
     }
 
-    private SlashCommandData badge() {
-        return Commands.slash("badge", "badge root")
-                .addSubcommands(new SubcommandData("list", "Lists all available badges"))
-                .addSubcommands(new SubcommandData("equip", "Equips badges"))
-                .addSubcommands(new SubcommandData("info", "Display's a badge's information")
-                        .addOption(OptionType.STRING, "name", "Name of the badge", true, true));
+    private SlashCommandData store() {
+        return Commands.slash("store", "Purchase items")
+                //.addSubcommands(new SubcommandData("info", "Displays info about an item."))
+                .addSubcommandGroups(new SubcommandGroupData("list", "Lists all items in a category")
+                        .addSubcommands(new SubcommandData("badges", "Lists all available badges.")));
+    }
+
+    private SlashCommandData inventory() {
+        return Commands.slash("inventory", "Manage your inventory")
+                .addSubcommandGroups(new SubcommandGroupData("equip", "Equip items on your profile")
+                        .addSubcommands(new SubcommandData("badges", "Equip your badges")));
     }
 
     public SlashCommandData getByName(String name) {
