@@ -1,15 +1,22 @@
 package net.lindseybot.testing.commands;
 
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.lindseybot.testing.services.CommandMappingService;
 import net.lindseybot.shared.entities.discord.Label;
+import net.lindseybot.shared.worker.AutoComplete;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
 import net.lindseybot.shared.worker.services.Messenger;
+import net.lindseybot.testing.services.CommandMappingService;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -166,6 +173,35 @@ public class DevCommand extends InteractionHandler {
                 this.msg.reply(event, Label.raw("Published " + data.getName() + " locally."));
             }
         }
+    }
+
+    @AutoComplete("dev.commands.publish.name")
+    public void onPublishName(CommandAutoCompleteInteractionEvent event) {
+        this.onAutoComplete(event);
+    }
+
+    @AutoComplete("dev.commands.remove.name")
+    public void onRemoveName(CommandAutoCompleteInteractionEvent event) {
+        this.onAutoComplete(event);
+    }
+
+    private void onAutoComplete(CommandAutoCompleteInteractionEvent event) {
+        List<Command.Choice> choices = new ArrayList<>();
+        for (CommandData command : this.service.getCommands()) {
+            choices.add(new Command.Choice(command.getName() + " - " + command.getType().name(), command.getName()));
+        }
+        AutoCompleteQuery query = event.getFocusedOption();
+        if (query.getValue().isBlank()) {
+            event.replyChoices(choices.stream().limit(25).collect(Collectors.toSet()))
+                    .queue();
+            return;
+        }
+        List<Command.Choice> reply = FuzzySearch.extractSorted(query.getValue(), choices, Command.Choice::getName, 45)
+                .stream()
+                .map(BoundExtractedResult::getReferent)
+                .limit(25)
+                .toList();
+        event.replyChoices(reply).queue();
     }
 
 }

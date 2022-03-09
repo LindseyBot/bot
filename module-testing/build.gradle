@@ -39,6 +39,8 @@ tasks.named('jar') {
 }
 
 dependencies {
+    api('me.xdrop:fuzzywuzzy:1.4.0')
+
     // Shared dependencies
     implementation project(':common')
     implementation("${JDA_SLUG}:${JDA_VERSION}") {
