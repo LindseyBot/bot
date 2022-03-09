@@ -1,13 +1,14 @@
 package net.lindseybot.moderation.commands;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
-import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.MessageCommand;
 import net.lindseybot.shared.worker.SlashCommand;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Component
 public class PruneCommand extends InteractionHandler {
@@ -39,34 +41,29 @@ public class PruneCommand extends InteractionHandler {
             return;
         }
         Long userId = this.getOption("user", event, Long.class);
-        TextChannel channel = event.getTextChannel();
         Member member = event.getMember();
         if (member == null) {
             return;
-        } else if (!member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
+        } else if (!member.hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)) {
             this.msg.error(event, Label.of("permissions.user"));
             return;
         }
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            return;
-        }
-        event.deferReply(false).queue((a) -> {
-            List<Message> messages = new ArrayList<>();
-            AtomicInteger taken = new AtomicInteger();
+        event.deferReply(false).queue((hook) -> {
             try {
-                channel.getIterableHistory().cache(false).forEachAsync(m -> {
-                    if (taken.incrementAndGet() == 1) {
-                        return true;
-                    } else if (userId == null || m.getAuthor().getIdLong() == userId) {
-                        messages.add(m);
-                    }
-                    if (messages.size() >= count) {
-                        return false;
-                    }
-                    return taken.get() <= 500;
-                }).thenRun(() -> deleteMessages(event, messages));
-            } catch (InsufficientPermissionException ex) {
+                List<Message> messages = this.findUntil(event.getMessageChannel(), count, (m) -> {
+                    return userId == null || m.getAuthor().getIdLong() == userId;
+                }, (m) -> {
+                    return false;
+                });
+                if (messages.isEmpty()) {
+                    this.msg.error(event, Label.of("commands.prune.empty"));
+                    return;
+                }
+                this.deleteMessages(event.getMessageChannel(), messages);
+                FMessage msg = FMessage.of(Label.of("commands.prune.success", messages.size()));
+                msg.setSelfDestruct(5000L);
+                this.msg.reply(event, msg);
+            } catch (PermissionException ex) {
                 this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));
             }
         }, this.noop());
@@ -77,7 +74,7 @@ public class PruneCommand extends InteractionHandler {
         Member member = event.getMember();
         if (member == null) {
             return;
-        } else if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
+        } else if (!member.hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)) {
             this.msg.error(event, Label.of("permissions.user"));
             return;
         }
@@ -87,68 +84,60 @@ public class PruneCommand extends InteractionHandler {
         }
         Message target = event.getTarget();
         if (target.getTimeCreated()
-                .isBefore(OffsetDateTime.now().minusDays(13))) {
+                .isBefore(OffsetDateTime.now().minusDays(14))) {
             this.msg.error(event, Label.raw("This message is too old."));
             return;
         }
         event.deferReply(false).queue((a) -> {
-            List<Message> messages = new ArrayList<>();
-            AtomicInteger taken = new AtomicInteger();
             try {
-                channel.getIterableHistory().cache(false).forEachAsync(m -> {
-                    if (m.getId().equals(target.getId())) {
-                        messages.add(m);
-                        return false;
-                    } else if (taken.incrementAndGet() == 1) {
-                        return true;
-                    }
-                    messages.add(m);
-                    return taken.get() <= 1000;
-                }).thenRun(() -> this.deleteMessages(event.getMessageChannel(), messages));
-            } catch (InsufficientPermissionException ex) {
+                List<Message> messages = this.findUntil(channel, 1000L, (m) -> {
+                    return true;
+                }, (m) -> {
+                    return m.getId().equals(target.getId());
+                });
+                if (messages.isEmpty()) {
+                    this.msg.error(event, Label.of("commands.prune.empty"));
+                    return;
+                }
+                this.deleteMessages(event.getMessageChannel(), messages);
+                FMessage msg = FMessage.of(Label.of("commands.prune.success", messages.size()));
+                msg.setSelfDestruct(5000L);
+                this.msg.reply(event, msg);
+            } catch (PermissionException ex) {
                 this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));
             }
         }, this.noop());
     }
 
-    private void deleteMessages(MessageChannel channel, List<Message> messages) {
-        try {
-            CompletableFuture.allOf(channel.purgeMessages(messages)
-                    .toArray(new CompletableFuture[0])).join();
-            // Success
-        } catch (InsufficientPermissionException ex) {
-            // In guild but no permission
-        } catch (IllegalArgumentException ex) {
-            // In dms?
-        }
+    private void deleteMessages(MessageChannel channel, List<Message> messages)
+            throws PermissionException {
+        CompletableFuture.allOf(channel.purgeMessages(messages)
+                .toArray(new CompletableFuture[0])).join();
     }
 
-    private void deleteMessages(SlashCommandInteractionEvent event, List<Message> messages) {
-        try {
-            int size = messages.size();
-            if (size == 0) {
-                this.msg.error(event, Label.of("commands.prune.empty"));
-                return;
-            } else if (size == 1) {
-                messages.get(0).delete().queue((aVoid) -> {
-                    FMessage msg = FMessage.of(Label.of("commands.prune.success", 1));
-                    msg.setSelfDestruct(5000L);
-                    this.msg.reply(event, msg);
-                }, throwable -> {
-                    this.msg.error(event, Label.of("error.discord", throwable.getMessage()));
-                });
-                return;
+    private List<Message> findUntil(MessageChannel channel, Long limit,
+                                    Function<Message, Boolean> check,
+                                    Function<Message, Boolean> stop) {
+        AtomicInteger taken = new AtomicInteger();
+        List<Message> messages = new ArrayList<>();
+        channel.getIterableHistory().cache(false).forEachAsync(message -> {
+            // Add conditions
+            if (taken.incrementAndGet() == 1
+                    && message.getAuthor().isBot()) {
+                return true;
+            } else if (message.getTimeCreated()
+                    .isBefore(OffsetDateTime.now().minusDays(14))) {
+                return false;
+            } else if (check.apply(message)) {
+                messages.add(message);
             }
-            event.getTextChannel().deleteMessages(messages).queue((aVoid) -> {
-                FMessage msg = FMessage.of(Label.of("commands.prune.success", Math.min(size, 100)));
-                msg.setSelfDestruct(5000L);
-                this.msg.reply(event, msg);
-            }, throwable -> {
-                this.msg.error(event, Label.of("error.discord", throwable.getMessage()));
-            });
-        } catch (InsufficientPermissionException ex) {
-            this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));
-        }
+            // Stop conditions
+            if (stop.apply(message)) {
+                return false;
+            }
+            return taken.get() <= limit;
+        }).join();
+        return messages;
     }
 
     private <T> Consumer<T> noop() {
