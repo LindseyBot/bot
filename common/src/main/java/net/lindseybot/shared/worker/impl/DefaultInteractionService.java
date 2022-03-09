@@ -2,14 +2,13 @@ package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.lindseybot.shared.worker.*;
-import net.lindseybot.shared.worker.reference.AutoCompleteReference;
-import net.lindseybot.shared.worker.reference.ButtonReference;
-import net.lindseybot.shared.worker.reference.CommandReference;
-import net.lindseybot.shared.worker.reference.SelectMenuReference;
+import net.lindseybot.shared.worker.reference.*;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -23,6 +22,8 @@ public class DefaultInteractionService implements InteractionService {
     private final Map<String, ButtonReference> buttons = new HashMap<>();
     private final Map<String, SelectMenuReference> selects = new HashMap<>();
     private final Map<String, AutoCompleteReference> autoCompletes = new HashMap<>();
+    private final Map<String, UserCommandReference> userCommands = new HashMap<>();
+    private final Map<String, MessageCommandReference> messageCommands = new HashMap<>();
 
     public DefaultInteractionService(List<InteractionHandler> handlers) {
         handlers.forEach(this::register);
@@ -35,6 +36,8 @@ public class DefaultInteractionService implements InteractionService {
             this.registerButtons(method, handler);
             this.registerSelects(method, handler);
             this.registerAutoCompletes(method, handler);
+            this.registerUserCommands(method, handler);
+            this.registerMessageCommands(method, handler);
         }
     }
 
@@ -59,6 +62,16 @@ public class DefaultInteractionService implements InteractionService {
     }
 
     @Override
+    public boolean hasUserCommand(String name) {
+        return this.userCommands.containsKey(name);
+    }
+
+    @Override
+    public boolean hasMessageCommand(String name) {
+        return this.messageCommands.containsKey(name);
+    }
+
+    @Override
     public CommandReference getCommand(String path) {
         return this.commands.get(path);
     }
@@ -76,6 +89,16 @@ public class DefaultInteractionService implements InteractionService {
     @Override
     public AutoCompleteReference getAutoComplete(String path) {
         return this.autoCompletes.get(path);
+    }
+
+    @Override
+    public UserCommandReference getUserCommand(String name) {
+        return this.userCommands.get(name);
+    }
+
+    @Override
+    public MessageCommandReference getMessageCommand(String name) {
+        return this.messageCommands.get(name);
     }
 
     private void registerCommands(Method method, InteractionHandler handler) {
@@ -158,6 +181,42 @@ public class DefaultInteractionService implements InteractionService {
         reference.setMethod(method);
         reference.setCommand(ac.command());
         autoCompletes.put(ac.value(), reference);
+    }
+
+    private void registerUserCommands(Method method, InteractionHandler handler) {
+        UserCommand uc = method.getDeclaredAnnotation(UserCommand.class);
+        if (uc == null) {
+            return;
+        } else if (method.getParameterCount() == 0) {
+            log.warn("Invalid user command listener declaration: " + uc.value());
+            return;
+        } else if (!UserContextInteractionEvent.class.equals(method.getParameterTypes()[0])) {
+            log.warn("Invalid user command listener declaration: " + uc.value());
+            return;
+        }
+        UserCommandReference reference = new UserCommandReference();
+        reference.setInstance(handler);
+        reference.setMethod(method);
+        reference.setEphemeral(uc.ephemeral());
+        userCommands.put(uc.value(), reference);
+    }
+
+    private void registerMessageCommands(Method method, InteractionHandler handler) {
+        MessageCommand mc = method.getDeclaredAnnotation(MessageCommand.class);
+        if (mc == null) {
+            return;
+        } else if (method.getParameterCount() == 0) {
+            log.warn("Invalid message command listener declaration: " + mc.value());
+            return;
+        } else if (!MessageContextInteractionEvent.class.equals(method.getParameterTypes()[0])) {
+            log.warn("Invalid message command listener declaration: " + mc.value());
+            return;
+        }
+        MessageCommandReference reference = new MessageCommandReference();
+        reference.setInstance(handler);
+        reference.setMethod(method);
+        reference.setEphemeral(mc.ephemeral());
+        messageCommands.put(mc.value(), reference);
     }
 
 }

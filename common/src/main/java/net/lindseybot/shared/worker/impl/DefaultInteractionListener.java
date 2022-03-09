@@ -7,7 +7,9 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
@@ -16,10 +18,7 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionService;
 import net.lindseybot.shared.worker.Metrics;
 import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
-import net.lindseybot.shared.worker.reference.AutoCompleteReference;
-import net.lindseybot.shared.worker.reference.ButtonReference;
-import net.lindseybot.shared.worker.reference.CommandReference;
-import net.lindseybot.shared.worker.reference.SelectMenuReference;
+import net.lindseybot.shared.worker.reference.*;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -176,6 +175,62 @@ public class DefaultInteractionListener extends ListenerAdapter {
             }
         } else {
             log.warn("Invalid autocomplete event: " + event.getClass().getSimpleName());
+        }
+    }
+
+    @Override
+    public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
+        String id = event.getCommandPath();
+        if (!this.service.hasMessageCommand(id)) {
+            return;
+        }
+        MessageCommandReference reference = this.service.getMessageCommand(id);
+        try {
+            this.taskExecutor.submit(() -> {
+                try {
+                    reference.invoke(event);
+                } catch (Exception ex) {
+                    log.error("Failed to execute message command: " + id, ex);
+                    this.msg.error(event, Label.of("error.internal"));
+                }
+            }).get(1500, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Failed to schedule message command execution", e);
+        } catch (TimeoutException e) {
+            if (event.isAcknowledged()) {
+                return;
+            }
+            log.warn("Timed out during message execution: {}", id);
+            event.deferReply(reference.isEphemeral())
+                    .queue();
+        }
+    }
+
+    @Override
+    public void onUserContextInteraction(@NotNull UserContextInteractionEvent event) {
+        String id = event.getCommandPath();
+        if (!this.service.hasUserCommand(id)) {
+            return;
+        }
+        UserCommandReference reference = this.service.getUserCommand(id);
+        try {
+            this.taskExecutor.submit(() -> {
+                try {
+                    reference.invoke(event);
+                } catch (Exception ex) {
+                    log.error("Failed to execute user command: " + id, ex);
+                    this.msg.error(event, Label.of("error.internal"));
+                }
+            }).get(1500, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Failed to schedule user command execution", e);
+        } catch (TimeoutException e) {
+            if (event.isAcknowledged()) {
+                return;
+            }
+            log.warn("Timed out during user execution: {}", id);
+            event.deferReply(reference.isEphemeral())
+                    .queue();
         }
     }
 

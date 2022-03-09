@@ -2,7 +2,9 @@ package net.lindseybot.shared.worker.services;
 
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
@@ -44,12 +46,56 @@ public interface Messenger {
     }
 
     /**
+     * Replies to a user context command with an ephemeral message.
+     *
+     * @param event UserContextCommand.
+     * @param label Message content.
+     */
+    default void error(@NotNull UserContextInteractionEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label, true));
+    }
+
+    /**
+     * Replies to a message context command with an ephemeral message.
+     *
+     * @param event MessageContextCommand.
+     * @param label Message content.
+     */
+    default void error(@NotNull MessageContextInteractionEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label, true));
+    }
+
+    /**
      * Replies to a slash command.
      *
      * @param event   SlashCommandInteractionEvent.
      * @param message Message response.
      */
     void reply(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message);
+
+    /**
+     * Replies to a component interaction.
+     *
+     * @param event   GenericComponentInteractionCreateEvent.
+     * @param message Message response.
+     */
+    void reply(@NotNull GenericComponentInteractionCreateEvent event, @NotNull FMessage message);
+
+    /**
+     * Replies to a message context command.
+     *
+     * @param event   MessageContextInteractionEvent.
+     * @param message Message response.
+     */
+    void reply(@NotNull MessageContextInteractionEvent event, @NotNull FMessage message);
+
+    /**
+     * Replies to a user context command.
+     *
+     * @param event   UserContextInteractionEvent.
+     * @param message Message response.
+     */
+    void reply(@NotNull UserContextInteractionEvent event, @NotNull FMessage message);
 
     /**
      * Replies to a slash command.
@@ -61,21 +107,57 @@ public interface Messenger {
         this.reply(event, FMessage.of(label));
     }
 
+    /**
+     * Replies to a component interaction.
+     *
+     * @param event GenericComponentInteractionCreateEvent.
+     * @param label Message content.
+     */
+    default void reply(@NotNull GenericComponentInteractionCreateEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label));
+    }
+
+    /**
+     * Replies to a message context command.
+     *
+     * @param event MessageContextInteractionEvent.
+     * @param label Message content.
+     */
+    default void reply(@NotNull MessageContextInteractionEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label));
+    }
+
+    /**
+     * Replies to a user context command.
+     *
+     * @param event UserContextInteractionEvent.
+     * @param label Message content.
+     */
+    default void reply(@NotNull UserContextInteractionEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label));
+    }
+
     void edit(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message);
+
+    void edit(@NotNull GenericComponentInteractionCreateEvent event, @NotNull FMessage message);
+
+    void edit(@NotNull MessageContextInteractionEvent event, @NotNull FMessage message);
+
+    void edit(@NotNull UserContextInteractionEvent event, @NotNull FMessage message);
 
     default void edit(@NotNull SlashCommandInteractionEvent event, @NotNull Label label) {
         this.edit(event, FMessage.of(label));
     }
 
-    void reply(@NotNull GenericComponentInteractionCreateEvent event, @NotNull FMessage message);
-
-    default void reply(@NotNull GenericComponentInteractionCreateEvent event, @NotNull Label label) {
-        this.reply(event, FMessage.of(label));
+    default void edit(@NotNull GenericComponentInteractionCreateEvent event, @NotNull Label label) {
+        this.edit(event, FMessage.of(label));
     }
 
-    void edit(@NotNull GenericComponentInteractionCreateEvent event, @NotNull FMessage message);
+    default void edit(@NotNull MessageContextInteractionEvent event, @NotNull Label label) {
+        this.edit(event, FMessage.of(label));
+    }
 
-    default void edit(@NotNull GenericComponentInteractionCreateEvent event, @NotNull Label label) {
+    default void edit(@NotNull UserContextInteractionEvent event, @NotNull Label label) {
         this.edit(event, FMessage.of(label));
     }
 

@@ -15,7 +15,7 @@ import java.util.Map;
 public class CommandMappingService {
 
     private final Translator i18n;
-    private final Map<String, SlashCommandData> commands = new HashMap<>();
+    private final Map<String, CommandData> commands = new HashMap<>();
 
     public CommandMappingService(Translator i18n) {
         this.i18n = i18n;
@@ -51,19 +51,32 @@ public class CommandMappingService {
         commands.put("store", this.store());
 
         commands.put("dev", this.dev());
+        // Message context
+        commands.put("msg-prune", this.msgPrune());
     }
 
-    public SlashCommandData getByName(String name) {
-        return this.commands.get(name);
+    public CommandData getByName(String name) {
+        return this.commands.values().stream()
+                .filter(c -> c.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public Collection<SlashCommandData> getCommands() {
+    public Collection<CommandData> getCommands() {
         return this.commands.values();
     }
 
     private String i18n(String label) {
         return this.i18n.get(Language.en_US, label);
     }
+
+    // -- Message context
+
+    private CommandData msgPrune() {
+        return Commands.message("Delete until here");
+    }
+
+    // --
 
     private SlashCommandData giveme() {
         return Commands.slash("giveme", i18n("commands.giveme.description"))

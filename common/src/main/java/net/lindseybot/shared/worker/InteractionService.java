@@ -1,9 +1,6 @@
 package net.lindseybot.shared.worker;
 
-import net.lindseybot.shared.worker.reference.AutoCompleteReference;
-import net.lindseybot.shared.worker.reference.ButtonReference;
-import net.lindseybot.shared.worker.reference.CommandReference;
-import net.lindseybot.shared.worker.reference.SelectMenuReference;
+import net.lindseybot.shared.worker.reference.*;
 
 public interface InteractionService {
 
@@ -17,6 +14,10 @@ public interface InteractionService {
 
     boolean hasAutoComplete(String path);
 
+    boolean hasUserCommand(String name);
+
+    boolean hasMessageCommand(String name);
+
     CommandReference getCommand(String path);
 
     ButtonReference getButton(String path);
@@ -24,4 +25,9 @@ public interface InteractionService {
     SelectMenuReference getSelectMenu(String path);
 
     AutoCompleteReference getAutoComplete(String path);
+
+    UserCommandReference getUserCommand(String name);
+
+    MessageCommandReference getMessageCommand(String name);
+
 }

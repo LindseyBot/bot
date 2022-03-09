@@ -3,7 +3,9 @@ package net.lindseybot.shared.worker.impl;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -40,6 +42,44 @@ public class MessengerImpl implements Messenger {
         if (event instanceof FakeSlashCommand fake) {
             this.reply(fake.getMessage(), message);
         } else if (event.isAcknowledged()) {
+            var hook = event.getHook()
+                    .sendMessage(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        } else {
+            var hook = event.reply(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        }
+    }
+
+    @Override
+    public void reply(@NotNull MessageContextInteractionEvent event, @NotNull FMessage message) {
+        Message content = getContent(message, event.getMember());
+        if (event.isAcknowledged()) {
+            var hook = event.getHook()
+                    .sendMessage(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        } else {
+            var hook = event.reply(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        }
+    }
+
+    @Override
+    public void reply(@NotNull UserContextInteractionEvent event, @NotNull FMessage message) {
+        Message content = getContent(message, event.getMember());
+        if (event.isAcknowledged()) {
             var hook = event.getHook()
                     .sendMessage(content)
                     .setEphemeral(message.isEphemeral())
@@ -102,6 +142,44 @@ public class MessengerImpl implements Messenger {
             hook.queue(h -> this.selfDestruct(h, message));
         } else {
             var hook = event.editMessage(content);
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        }
+    }
+
+    @Override
+    public void edit(@NotNull MessageContextInteractionEvent event, @NotNull FMessage message) {
+        Message content = getContent(message, event.getMember());
+        if (event.isAcknowledged()) {
+            var hook = event.getHook()
+                    .sendMessage(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        } else {
+            var hook = event.reply(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        }
+    }
+
+    @Override
+    public void edit(@NotNull UserContextInteractionEvent event, @NotNull FMessage message) {
+        Message content = getContent(message, event.getMember());
+        if (event.isAcknowledged()) {
+            var hook = event.getHook()
+                    .sendMessage(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
+            this.addFiles(hook, message);
+            hook.queue(h -> this.selfDestruct(h, message));
+        } else {
+            var hook = event.reply(content)
+                    .setEphemeral(message.isEphemeral())
+                    .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
             hook.queue(h -> this.selfDestruct(h, message));
         }
