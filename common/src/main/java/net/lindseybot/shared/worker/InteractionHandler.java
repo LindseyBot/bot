@@ -76,6 +76,8 @@ public abstract class InteractionHandler {
             return (T) mapping.getAsGuildChannel();
         } else if (Role.class.equals(tClass)) {
             return (T) mapping.getAsRole();
+        } else if (Message.Attachment.class.equals(tClass)) {
+            return (T) mapping.getAsAttachment();
         }
         throw new IllegalStateException("Unexpected value: " + tClass);
     }

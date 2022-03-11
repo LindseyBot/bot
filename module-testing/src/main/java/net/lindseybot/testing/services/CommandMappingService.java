@@ -155,6 +155,10 @@ public class CommandMappingService {
         modules.addChoice("Starboard", "starboard");
         modules.addChoice("Welcomer", "welcome");
         return Commands.slash("lindsey", i18n("commands.lindsey.description"))
+                .addSubcommands(new SubcommandData("bug", i18n("commands.lindsey.bug"))
+                        .addOption(OptionType.STRING, "description", i18n("commands.lindsey.bug.description"), true)
+                        .addOption(OptionType.ATTACHMENT, "image", i18n("commands.lindsey.bug.image"))
+                )
                 .addSubcommandGroups(new SubcommandGroupData("modules", i18n("commands.lindsey.modules"))
                         .addSubcommands(new SubcommandData("list", i18n("commands.lindsey.modules.list")))
                         .addSubcommands(new SubcommandData("enable", i18n("commands.lindsey.modules.enable"))
@@ -165,7 +169,8 @@ public class CommandMappingService {
                                 .addOptions(modules))
                         .addSubcommands(new SubcommandData("configure", i18n("commands.lindsey.modules.configure"))
                                 .addOptions(modules))
-                        .addSubcommands(new SubcommandData("logs", i18n("commands.lindsey.modules.logs"))));
+                        .addSubcommands(new SubcommandData("logs", i18n("commands.lindsey.modules.logs")))
+                );
     }
 
     private SlashCommandData apoiase() {
