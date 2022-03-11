@@ -151,7 +151,7 @@ public class CommandMappingService {
         modules.addChoice("Anti-Advertising", "antiad");
         modules.addChoice("AntiScam", "antiscam");
         modules.addChoice("KeepRoles", "keeproles");
-        modules.addChoice("registration", "Registration");
+        modules.addChoice("Registration", "registration");
         modules.addChoice("Starboard", "starboard");
         modules.addChoice("Welcomer", "welcome");
         return Commands.slash("lindsey", i18n("commands.lindsey.description"))
