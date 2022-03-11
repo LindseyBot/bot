@@ -64,13 +64,18 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
         Starboard starboard = this.service.get(guild);
         MessageBuilder builder = new MessageBuilder();
         if (starboard.isEnabled()) {
-            TextChannel channel = guild.getTextChannelById(starboard.getChannel());
-            if (channel == null) {
-                starboard.setEnabled(false);
-                this.service.save(starboard);
-                return this.onStatus(member, guild);
+            if (starboard.getChannel() != null) {
+                TextChannel channel = guild.getTextChannelById(starboard.getChannel());
+                if (channel == null) {
+                    starboard.setChannel(null);
+                    starboard.setEnabled(false);
+                    this.service.save(starboard);
+                    return this.onStatus(member, guild);
+                }
+                builder.content(Label.of("commands.modules.starboard.enabled", channel.getAsMention(), starboard.getMinStars()));
+            } else {
+                builder.content(Label.of("commands.modules.starboard.enabled", "<Not configured>", starboard.getMinStars()));
             }
-            builder.content(Label.of("commands.modules.starboard.enabled", channel.getAsMention(), starboard.getMinStars()));
         } else {
             builder.content(Label.of("commands.modules.starboard.disabled"));
         }
