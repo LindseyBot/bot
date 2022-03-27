@@ -51,6 +51,9 @@ public class RoleHistoryListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        if (event.getUser().isBot()) {
+            return;
+        }
         boolean isToKeepRoles = this.service.isActive(event.getGuild());
         if (!isToKeepRoles) {
             return;
@@ -79,6 +82,9 @@ public class RoleHistoryListener extends ListenerAdapter {
     }
 
     private void saveRoles(Member member) {
+        if (member.getUser().isBot()) {
+            return;
+        }
         Set<Long> roles = member.getRoles()
                 .stream()
                 .map(ISnowflake::getIdLong)
