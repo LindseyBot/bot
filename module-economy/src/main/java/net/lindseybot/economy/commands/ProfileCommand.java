@@ -76,7 +76,8 @@ public class ProfileCommand extends InteractionHandler {
         if (profile.getCountry() != null) {
             object.put("country", profile.getCountry().name().toLowerCase(Locale.ROOT));
         }
-        if (!customization.getBadges().isEmpty()) {
+        if (customization.getBadges() != null
+                && !customization.getBadges().isEmpty()) {
             object.put("badges", customization.getBadges());
         } else {
             List<Long> ids = this.badges.findAll()
