@@ -1,5 +1,6 @@
 package net.lindseybot.testing.services;
 
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.lindseybot.shared.enums.Language;
@@ -232,11 +233,19 @@ public class CommandMappingService {
     private SlashCommandData voice() {
         return Commands.slash("voice", i18n("commands.voice.description"))
                 .addSubcommands(new SubcommandData("split", i18n("commands.voice.split.description"))
-                        .addOption(OptionType.CHANNEL, "from", i18n("commands.voice.split.from"), true)
-                        .addOption(OptionType.CHANNEL, "to", i18n("commands.voice.split.to"), true))
+                        .addOptions(new OptionData(OptionType.CHANNEL, "from", i18n("commands.voice.split.from"))
+                                .setRequired(true)
+                                .setChannelTypes(ChannelType.VOICE))
+                        .addOptions(new OptionData(OptionType.CHANNEL, "to", i18n("commands.voice.split.to"))
+                                .setRequired(true)
+                                .setChannelTypes(ChannelType.VOICE)))
                 .addSubcommands(new SubcommandData("move", i18n("commands.voice.move.description"))
-                        .addOption(OptionType.CHANNEL, "from", i18n("commands.voice.move.from"), true)
-                        .addOption(OptionType.CHANNEL, "to", i18n("commands.voice.move.to"), true));
+                        .addOptions(new OptionData(OptionType.CHANNEL, "from", i18n("commands.voice.move.from"))
+                                .setRequired(true)
+                                .setChannelTypes(ChannelType.VOICE))
+                        .addOptions(new OptionData(OptionType.CHANNEL, "to", i18n("commands.voice.move.to"))
+                                .setRequired(true)
+                                .setChannelTypes(ChannelType.VOICE)));
     }
 
     private SlashCommandData nsfw() {
