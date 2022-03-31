@@ -4,6 +4,7 @@ ext {
     JDA_SLUG = 'com.github.DV8FromtheWorld:JDA'
     ORG_JSON_VERSION = '20190722'
     EXPIRING_MAP_VERSION = '0.5.10'
+    SPRING_VERSION = '2.6.6'
 }
 
 version = BOT_VERSION
