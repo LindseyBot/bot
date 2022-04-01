@@ -40,6 +40,7 @@ dependencies {
     implementation project(':module-fun')
     implementation project(':module-help')
     implementation project(':module-info')
+    implementation project(':module-legacy')
     implementation project(':module-moderation')
     implementation project(':module-nsfw')
     implementation project(':module-wiki')

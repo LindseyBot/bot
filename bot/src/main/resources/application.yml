@@ -6,6 +6,15 @@ app:
     gateway: 'ws://127.0.0.1:1234'
     rest: 'http://rest:1235'
     intents: 14031
+  images:
+    ip: 127.0.0.1
+    port: 8080
+  prometheus:
+    host: ''
+  legacy:
+    ip: '127.0.0.1'
+    port: 6379
+    password: 'password'
 spring:
   redis:
     host: 127.0.0.1
