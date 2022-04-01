@@ -52,9 +52,10 @@ dependencies {
     implementation("${JDA_SLUG}:${JDA_VERSION}") {
         exclude module: 'opus-java'
     }
-    implementation('com.fasterxml.jackson.core:jackson-databind:2.13.1')
+    implementation("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
 
     // Spring
+    implementation('redis.clients:jedis:4.2.1')
     implementation('org.mariadb.jdbc:mariadb-java-client')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-data-redis')

@@ -42,10 +42,10 @@ dependencies {
     implementation("${JDA_SLUG}:${JDA_VERSION}") {
         exclude module: 'opus-java'
     }
+    implementation('net.sf.trove4j:trove4j:3.0.3')
     implementation("org.json:json:${ORG_JSON_VERSION}")
     implementation("net.jodah:expiringmap:${EXPIRING_MAP_VERSION}")
-    implementation('net.sf.trove4j:trove4j:3.0.3')
-    implementation('com.fasterxml.jackson.core:jackson-databind:2.13.1')
+    implementation("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
 
     // Prometheus
     api('io.prometheus:simpleclient_pushgateway:0.15.0')
