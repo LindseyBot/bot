@@ -50,6 +50,7 @@ public class CommandMappingService {
         commands.put("help", this.help());
         commands.put("inventory", this.inventory());
         commands.put("store", this.store());
+        commands.put("level", this.level());
 
         commands.put("dev", this.dev());
         // Message context
@@ -81,13 +82,13 @@ public class CommandMappingService {
 
     private SlashCommandData giveme() {
         return Commands.slash("giveme", i18n("commands.giveme.description"))
-                .addSubcommands(new SubcommandData("list", i18n("commands.giveme.list")))
-                .addSubcommands(new SubcommandData("get", i18n("commands.giveme.get"))
+                .addSubcommands(subcommand("list", "commands.giveme.list"))
+                .addSubcommands(subcommand("get", "commands.giveme.get")
                         .addOptions(new OptionData(OptionType.STRING, "name", i18n("commands.giveme.role"), true)
                                 .setAutoComplete(true)))
-                .addSubcommands(new SubcommandData("add", i18n("commands.giveme.add"))
+                .addSubcommands(subcommand("add", "commands.giveme.add")
                         .addOption(OptionType.ROLE, "name", i18n("commands.giveme.role"), true))
-                .addSubcommands(new SubcommandData("remove", i18n("commands.giveme.remove"))
+                .addSubcommands(subcommand("remove", "commands.giveme.remove")
                         .addOption(OptionType.ROLE, "name", i18n("commands.giveme.role"), true));
     }
 
@@ -101,11 +102,11 @@ public class CommandMappingService {
 
     private SlashCommandData cookies() {
         return Commands.slash("cookies", i18n("commands.cookies.description"))
-                .addSubcommands(new SubcommandData("daily", i18n("commands.cookies.daily.description")))
-                .addSubcommands(new SubcommandData("send", i18n("commands.cookies.send.description"))
+                .addSubcommands(subcommand("daily", "commands.cookies.daily.description"))
+                .addSubcommands(subcommand("send", "commands.cookies.send.description")
                         .addOption(OptionType.USER, "target", i18n("commands.cookies.send.target"), true)
                         .addOption(OptionType.INTEGER, "amount", i18n("commands.cookies.send.amount"), true))
-                .addSubcommands(new SubcommandData("balance", i18n("commands.cookies.balance.description"))
+                .addSubcommands(subcommand("balance", "commands.cookies.balance.description")
                         .addOption(OptionType.USER, "user", i18n("commands.cookies.balance.user"), false));
     }
 
@@ -171,6 +172,23 @@ public class CommandMappingService {
                         .addSubcommands(new SubcommandData("configure", i18n("commands.lindsey.modules.configure"))
                                 .addOptions(modules))
                         .addSubcommands(new SubcommandData("logs", i18n("commands.lindsey.modules.logs")))
+                )
+                .addSubcommandGroups(new SubcommandGroupData("leveling", i18n("commands.lindsey.leveling"))
+                        .addSubcommands(new SubcommandData("info", i18n("commands.lindsey.leveling.info")))
+                        .addSubcommands(new SubcommandData("weights", i18n("commands.lindsey.leveling.weights"))
+                                .addOptions(new OptionData(OptionType.STRING, "type", i18n("commands.lindsey.leveling.weights.type"))
+                                        .addChoice("Messages", "messages")
+                                        .addChoice("Attachments", "attachments")
+                                        .addChoice("Reactions", "reactions")
+                                        .addChoice("Stars", "stars")
+                                        .setRequired(true))
+                                .addOptions(new OptionData(OptionType.INTEGER, "weight", i18n("commands.lindsey.leveling.weights.weight"))
+                                        .setRequired(true)))
+                        .addSubcommands(new SubcommandData("give", i18n("commands.lindsey.leveling.give"))
+                                .addOptions(new OptionData(OptionType.USER, "user", i18n("commands.lindsey.leveling.give.user"))
+                                        .setRequired(true))
+                                .addOptions(new OptionData(OptionType.INTEGER, "points", i18n("commands.lindsey.leveling.give.points"))
+                                        .setRequired(true)))
                 );
     }
 
@@ -298,27 +316,44 @@ public class CommandMappingService {
                         .addSubcommands(new SubcommandData("badges", i18n("commands.inventory.equip.badges"))));
     }
 
+    private SlashCommandData level() {
+        return Commands.slash("level", i18n("commands.level"))
+                .addOption(OptionType.USER, "user", i18n("commands.level.user"));
+    }
+
     // ------------------------------
 
     private SlashCommandData dev() {
         return Commands.slash("dev", "Developer commands.")
                 .addSubcommandGroups(new SubcommandGroupData("commands", "Slash command management")
-                        .addSubcommands(new SubcommandData("publish", "Publish slash commands.")
+                        .addSubcommands(subcommand("publish", "Publish slash commands.")
                                 .addOptions(new OptionData(OptionType.STRING, "name", "Command name", true)
                                         .setAutoComplete(true))
                                 .addOption(OptionType.BOOLEAN, "global", "Is Global Publish", false))
-                        .addSubcommands(new SubcommandData("remove", "Remove slash commands.")
+                        .addSubcommands(subcommand("remove", "Remove slash commands.")
                                 .addOptions(new OptionData(OptionType.STRING, "name", "Command name", true)
                                         .setAutoComplete(true))
                                 .addOption(OptionType.BOOLEAN, "global", "Remove globally", false))
-                        .addSubcommands(new SubcommandData("list", "List all registered commands.")
-                                .addOptions(new OptionData(OptionType.STRING, "filter", "List filter", true)
+                        .addSubcommands(subcommand("list", "List all registered commands.")
+                                .addOptions(strOption("filter", "List filter")
+                                        .setRequired(true)
                                         .addChoice("Known (Internal)", "known")
                                         .addChoice("Published (Guild)", "guild")
-                                        .addChoice("Published (Global)", "global"))))
+                                        .addChoice("Published (Global)", "global")
+                                )))
                 .addSubcommandGroups(new SubcommandGroupData("items", "Item management")
-                        .addSubcommands(new SubcommandData("publish", "Publish an item")
+                        .addSubcommands(subcommand("publish", "Publish an item")
                                 .addOption(OptionType.STRING, "name", "Item name", true)));
+    }
+
+    // --------------------------------
+
+    private SubcommandData subcommand(String name, String i18n) {
+        return new SubcommandData(name, this.i18n(i18n));
+    }
+
+    private OptionData strOption(String name, String i18n) {
+        return new OptionData(OptionType.STRING, name, this.i18n(i18n));
     }
 
 }
