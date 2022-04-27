@@ -3,6 +3,7 @@ package net.lindseybot.moderation.commands;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -28,7 +29,6 @@ public class HackBan extends InteractionHandler {
         String reason = this.getOption("reason", event, String.class);
         Member member = event.getMember();
         if (member == null) {
-
             return;
         } else if (!member.hasPermission(Permission.BAN_MEMBERS)) {
             this.msg.error(event, Label.of("permissions.user"));
@@ -40,7 +40,7 @@ public class HackBan extends InteractionHandler {
         }
         event.deferReply(false).queue((a) -> {
             try {
-                guild.ban(String.valueOf(userId), 7, reason).queue((aVoid) -> {
+                guild.ban(UserSnowflake.fromId(userId), 7, reason).queue((aVoid) -> {
                     this.msg.reply(event, Label.of("commands.hackban.success"));
                 }, throwable -> {
                     this.msg.reply(event, Label.of("error.discord", throwable.getMessage()));

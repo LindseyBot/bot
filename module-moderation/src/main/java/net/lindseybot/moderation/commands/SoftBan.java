@@ -3,6 +3,7 @@ package net.lindseybot.moderation.commands;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -41,9 +42,9 @@ public class SoftBan extends InteractionHandler {
         }
         event.deferReply(false).queue((a) -> {
             try {
-                guild.ban(String.valueOf(userId), 7, reason)
+                guild.ban(UserSnowflake.fromId(userId), 7, reason)
                         .delay(1, TimeUnit.SECONDS)
-                        .and(guild.unban(String.valueOf(userId)))
+                        .and(guild.unban(UserSnowflake.fromId(userId)))
                         .queue((aVoid) -> {
                             this.msg.reply(event, Label.of("commands.softban.success"));
                         }, throwable -> {
