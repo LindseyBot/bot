@@ -30,6 +30,18 @@ public class LegacyService {
         }
     }
 
+    public void setPrefix(Guild guild, String prefix) {
+        try (Jedis jedis = this.jedisPool.getResource()) {
+            if (prefix == null) {
+                jedis.hdel("LewdBot:Profile:" + guild.getId(), "prefix");
+            } else {
+                jedis.hset("LewdBot:Profile:" + guild.getId(), "prefix", prefix);
+            }
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to update prefix");
+        }
+    }
+
     public String getPrefix(Guild guild) {
         String prefix;
         try (Jedis jedis = this.jedisPool.getResource()) {
