@@ -29,15 +29,15 @@ public class CookiesBalance extends InteractionHandler {
             return;
         }
         UserProfile other = this.profiles.get(target);
-        if (self.getCookies() >= other.getCookies()) {
-            long diff = self.getCookies() - other.getCookies();
+        if (self.getCookies() < other.getCookies()) {
+            long diff = other.getCookies() - self.getCookies();
             this.msg.reply(event, Label.of("commands.cookies.balance.more",
-                    target.getAsMention(), self.getCookies(), diff,
+                    target.getAsMention(), other.getCookies(), diff,
                     this.getPercentage(diff, self.getCookies())));
         } else {
-            long diff = other.getCookies() - self.getCookies();
+            long diff = self.getCookies() - other.getCookies();
             this.msg.reply(event, Label.of("commands.cookies.balance.less",
-                    target.getAsMention(), self.getCookies(), diff,
+                    target.getAsMention(), other.getCookies(), diff,
                     this.getPercentage(diff, other.getCookies())));
         }
     }
