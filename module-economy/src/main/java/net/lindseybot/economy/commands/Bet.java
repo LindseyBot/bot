@@ -50,14 +50,14 @@ public class Bet extends InteractionHandler {
             this.repository.save(bet);
             this.msg.reply(event, this.createDouble(5L, event.getUser().getIdLong()));
         } else {
-            this.msg.reply(event, this.createNothing(5L));
+            this.msg.reply(event, this.createNothing(5L, event.getUser().getIdLong()));
         }
     }
 
     @Button("bet.bet")
     public void onBet(ButtonInteractionEvent event) {
-        String target = event.getComponentId().split(":")[1];
-        if (!target.equals(event.getUser().getId())) {
+        String target = this.getData(event);
+        if (!event.getUser().getId().equals(target)) {
             this.msg.error(event, Label.of("commands.bet.owned"));
             return;
         }
@@ -73,14 +73,14 @@ public class Bet extends InteractionHandler {
             this.msg.edit(event, this.createDouble(bet.getCount(), event.getUser().getIdLong()));
         } else {
             this.repository.delete(bet);
-            this.msg.edit(event, this.createNothing(bet.getCount()));
+            this.msg.edit(event, this.createNothing(bet.getCount(), event.getUser().getIdLong()));
         }
     }
 
     @Button("bet.fold")
     public void onFold(ButtonInteractionEvent event) {
-        String target = event.getComponentId().split(":")[1];
-        if (!target.equals(event.getUser().getId())) {
+        String target = this.getData(event);
+        if (!event.getUser().getId().equals(target)) {
             this.msg.error(event, Label.of("commands.bet.owned"));
             return;
         }
@@ -92,7 +92,39 @@ public class Bet extends InteractionHandler {
         BetModel bet = oBet.get();
         this.repository.delete(bet);
         this.service.pay(event.getUser(), bet.getCount());
-        this.msg.edit(event, Label.of("commands.bet.end", bet.getCount()));
+        // --
+        MessageBuilder builder = new MessageBuilder();
+        builder.content(Label.of("commands.bet.end", bet.getCount()));
+        builder.addComponent(new ButtonBuilder()
+                .secondary("bet.reset", Label.raw("Try again")).withData(event.getUser().getId())
+                .build());
+        this.msg.edit(event, builder.build());
+    }
+
+    @Button("bet.reset")
+    public void onReset(ButtonInteractionEvent event) {
+        if (!this.service.has(event.getUser(), 5)) {
+            this.msg.error(event, Label.of("economy.not_enough"));
+            return;
+        } else if (this.repository.findById(event.getUser().getIdLong()).isPresent()) {
+            this.msg.error(event, Label.of("commands.bet.running"));
+            return;
+        }
+        String target = this.getData(event);
+        if (!event.getUser().getId().equals(target)) {
+            this.msg.error(event, Label.of("commands.bet.owned"));
+            return;
+        }
+        this.service.deduct(event.getUser(), 5);
+        if (this.random.nextBoolean()) {
+            BetModel bet = new BetModel();
+            bet.setId(event.getUser().getIdLong());
+            bet.setCount(5);
+            this.repository.save(bet);
+            this.msg.edit(event, this.createDouble(5L, event.getUser().getIdLong()));
+        } else {
+            this.msg.edit(event, this.createNothing(5L, event.getUser().getIdLong()));
+        }
     }
 
     private FMessage createDouble(long total, long userId) {
@@ -109,9 +141,12 @@ public class Bet extends InteractionHandler {
         return builder.build();
     }
 
-    private FMessage createNothing(long total) {
+    private FMessage createNothing(long total, long userId) {
         MessageBuilder builder = new MessageBuilder();
         builder.content(Label.of("commands.bet.lose", total));
+        builder.addComponent(new ButtonBuilder()
+                .secondary("bet.reset", Label.raw("Try again")).withData(String.valueOf(userId))
+                .build());
         return builder.build();
     }
 
