@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.lindseybot.legacy.models.SlashConverter;
 import net.lindseybot.legacy.services.LegacyService;
 import net.lindseybot.shared.entities.discord.Label;
@@ -35,12 +35,12 @@ public class CommandListener extends ListenerAdapter {
     private final StringRedisTemplate redis;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public CommandListener(ShardManager api,
+    public CommandListener(IEventManager api,
                            Messenger msg,
                            LegacyService legacy,
                            List<SlashConverter> converters,
                            StringRedisTemplate redis) {
-        api.addEventListener(this);
+        api.register(this);
         this.msg = msg;
         this.legacy = legacy;
         this.redis = redis;

@@ -11,6 +11,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
@@ -50,7 +51,7 @@ public class RedisConfig {
     public RedisMessageListenerContainer listeners(RedisConnectionFactory factory, ShardManager api) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
-        container.addMessageListener(new LegacyListener(api), new PatternTopic("legacy"));
+        container.addMessageListener(new LegacyListener(api), new ChannelTopic("legacy"));
         return container;
     }
 

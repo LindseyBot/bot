@@ -73,6 +73,7 @@ public class DefaultWorker {
             }
             if (config.getShards() != null) {
                 ShardProperties shards = config.getShards();
+                builder.setShardsTotal(shards.getTotal());
                 if (shards.getShards() != null) {
                     builder.setShards(shards.getShards());
                     log.info("Starting JDA with shard set.");
@@ -80,7 +81,6 @@ public class DefaultWorker {
                     builder.setShards(shards.getMin(), shards.getMax());
                     log.info("Starting JDA with shard range.");
                 }
-                builder.setShardsTotal(shards.getTotal());
             }
             return builder.build();
         } catch (LoginException ex) {
