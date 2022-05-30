@@ -8,6 +8,7 @@ import net.lindseybot.info.LibraryInfo;
 import net.lindseybot.legacy.LibraryLegacy;
 import net.lindseybot.moderation.LibraryModeration;
 import net.lindseybot.nsfw.LibraryNSFW;
+import net.lindseybot.points.LibraryPoints;
 import net.lindseybot.testing.LibraryTesting;
 import net.lindseybot.wiki.LibraryWiki;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Import;
         LibraryLegacy.class,
         LibraryModeration.class,
         LibraryNSFW.class,
+        LibraryPoints.class,
         LibraryWiki.class,
         LibraryTesting.class
 })
