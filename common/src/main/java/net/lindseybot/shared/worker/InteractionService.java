@@ -18,6 +18,8 @@ public interface InteractionService {
 
     boolean hasMessageCommand(String name);
 
+    boolean hasModal(String path);
+
     CommandReference getCommand(String path);
 
     ButtonReference getButton(String path);
@@ -29,5 +31,7 @@ public interface InteractionService {
     UserCommandReference getUserCommand(String name);
 
     MessageCommandReference getMessageCommand(String name);
+
+    ModalReference getModal(String path);
 
 }

@@ -2,6 +2,7 @@ package net.lindseybot.shared.worker.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -24,6 +25,7 @@ public class DefaultInteractionService implements InteractionService {
     private final Map<String, AutoCompleteReference> autoCompletes = new HashMap<>();
     private final Map<String, UserCommandReference> userCommands = new HashMap<>();
     private final Map<String, MessageCommandReference> messageCommands = new HashMap<>();
+    private final Map<String, ModalReference> modals = new HashMap<>();
 
     public DefaultInteractionService(List<InteractionHandler> handlers) {
         handlers.forEach(this::register);
@@ -38,6 +40,7 @@ public class DefaultInteractionService implements InteractionService {
             this.registerAutoCompletes(method, handler);
             this.registerUserCommands(method, handler);
             this.registerMessageCommands(method, handler);
+            this.registerModals(method, handler);
         }
     }
 
@@ -72,6 +75,11 @@ public class DefaultInteractionService implements InteractionService {
     }
 
     @Override
+    public boolean hasModal(String path) {
+        return this.modals.containsKey(path);
+    }
+
+    @Override
     public CommandReference getCommand(String path) {
         return this.commands.get(path);
     }
@@ -99,6 +107,11 @@ public class DefaultInteractionService implements InteractionService {
     @Override
     public MessageCommandReference getMessageCommand(String name) {
         return this.messageCommands.get(name);
+    }
+
+    @Override
+    public ModalReference getModal(String path) {
+        return this.modals.get(path);
     }
 
     private void registerCommands(Method method, InteractionHandler handler) {
@@ -138,6 +151,25 @@ public class DefaultInteractionService implements InteractionService {
         reference.setEdit(btn.edit());
         reference.setEphemeral(btn.ephemeral());
         buttons.put(btn.value(), reference);
+    }
+
+    private void registerModals(Method method, InteractionHandler handler) {
+        ModalListener mdl = method.getDeclaredAnnotation(ModalListener.class);
+        if (mdl == null) {
+            return;
+        } else if (method.getParameterCount() == 0) {
+            log.warn("Invalid modal listener declaration: " + mdl.value());
+            return;
+        } else if (!ModalInteractionEvent.class.equals(method.getParameterTypes()[0])) {
+            log.warn("Invalid modal listener declaration: " + mdl.value());
+            return;
+        }
+        ModalReference reference = new ModalReference();
+        reference.setInstance(handler);
+        reference.setMethod(method);
+        reference.setEdit(mdl.edit());
+        reference.setEphemeral(mdl.ephemeral());
+        modals.put(mdl.value(), reference);
     }
 
     private void registerSelects(Method method, InteractionHandler handler) {

@@ -1,16 +1,19 @@
 package net.lindseybot.shared.worker;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public abstract class InteractionHandler {
 
@@ -42,6 +45,34 @@ public abstract class InteractionHandler {
             return null;
         }
         return option.get(0).getValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public @NotNull <T> Optional<T> getOption(@NotNull String name,
+                                              @NotNull ModalInteractionEvent event,
+                                              @NotNull Class<T> tClass) {
+        ModalMapping mapping = event.getValue(name);
+        if (mapping == null) {
+            return Optional.empty();
+        }
+        if (String.class.equals(tClass)) {
+            return Optional.of((T) mapping.getAsString());
+        } else if (Boolean.class.equals(tClass)) {
+            return Optional.of((T) OptionUtils.parseBoolean(mapping.getAsString()));
+        } else if (Integer.class.equals(tClass)) {
+            try {
+                return Optional.of((T) Integer.valueOf(mapping.getAsString()));
+            } catch (IllegalArgumentException ex) {
+                return Optional.empty();
+            }
+        } else if (Long.class.equals(tClass)) {
+            try {
+                return Optional.of((T) Long.valueOf(mapping.getAsString()));
+            } catch (IllegalArgumentException ex) {
+                return Optional.empty();
+            }
+        }
+        throw new IllegalStateException("Unexpected value: " + tClass);
     }
 
     @SuppressWarnings("unchecked")
