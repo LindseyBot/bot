@@ -1,4 +1,4 @@
-package net.lindseybot.points.entities;
+package net.lindseybot.shared.entities.profile.servers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

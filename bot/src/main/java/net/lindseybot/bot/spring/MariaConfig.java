@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EntityScan("net.lindseybot.shared.entities")
-@EnableJpaRepositories("net.lindseybot.bot.repositories.sql")
+@EnableJpaRepositories({
+        "net.lindseybot.bot.repositories.sql",
+        "net.lindseybot.shared.repositories"
+})
 public class MariaConfig {
 }

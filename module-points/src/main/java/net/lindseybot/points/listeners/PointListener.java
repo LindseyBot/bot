@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.lindseybot.points.entities.PointConfig;
+import net.lindseybot.shared.entities.profile.servers.PointConfig;
 import net.lindseybot.points.services.PointService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
