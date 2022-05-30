@@ -2,6 +2,7 @@ package net.lindseybot.shared.worker.services;
 
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -66,6 +67,16 @@ public interface Messenger {
     }
 
     /**
+     * Replies to a modal interaction with an ephemeral message.
+     *
+     * @param event ModalInteraction.
+     * @param label Message content.
+     */
+    default void error(@NotNull ModalInteractionEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label, true));
+    }
+
+    /**
      * Replies to a slash command.
      *
      * @param event   SlashCommandInteractionEvent.
@@ -96,6 +107,14 @@ public interface Messenger {
      * @param message Message response.
      */
     void reply(@NotNull UserContextInteractionEvent event, @NotNull FMessage message);
+
+    /**
+     * Replies to a modal.
+     *
+     * @param event   ModalInteraction.
+     * @param message Message response.
+     */
+    void reply(@NotNull ModalInteractionEvent event, @NotNull FMessage message);
 
     /**
      * Replies to a slash command.
@@ -134,6 +153,16 @@ public interface Messenger {
      * @param label Message content.
      */
     default void reply(@NotNull UserContextInteractionEvent event, @NotNull Label label) {
+        this.reply(event, FMessage.of(label));
+    }
+
+    /**
+     * Replies to a modal.
+     *
+     * @param event ModalInteraction.
+     * @param label Message content.
+     */
+    default void reply(@NotNull ModalInteractionEvent event, @NotNull Label label) {
         this.reply(event, FMessage.of(label));
     }
 

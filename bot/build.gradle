@@ -57,6 +57,7 @@ dependencies {
     // Spring
     implementation('redis.clients:jedis:4.2.1')
     implementation('org.mariadb.jdbc:mariadb-java-client')
+    implementation('com.github.ben-manes.caffeine:caffeine:3.1.0')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-data-redis')
 

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionService;
 import net.lindseybot.shared.worker.Metrics;
+import net.lindseybot.shared.worker.UserError;
 import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
 import net.lindseybot.shared.worker.reference.*;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -65,6 +67,8 @@ public class DefaultInteractionListener extends ListenerAdapter {
             this.taskExecutor.submit(() -> timer.observe(timer.time(() -> {
                 try {
                     reference.invoke(event);
+                } catch (UserError error) {
+                    this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
                     log.error("Failed to execute command: " + event.getCommandPath(), ex);
                     this.msg.error(event, Label.of("error.internal"));
@@ -96,6 +100,8 @@ public class DefaultInteractionListener extends ListenerAdapter {
             this.taskExecutor.submit(() -> {
                 try {
                     reference.invoke(event);
+                } catch (UserError error) {
+                    this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
                     log.error("Failed to execute button: " + event.getComponentId(), ex);
                     this.msg.error(event, Label.of("error.internal"));
@@ -132,6 +138,8 @@ public class DefaultInteractionListener extends ListenerAdapter {
             this.taskExecutor.submit(() -> {
                 try {
                     reference.invoke(event);
+                } catch (UserError error) {
+                    this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
                     log.error("Failed to execute select menu: " + event.getComponentId(), ex);
                     this.msg.error(event, Label.of("error.internal"));
@@ -189,6 +197,8 @@ public class DefaultInteractionListener extends ListenerAdapter {
             this.taskExecutor.submit(() -> {
                 try {
                     reference.invoke(event);
+                } catch (UserError error) {
+                    this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
                     log.error("Failed to execute message command: " + id, ex);
                     this.msg.error(event, Label.of("error.internal"));
@@ -217,6 +227,38 @@ public class DefaultInteractionListener extends ListenerAdapter {
             this.taskExecutor.submit(() -> {
                 try {
                     reference.invoke(event);
+                } catch (UserError error) {
+                    this.msg.error(event, error.getLabel());
+                } catch (Exception ex) {
+                    log.error("Failed to execute user command: " + id, ex);
+                    this.msg.error(event, Label.of("error.internal"));
+                }
+            }).get(1500, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Failed to schedule user command execution", e);
+        } catch (TimeoutException e) {
+            if (event.isAcknowledged()) {
+                return;
+            }
+            log.warn("Timed out during user execution: {}", id);
+            event.deferReply(reference.isEphemeral())
+                    .queue();
+        }
+    }
+
+    @Override
+    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+        String id = event.getModalId();
+        if (!this.service.hasModal(id)) {
+            return;
+        }
+        ModalReference reference = this.service.getModal(id);
+        try {
+            this.taskExecutor.submit(() -> {
+                try {
+                    reference.invoke(event);
+                } catch (UserError error) {
+                    this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
                     log.error("Failed to execute user command: " + id, ex);
                     this.msg.error(event, Label.of("error.internal"));
