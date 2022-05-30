@@ -156,6 +156,7 @@ public class CommandMappingService {
         modules.addChoice("Registration", "registration");
         modules.addChoice("Starboard", "starboard");
         modules.addChoice("Welcomer", "welcome");
+        modules.addChoice("Points", "points");
         return Commands.slash("lindsey", i18n("commands.lindsey.description"))
                 .addSubcommands(new SubcommandData("bug", i18n("commands.lindsey.bug"))
                         .addOption(OptionType.STRING, "description", i18n("commands.lindsey.bug.description"), true)
@@ -170,6 +171,8 @@ public class CommandMappingService {
                         .addSubcommands(new SubcommandData("status", i18n("commands.lindsey.modules.status"))
                                 .addOptions(modules))
                         .addSubcommands(new SubcommandData("configure", i18n("commands.lindsey.modules.configure"))
+                                .addOptions(modules))
+                        .addSubcommands(new SubcommandData("config", i18n("commands.lindsey.modules.configure"))
                                 .addOptions(modules))
                         .addSubcommands(new SubcommandData("logs", i18n("commands.lindsey.modules.logs")))
                 )
