@@ -20,13 +20,35 @@ public class BooruService {
         ImageBoard.setUserAgent("Lindsey/1.0 (https://lindseybot.net/)");
         banned.add("cub");
         banned.add("loli");
+        banned.add("lolicon");
         banned.add("shota");
+        banned.add("shotacon");
         banned.add("young");
+        banned.add("younger");
         banned.add("child");
         banned.add("childish");
         banned.add("kid");
         banned.add("kids");
+        banned.add("underage");
+        banned.add("under_age");
         banned.add("bestiality");
+        banned.add("zoophilia");
+        banned.add("tagme");
+        banned.add("dismemberment");
+        banned.add("death");
+        banned.add("decapitation");
+        banned.add("guro");
+        banned.add("eye_socket");
+        banned.add("necrophilia");
+        banned.add("rape");
+        banned.add("gangrape");
+        banned.add("gore");
+        banned.add("gross");
+        banned.add("bruise");
+        banned.add("asphyxiation");
+        banned.add("scat");
+        banned.add("strangling");
+        banned.add("torture");
     }
 
     public boolean isRisky(BoardImage image) {
