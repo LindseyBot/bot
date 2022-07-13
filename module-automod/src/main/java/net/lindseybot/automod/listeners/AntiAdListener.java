@@ -60,8 +60,9 @@ public class AntiAdListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         Member author = event.getMember();
         if (author == null
-                || author.getUser().isBot()
-                || author.hasPermission(Permission.MESSAGE_MANAGE)) {
+            || author.getUser().isBot()
+            || author.hasPermission(Permission.MESSAGE_MANAGE)
+            || !event.getGuild().getSelfMember().canInteract(author)) {
             return;
         }
         Message message = event.getMessage();
@@ -142,10 +143,10 @@ public class AntiAdListener extends ListenerAdapter {
 
     private boolean isOffense(Invite invite, Guild guild) {
         return invite != null
-                && invite.getType() == Invite.InviteType.GUILD
-                && invite.getGuild() != null
-                && !guild.getId().equals(invite.getGuild().getId())
-                && !this.officialInvites.contains(invite.getCode());
+               && invite.getType() == Invite.InviteType.GUILD
+               && invite.getGuild() != null
+               && !guild.getId().equals(invite.getGuild().getId())
+               && !this.officialInvites.contains(invite.getCode());
     }
 
     private <T> Consumer<T> noop() {
