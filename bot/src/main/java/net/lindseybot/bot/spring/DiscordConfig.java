@@ -1,4 +1,4 @@
-package net.lindseybot.shared.worker;
+package net.lindseybot.bot.spring;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.hooks.IEventManager;
@@ -11,13 +11,14 @@ import net.dv8tion.jda.internal.utils.concurrent.CountingThreadFactory;
 import net.lindseybot.shared.properties.BotProperties;
 import net.lindseybot.shared.properties.PrometheusProperties;
 import net.lindseybot.shared.properties.ShardProperties;
+import net.lindseybot.shared.worker.InteractionHandler;
+import net.lindseybot.shared.worker.InteractionService;
+import net.lindseybot.shared.worker.Metrics;
 import net.lindseybot.shared.worker.impl.*;
-import net.lindseybot.shared.worker.services.DiscordAdapter;
 import net.lindseybot.shared.worker.services.Messenger;
-import net.lindseybot.shared.worker.services.ProfileService;
-import net.lindseybot.shared.worker.services.Translator;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.security.auth.login.LoginException;
 import java.net.MalformedURLException;
@@ -26,13 +27,9 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Initializes necessary services, requires two beans:
- * - List of interaction handlers
- * - BotProperties with credentials
- */
 @Slf4j
-public class DefaultWorker {
+@Configuration
+public class DiscordConfig {
 
     @Bean
     public ShardManager jda(BotProperties config, IEventManager manager) throws LoginException {
@@ -101,21 +98,6 @@ public class DefaultWorker {
     public DefaultInteractionListener interactionListener(
             InteractionService service, IEventManager api, Messenger msg, Metrics metrics) {
         return new DefaultInteractionListener(service, api, msg, metrics);
-    }
-
-    @Bean
-    public Messenger messenger(DiscordAdapter adapter) {
-        return new MessengerImpl(adapter);
-    }
-
-    @Bean
-    public DiscordAdapter discordAdapter(Translator i18n) {
-        return new DiscordAdapter(i18n);
-    }
-
-    @Bean
-    public Translator translator(ProfileService profiles) {
-        return new Translator(profiles);
     }
 
 }
