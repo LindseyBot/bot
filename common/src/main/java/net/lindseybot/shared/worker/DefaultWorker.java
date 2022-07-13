@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.Compression;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.utils.concurrent.CountingThreadFactory;
 import net.lindseybot.shared.properties.BotProperties;
@@ -40,6 +41,7 @@ public class DefaultWorker {
             DefaultShardManagerBuilder builder = DefaultShardManagerBuilder
                     .createLight(config.getToken())
                     .enableCache(CacheFlag.VOICE_STATE)
+                    .setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.PENDING))
                     .setEventManagerProvider((d) -> manager);
             if (config.getGateway() != null && !config.getGateway().isBlank()) {
                 builder.setSessionController(new GatewayController(config));
