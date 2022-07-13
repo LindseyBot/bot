@@ -45,10 +45,12 @@ jobs:
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           echo IMAGE_ID=$IMAGE_ID
           
-          echo "Tagging image as $IMAGE_ID:$VERSION"
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          echo "Tagging image as $IMAGE_ID:$RELEASE"
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker tag $IMAGE_NAME $IMAGE_ID:$RELEASE
+          
           echo "Pushing images"
-          docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$RELEASE
           docker push $IMAGE_ID:latest
       - name: Create Sentry release
         uses: getsentry/action-release@v1
