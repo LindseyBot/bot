@@ -32,6 +32,9 @@ repositories {
 
 bootJar {
     archiveFileName = "${project.name}.${archiveExtension.get()}"
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
 }
 
 dependencies {
