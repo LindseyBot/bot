@@ -1,5 +1,4 @@
 ext {
-    BOT_VERSION = '1.3.0'
     JDA_VERSION = '5.0.0-alpha.13'
     JDA_SLUG = 'net.dv8tion:JDA'
     ORG_JSON_VERSION = '20190722'
@@ -8,4 +7,4 @@ ext {
     JACKSON_VERSION = '2.13.2.1'
 }
 
-version = BOT_VERSION
+version = System.getenv("RELEASE") ?: "beta"
