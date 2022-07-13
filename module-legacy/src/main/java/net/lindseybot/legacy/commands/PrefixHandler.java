@@ -30,7 +30,9 @@ public class PrefixHandler extends SlashConverter {
         } else if (!member.hasPermission(Permission.MANAGE_SERVER)) {
             return null;
         }
-        if (args[0].equalsIgnoreCase("reset")) {
+        if (args.length == 0) {
+            return null;
+        } else if (args[0].equalsIgnoreCase("reset")) {
             service.setPrefix(event.getGuild(), null);
             event.getMessage()
                     .reply("Prefix reset. Prefix commands may stop working in the future.")
