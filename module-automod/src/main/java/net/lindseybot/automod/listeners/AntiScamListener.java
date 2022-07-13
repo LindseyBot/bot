@@ -48,8 +48,8 @@ public class AntiScamListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         Member author = event.getMember();
         if (author == null
-                || author.getUser().isBot()
-                || author.hasPermission(Permission.MESSAGE_MANAGE)) {
+            || author.getUser().isBot()
+            || author.hasPermission(Permission.MESSAGE_MANAGE)) {
             return;
         }
         Message message = event.getMessage();
@@ -57,8 +57,11 @@ public class AntiScamListener extends ListenerAdapter {
         Member self = event.getGuild().getSelfMember();
         if (!content.contains("http")) {
             return;
-        } else if (!self.hasPermission(Permission.BAN_MEMBERS) && (!self.hasPermission(Permission.MESSAGE_MANAGE)
-                || !self.hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE))) {
+        } else if (!self.hasPermission(Permission.BAN_MEMBERS)
+                   && (!self.hasPermission(Permission.MESSAGE_MANAGE)
+                       || !self.hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE))) {
+            return;
+        } else if (!self.canInteract(event.getMember())) {
             return;
         }
         try {
@@ -93,7 +96,7 @@ public class AntiScamListener extends ListenerAdapter {
                 return v;
             }));
             if (integer.incrementAndGet() > settings.getStrikes()
-                    || OffsetDateTime.now().minusDays(1).isBefore(author.getTimeJoined())) {
+                || OffsetDateTime.now().minusDays(1).isBefore(author.getTimeJoined())) {
                 event.getMember().ban(7, "Scam link: " + domain)
                         .queue(this.noop(), this.noop());
                 return;
