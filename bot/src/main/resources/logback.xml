@@ -14,6 +14,7 @@
         </encoder>
     </appender>
     <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+        <filter class="net.lindseybot.bot.internal.NetworkExceptions"/>
         <minimumBreadcrumbLevel>WARN</minimumBreadcrumbLevel>
     </appender>
     <root level="INFO">
