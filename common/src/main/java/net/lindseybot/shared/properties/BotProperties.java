@@ -9,6 +9,5 @@ public class BotProperties {
     private ShardProperties shards;
     private String gateway;
     private String rest;
-    private Integer intents;
 
 }
