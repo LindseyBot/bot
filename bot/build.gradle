@@ -48,7 +48,7 @@ dependencies {
     implementation project(':module-nsfw')
     implementation project(':module-wiki')
     implementation project(':module-testing')
-    implementation('io.sentry:sentry-logback:5.6.0')
+    implementation('io.sentry:sentry-logback:6.2.1')
 
     // Shared Dependencies
     implementation project(':common')
