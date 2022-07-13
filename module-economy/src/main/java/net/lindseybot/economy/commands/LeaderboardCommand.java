@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -130,7 +131,7 @@ public class LeaderboardCommand extends InteractionHandler {
             object.put("background", bg);
         }
         if (profile.getCountry() != null
-                && profile.getCountry() != Flags.Unknown) {
+            && profile.getCountry() != Flags.Unknown) {
             object.put("country", profile.getCountry().name().toLowerCase(Locale.ROOT));
         }
         object.put("value", this.getValue(type, profile));
@@ -156,13 +157,15 @@ public class LeaderboardCommand extends InteractionHandler {
     }
 
     private long findRank(LeaderboardType type, long user) {
+        Long result;
         if (type == LeaderboardType.COOKIES) {
-            return this.repository.findCookieRank(user);
+            result = this.repository.findCookieRank(user);
         } else if (type == LeaderboardType.SLOT_WINS) {
-            return this.repository.findSlotRank(user);
+            result = this.repository.findSlotRank(user);
         } else {
-            return this.repository.findStreakRank(user);
+            result = this.repository.findStreakRank(user);
         }
+        return Objects.requireNonNullElse(result, 10000L);
     }
 
 }
