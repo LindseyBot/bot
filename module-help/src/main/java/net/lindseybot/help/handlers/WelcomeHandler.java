@@ -1,5 +1,6 @@
 package net.lindseybot.help.handlers;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -116,7 +117,7 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions().isEmpty()) {
+                   || event.getSelectedOptions().isEmpty()) {
             return;
         }
         SelectOption channel = event.getSelectedOptions().get(0);
@@ -138,7 +139,7 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
         EmbedBuilder embed = new EmbedBuilder();
         embed.title(Label.raw("Welcome Setup (2/2)"));
         embed.description(Label.raw("Please type the desired welcome message in chat, and when you are done click the Finish button below. Remember you can use placeholders to fill" +
-                " information like the user's name."));
+                                    " information like the user's name."));
         embed.color(GFXUtils.GREEN);
 
         MessageBuilder builder = new MessageBuilder();
@@ -186,9 +187,12 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
         this.service.save(welcome);
 
         this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild()));
-        message.delete()
-                .reason("Welcome Message Setup")
-                .queue(noop(), noop());
+        if (event.getGuild().getSelfMember()
+                .hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)) {
+            message.delete()
+                    .reason("Welcome Message Setup")
+                    .queue(noop(), noop());
+        }
     }
 
 }
