@@ -19,6 +19,7 @@ public class NetworkExceptions extends AbstractMatcherFilter<ILoggingEvent> {
         messages.add("network is unreachable");
         messages.add("timeout");
         messages.add("http error fetching url. status=503");
+        messages.add("unknown interaction");
     }
 
     @Override
