@@ -96,7 +96,7 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
     @Override
     public ReplyCallbackAction reply(@NotNull String content) {
         return new ProxyRestAction(this).withMessage(new MessageBuilder(content)
-                .setAllowedMentions(List.of(Message.MentionType.EMOTE, Message.MentionType.CHANNEL))
+                .setAllowedMentions(List.of(Message.MentionType.EMOJI, Message.MentionType.CHANNEL))
                 .build());
     }
 
@@ -127,7 +127,7 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
         dataObject.put("name", fake.getName());
         dataObject.put("value", fake.getValue());
         dataObject.put("type", fake.getType().getKey());
-        return new OptionMapping(dataObject, fake.getResolved());
+        return new OptionMapping(dataObject, fake.getResolved(), message.getJDA(), message.getGuild());
     }
 
 }

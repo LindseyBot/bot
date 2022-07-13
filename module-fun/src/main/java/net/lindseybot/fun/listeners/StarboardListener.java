@@ -3,6 +3,7 @@ package net.lindseybot.fun.listeners;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
@@ -34,8 +35,8 @@ public class StarboardListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        MessageReaction.ReactionEmote emote = event.getReactionEmote();
-        if (!emote.getName().equals("\u2B50")) {
+        MessageReaction reaction = event.getReaction();
+        if (!reaction.getEmoji().getName().equals("\u2B50")) {
             return;
         } else if (!event.isFromGuild()) {
             return;
@@ -45,8 +46,8 @@ public class StarboardListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionRemove(@NotNull MessageReactionRemoveEvent event) {
-        MessageReaction.ReactionEmote emote = event.getReactionEmote();
-        if (!emote.getName().equals("\u2B50")) {
+        MessageReaction reaction = event.getReaction();
+        if (!reaction.getEmoji().getName().equals("\u2B50")) {
             return;
         } else if (!event.isFromGuild()) {
             return;
@@ -68,7 +69,7 @@ public class StarboardListener extends ListenerAdapter {
         }
         channel.retrieveMessageById(reaction.getMessageId()).queue(message -> {
             Optional<MessageReaction> rcc = message.getReactions().stream()
-                    .filter(rc -> rc.getReactionEmote().getAsReactionCode().equals("\u2B50"))
+                    .filter(rc -> rc.getEmoji().getAsReactionCode().equals("\u2B50"))
                     .findFirst();
             StarboardMessage starboard = service.findMessage(reaction, guild, starboardChannel);
             if (rcc.isPresent()) {
@@ -133,7 +134,7 @@ public class StarboardListener extends ListenerAdapter {
                 .append(" ID: ").append(message.getId());
         messageBuilder.setEmbeds(builder.build());
         messageBuilder.setAllowedMentions(
-                Arrays.asList(Message.MentionType.EMOTE, Message.MentionType.CHANNEL));
+                Arrays.asList(Message.MentionType.EMOJI, Message.MentionType.CHANNEL));
         Button button = Button.link(message.getJumpUrl(), "Jump")
                 .withEmoji(Emoji.fromUnicode("\uD83D\uDD17"));
         messageBuilder.setActionRows(ActionRow.of(button));
@@ -142,7 +143,7 @@ public class StarboardListener extends ListenerAdapter {
 
     private boolean isFile(String path) {
         return path.endsWith("gif") || path.endsWith("png") || path.endsWith("jpg") || path.endsWith("webp")
-                || path.endsWith("mp4") || path.endsWith("jpeg");
+               || path.endsWith("mp4") || path.endsWith("jpeg");
     }
 
     private String getIcon(int stars) {

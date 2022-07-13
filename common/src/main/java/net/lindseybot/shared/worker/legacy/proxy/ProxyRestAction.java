@@ -29,7 +29,7 @@ public class ProxyRestAction implements ReplyCallbackAction {
 
     public ProxyRestAction(FakeSlashCommand cmd) {
         this.cmd = cmd;
-        this.mentions = EnumSet.of(Message.MentionType.EMOTE, Message.MentionType.CHANNEL);
+        this.mentions = EnumSet.of(Message.MentionType.EMOJI, Message.MentionType.CHANNEL);
     }
 
     public ReplyCallbackAction withMessage(Message message) {
@@ -94,6 +94,12 @@ public class ProxyRestAction implements ReplyCallbackAction {
     @NotNull
     @Override
     public ReplyCallbackAction deadline(long timestamp) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ReplyCallbackAction closeResources() {
         return null;
     }
 

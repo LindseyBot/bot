@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -32,7 +33,7 @@ public class DiscordAdapter {
         this.i18n = i18n;
         this.DEFAULT_ALLOWED_MENTIONS = new ArrayList<>();
         this.DEFAULT_ALLOWED_MENTIONS.add(Message.MentionType.CHANNEL);
-        this.DEFAULT_ALLOWED_MENTIONS.add(Message.MentionType.EMOTE);
+        this.DEFAULT_ALLOWED_MENTIONS.add(Message.MentionType.EMOJI);
     }
 
     public String getLabel(Label msg, ISnowflake snowflake) {
@@ -164,7 +165,7 @@ public class DiscordAdapter {
         if (emote.isUnicode()) {
             return Emoji.fromUnicode(emote.getName());
         } else {
-            return Emoji.fromEmote(emote.getName(), emote.getId(), emote.isAnimated());
+            return Emoji.fromCustom(emote.getName(), emote.getId(), emote.isAnimated());
         }
     }
 
