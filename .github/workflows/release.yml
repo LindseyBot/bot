@@ -15,6 +15,16 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+      - name: Fetch version
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          
+          echo VERSION=$VERSION
+          echo "RELEASE=$VERSION" >> $GITHUB_ENV
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
       - name: Build with gradle
@@ -32,16 +42,7 @@ jobs:
           
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          
           echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          echo "RELEASE=$VERSION" >> $GITHUB_ENV
           
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
