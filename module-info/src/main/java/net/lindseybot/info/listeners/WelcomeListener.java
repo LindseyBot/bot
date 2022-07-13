@@ -65,7 +65,7 @@ public class WelcomeListener extends ListenerAdapter {
             return;
         }
         FMessage message = FMessage.of(Label.raw(finalMsg));
-        message.setAllowedMentions(Arrays.asList(MentionType.EMOTE, MentionType.CHANNEL, MentionType.USER));
+        message.setAllowedMentions(Arrays.asList(MentionType.EMOJI, MentionType.CHANNEL, MentionType.USER));
         this.msg.send(channel, message);
     }
 

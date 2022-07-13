@@ -17,7 +17,7 @@ public enum MentionType {
     /**
      * Emote mentions.
      */
-    EMOTE,
+    EMOJI,
     /**
      * Here (online members) mentions.
      */
