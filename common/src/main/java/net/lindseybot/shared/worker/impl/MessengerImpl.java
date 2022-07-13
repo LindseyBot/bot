@@ -207,6 +207,9 @@ public class MessengerImpl implements Messenger {
 
     @Override
     public void send(GuildMessageChannel channel, FMessage message) {
+        if (!channel.canTalk()) {
+            return;
+        }
         Message content = this.adapter.getMessage(message, channel);
         var hook = channel.sendMessage(content)
                 .allowedMentions(this.adapter.allowed(message));
@@ -216,6 +219,9 @@ public class MessengerImpl implements Messenger {
 
     @Override
     public void reply(Message message, FMessage reply) {
+        if (!message.getChannel().canTalk()) {
+            return;
+        }
         Message content = this.adapter.getMessage(reply, message.getChannel());
         var hook = message.reply(content)
                 .mentionRepliedUser(false)
