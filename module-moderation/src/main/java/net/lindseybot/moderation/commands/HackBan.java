@@ -3,11 +3,13 @@ package net.lindseybot.moderation.commands;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.lindseybot.shared.entities.discord.Label;
+import net.lindseybot.shared.errors.MissingArgumentError;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.SlashCommand;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -25,8 +27,10 @@ public class HackBan extends InteractionHandler {
     @SlashCommand(value = "hackban", guildOnly = true)
     @SuppressWarnings("CodeBlock2Expr")
     public void onCommand(SlashCommandInteractionEvent event) {
-        Long userId = this.getOption("user", event, Long.class);
-        String reason = this.getOption("reason", event, String.class);
+        OptionMapping target = event.getOption("user");
+        if (target == null) {
+            throw new MissingArgumentError("user");
+        }
         Member member = event.getMember();
         if (member == null) {
             return;
@@ -37,13 +41,20 @@ public class HackBan extends InteractionHandler {
         Guild guild = event.getGuild();
         if (guild == null) {
             return;
+        } else if (target.getAsMember() != null) {
+            if (!guild.getSelfMember().canInteract(target.getAsMember())) {
+                this.msg.error(event, Label.of("permissions.hierarchy"));
+                return;
+            }
         }
+        User user = target.getAsUser();
+        String reason = event.getOption("reason", "No reason provided.", OptionMapping::getAsString);
         event.deferReply(false).queue((a) -> {
             try {
-                guild.ban(UserSnowflake.fromId(userId), 7, reason).queue((aVoid) -> {
+                guild.ban(user, 7, reason).queue((aVoid) -> {
                     this.msg.reply(event, Label.of("commands.hackban.success"));
                 }, throwable -> {
-                    this.msg.reply(event, Label.of("error.discord", throwable.getMessage()));
+                    this.msg.error(event, Label.of("error.discord", throwable.getMessage()));
                 });
             } catch (InsufficientPermissionException ex) {
                 this.msg.error(event, Label.of("permissions.bot", ex.getPermission().getName()));
