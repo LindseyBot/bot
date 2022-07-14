@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class MessengerImpl implements Messenger {
 
@@ -235,7 +236,7 @@ public class MessengerImpl implements Messenger {
             return;
         }
         message.delete()
-                .queueAfter(data.getSelfDestruct(), TimeUnit.MILLISECONDS);
+                .queueAfter(data.getSelfDestruct(), TimeUnit.MILLISECONDS, noop(), noop());
     }
 
     private void selfDestruct(InteractionHook hook, FMessage data) {
@@ -243,7 +244,7 @@ public class MessengerImpl implements Messenger {
             return;
         }
         hook.deleteOriginal()
-                .queueAfter(data.getSelfDestruct(), TimeUnit.MILLISECONDS);
+                .queueAfter(data.getSelfDestruct(), TimeUnit.MILLISECONDS, noop(), noop());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -276,6 +277,11 @@ public class MessengerImpl implements Messenger {
                 hook.addFile(attachment.getStream(), attachment.getName(), attachment.getFlags());
             }
         }
+    }
+
+    private <T> Consumer<T> noop() {
+        return t -> {
+        };
     }
 
 }
