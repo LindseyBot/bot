@@ -1,6 +1,8 @@
 package net.lindseybot.testing.services;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.lindseybot.shared.enums.Language;
@@ -232,24 +234,32 @@ public class CommandMappingService {
 
     private SlashCommandData hackban() {
         return Commands.slash("hackban", i18n("commands.hackban.description"))
+                .setGuildOnly(true)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS))
                 .addOption(OptionType.USER, "user", i18n("commands.hackban.user"), true)
                 .addOption(OptionType.STRING, "reason", i18n("commands.hackban.reason"), true);
     }
 
     private SlashCommandData prune() {
         return Commands.slash("prune", i18n("commands.prune.description"))
+                .setGuildOnly(true)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE))
                 .addOption(OptionType.INTEGER, "count", i18n("commands.prune.count"), true)
                 .addOption(OptionType.USER, "user", i18n("commands.prune.user"), false);
     }
 
     private SlashCommandData softban() {
         return Commands.slash("softban", i18n("commands.softban.description"))
+                .setGuildOnly(true)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS))
                 .addOption(OptionType.USER, "user", i18n("commands.softban.user"), true)
                 .addOption(OptionType.STRING, "reason", i18n("commands.softban.reason"), false);
     }
 
     private SlashCommandData voice() {
         return Commands.slash("voice", i18n("commands.voice.description"))
+                .setGuildOnly(true)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.VOICE_MOVE_OTHERS))
                 .addSubcommands(new SubcommandData("split", i18n("commands.voice.split.description"))
                         .addOptions(new OptionData(OptionType.CHANNEL, "from", i18n("commands.voice.split.from"))
                                 .setRequired(true)

@@ -1,5 +1,6 @@
 package net.lindseybot.moderation.commands;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class VoiceMove extends InteractionHandler {
 
@@ -58,9 +60,8 @@ public class VoiceMove extends InteractionHandler {
         Guild guild = event.getGuild();
         if (guild == null) {
             return;
-        }
-        if (!event.getMember()
-                .hasPermission(Permission.VOICE_MOVE_OTHERS)) {
+        } else if (!event.getMember().hasPermission(Permission.VOICE_MOVE_OTHERS)) {
+            log.warn("Permission check prevented use of voice move on {}", guild.getId());
             this.msg.error(event, Label.of("permissions.user"));
             return;
         }
