@@ -66,6 +66,8 @@ public class StarboardListener extends ListenerAdapter {
         TextChannel channel = (TextChannel) reaction.getChannel();
         if (channel.isNSFW() && !starboardChannel.isNSFW()) {
             return;
+        } else if (!starboardChannel.canTalk()) {
+            return;
         }
         channel.retrieveMessageById(reaction.getMessageId()).queue(message -> {
             Optional<MessageReaction> rcc = message.getReactions().stream()
