@@ -49,13 +49,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -68,13 +68,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -87,13 +87,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -106,13 +106,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -126,7 +126,7 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .editOriginal(content);
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             this.reply(event, message);
         }
@@ -143,13 +143,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -160,11 +160,11 @@ public class MessengerImpl implements Messenger {
             var hook = event.getHook()
                     .editOriginal(content);
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.editMessage(content);
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -177,13 +177,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -196,13 +196,13 @@ public class MessengerImpl implements Messenger {
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         } else {
             var hook = event.reply(content)
                     .setEphemeral(message.isEphemeral())
                     .allowedMentions(this.adapter.allowed(message));
             this.addFiles(hook, message);
-            hook.queue(h -> this.selfDestruct(h, message));
+            hook.queue(h -> this.selfDestruct(h, message), noop());
         }
     }
 
@@ -215,7 +215,7 @@ public class MessengerImpl implements Messenger {
         var hook = channel.sendMessage(content)
                 .allowedMentions(this.adapter.allowed(message));
         this.addFiles(hook, message);
-        hook.queue(m -> this.selfDestruct(m, message));
+        hook.queue(m -> this.selfDestruct(m, message), noop());
     }
 
     @Override
@@ -228,7 +228,7 @@ public class MessengerImpl implements Messenger {
                 .mentionRepliedUser(false)
                 .allowedMentions(this.adapter.allowed(reply));
         this.addFiles(hook, reply);
-        hook.queue(m -> this.selfDestruct(m, reply));
+        hook.queue(m -> this.selfDestruct(m, reply), noop());
     }
 
     private void selfDestruct(Message message, FMessage data) {
