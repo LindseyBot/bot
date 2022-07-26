@@ -66,6 +66,7 @@ public class RoleHistoryListener extends ListenerAdapter {
             Set<Role> roles = history.getRoles().stream()
                     .map(roleId -> event.getGuild().getRoleById(roleId))
                     .filter(Objects::nonNull)
+                    .filter(role -> !role.isManaged())
                     .filter(role -> event.getGuild().getSelfMember().canInteract(role))
                     .collect(Collectors.toSet());
             event.getGuild().modifyMemberRoles(event.getMember(), roles)
