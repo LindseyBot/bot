@@ -48,8 +48,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
 
     // Prometheus
-    api('io.prometheus:simpleclient_pushgateway:0.15.0')
-    api('io.prometheus:simpleclient:0.15.0')
+    api('io.prometheus:simpleclient:0.16.0')
+    api('io.prometheus:simpleclient_httpserver:0.16.0')
 
     // Spring
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')

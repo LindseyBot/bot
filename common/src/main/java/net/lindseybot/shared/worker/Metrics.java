@@ -2,42 +2,36 @@ package net.lindseybot.shared.worker;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Summary;
-import io.prometheus.client.exporter.PushGateway;
+import io.prometheus.client.exporter.HTTPServer;
 import lombok.extern.slf4j.Slf4j;
-import net.lindseybot.shared.properties.PrometheusProperties;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 @Slf4j
-public class Metrics {
+public class Metrics implements Closeable {
 
-    private final PushGateway pushgateway;
-    private final CollectorRegistry registry = new CollectorRegistry();
+    private final HTTPServer server;
 
-    public Metrics(PrometheusProperties config) {
-        if (config.getHost() == null || config.getHost().isBlank()) {
-            this.pushgateway = null;
-            return;
-        }
-        this.pushgateway = new PushGateway(config.getHost());
+    private final Summary commands;
+
+    public Metrics() throws IOException {
+        CollectorRegistry registry = new CollectorRegistry();
+        this.server = new HTTPServer.Builder()
+                .withPort(1234)
+                .withRegistry(registry)
+                .build();
+        this.commands = Summary.build()
+                .name("lindsey_commands")
+                .help("Command execution timings.")
+                .labelNames("name", "slash")
+                .register(registry);
     }
 
-    public void push() {
-        if (this.pushgateway == null) {
-            return;
-        }
-        try {
-            this.pushgateway.push(registry, "lindsey_bot");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void close() {
+        this.server.close();
     }
-
-    private final Summary commands = Summary.build()
-            .name("lindsey_commands")
-            .help("Command execution timings.")
-            .labelNames("name", "slash")
-            .register(registry);
 
     public Summary.Child commands(String name, boolean slash) {
         return this.commands.labels(name, String.valueOf(slash));

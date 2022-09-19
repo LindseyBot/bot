@@ -2,7 +2,6 @@ package net.lindseybot.bot.spring;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import net.lindseybot.shared.properties.BotProperties;
-import net.lindseybot.shared.properties.PrometheusProperties;
 import net.lindseybot.shared.worker.impl.MessengerImpl;
 import net.lindseybot.shared.worker.services.DiscordAdapter;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -23,12 +22,6 @@ public class WorkerConfig {
     @ConfigurationProperties(prefix = "app.bot")
     public BotProperties bot() {
         return new BotProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "app.prometheus")
-    public PrometheusProperties prometheus() {
-        return new PrometheusProperties();
     }
 
     @Bean
