@@ -1,6 +1,13 @@
 package net.lindseybot.shared.worker;
 
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -99,12 +106,12 @@ public abstract class InteractionHandler {
             if (mapping.getChannelType() != ChannelType.TEXT) {
                 return null;
             }
-            return (T) mapping.getAsGuildChannel();
+            return (T) mapping.getAsChannel();
         } else if (VoiceChannel.class.equals(tClass)) {
             if (mapping.getChannelType() != ChannelType.VOICE) {
                 return null;
             }
-            return (T) mapping.getAsGuildChannel();
+            return (T) mapping.getAsChannel();
         } else if (Role.class.equals(tClass)) {
             return (T) mapping.getAsRole();
         } else if (Message.Attachment.class.equals(tClass)) {

@@ -48,7 +48,7 @@ public class Picarto extends InteractionHandler {
         }
         String nsfw = String.valueOf(obj.getBoolean("adult"));
         nsfw = nsfw.substring(0, 1).toUpperCase() + nsfw.substring(1).toLowerCase();
-        if (nsfw.equals("True") && !event.getTextChannel().isNSFW()) {
+        if (nsfw.equals("True") && !event.getGuildChannel().asTextChannel().isNSFW()) {
             this.msg.error(event, Label.of("commands.streamers.nsfw"));
             return;
         }

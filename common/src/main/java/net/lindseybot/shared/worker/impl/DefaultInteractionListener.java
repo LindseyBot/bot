@@ -2,9 +2,9 @@ package net.lindseybot.shared.worker.impl;
 
 import io.prometheus.client.Summary;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.attribute.IAgeRestrictedChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -277,10 +277,10 @@ public class DefaultInteractionListener extends ListenerAdapter {
     }
 
     private boolean isNSFW(MessageChannel channel) {
-        if (channel instanceof BaseGuildMessageChannel guild) {
+        if (channel instanceof IAgeRestrictedChannel guild) {
             return guild.isNSFW();
         } else if (channel instanceof ThreadChannel thread) {
-            return ((BaseGuildMessageChannel) thread.getParentMessageChannel()).isNSFW();
+            return ((IAgeRestrictedChannel) thread.getParentMessageChannel()).isNSFW();
         } else {
             return false;
         }

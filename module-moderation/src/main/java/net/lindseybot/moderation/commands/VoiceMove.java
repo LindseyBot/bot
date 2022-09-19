@@ -2,10 +2,10 @@ package net.lindseybot.moderation.commands;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -36,10 +36,10 @@ public class VoiceMove extends InteractionHandler {
         if (from == null) {
             return;
         } else if (from.getChannelType() != ChannelType.VOICE) {
-            this.msg.error(event, Label.of("validation.voice", from.getAsGuildChannel().getAsMention()));
+            this.msg.error(event, Label.of("validation.voice", from.getAsChannel().getAsMention()));
             return;
         }
-        VoiceChannel fromChannel = (VoiceChannel) from.getAsGuildChannel();
+        VoiceChannel fromChannel = from.getAsChannel().asVoiceChannel();
         int members = fromChannel.getMembers().size();
         if (members == 0) {
             this.msg.error(event, Label.of("commands.voice.move.empty"));
@@ -49,10 +49,10 @@ public class VoiceMove extends InteractionHandler {
         if (target == null) {
             return;
         } else if (target.getChannelType() != ChannelType.VOICE) {
-            this.msg.error(event, Label.of("validation.voice", target.getAsGuildChannel().getAsMention()));
+            this.msg.error(event, Label.of("validation.voice", target.getAsChannel().getAsMention()));
             return;
         }
-        VoiceChannel toChannel = (VoiceChannel) target.getAsGuildChannel();
+        VoiceChannel toChannel = target.getAsChannel().asVoiceChannel();
         Member member = event.getMember();
         if (member == null) {
             return;

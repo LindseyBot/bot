@@ -1,12 +1,19 @@
 package net.lindseybot.shared.worker.legacy;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.data.DataObject;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.lindseybot.shared.worker.legacy.proxy.ProxyRestAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,9 +59,8 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
     }
 
     @NotNull
-    @Override
     public TextChannel getTextChannel() {
-        return this.message.getTextChannel();
+        return (TextChannel) this.message.getChannel();
     }
 
     @Nullable
@@ -71,7 +77,7 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
 
     @NotNull
     @Override
-    public MessageChannel getChannel() {
+    public MessageChannelUnion getChannel() {
         return this.message.getChannel();
     }
 
@@ -88,16 +94,11 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
 
     @NotNull
     @Override
-    public ReplyCallbackAction reply(@NotNull Message message) {
-        return new ProxyRestAction(this).withMessage(message);
-    }
-
-    @NotNull
-    @Override
     public ReplyCallbackAction reply(@NotNull String content) {
-        return new ProxyRestAction(this).withMessage(new MessageBuilder(content)
-                .setAllowedMentions(List.of(Message.MentionType.EMOJI, Message.MentionType.CHANNEL))
-                .build());
+        MessageCreateData data = new MessageCreateBuilder().setContent(content).build();
+        return new ProxyRestAction(this)
+                .withMessage(data)
+                .setAllowedMentions(List.of(Message.MentionType.EMOJI, Message.MentionType.CHANNEL));
     }
 
     @Override

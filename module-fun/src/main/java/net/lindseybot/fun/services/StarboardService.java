@@ -2,7 +2,7 @@ package net.lindseybot.fun.services;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.lindseybot.fun.entities.StarboardMessage;
 import net.lindseybot.fun.repositories.sql.StarboardMessageRepository;
 import net.lindseybot.fun.repositories.sql.StarboardRepository;

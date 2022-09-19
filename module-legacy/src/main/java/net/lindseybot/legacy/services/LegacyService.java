@@ -1,7 +1,7 @@
 package net.lindseybot.legacy.services;
 
-import net.dv8tion.jda.api.entities.Channel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.lindseybot.legacy.models.IRedisConfig;
 import net.lindseybot.legacy.properties.LegacyProperties;
 import org.springframework.stereotype.Service;

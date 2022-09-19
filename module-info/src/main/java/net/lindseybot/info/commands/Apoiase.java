@@ -71,7 +71,7 @@ public class Apoiase extends InteractionHandler {
         JSONObject campaigns = obj.getJSONArray("campaigns").getJSONObject(0);
         JSONObject state = obj.getJSONArray("address").getJSONObject(0);
         boolean nsfw = campaigns.getBoolean("explicit");
-        if (nsfw && !event.getTextChannel().isNSFW()) {
+        if (nsfw && !event.getGuildChannel().asTextChannel().isNSFW()) {
             this.msg.error(event, Label.of("commands.crowdfunding.nsfw"));
             return;
         }

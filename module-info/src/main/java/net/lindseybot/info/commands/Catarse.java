@@ -120,7 +120,7 @@ public class Catarse extends InteractionHandler {
             return;
         }
         boolean nsfw = obj.getBoolean("is_adult_content");
-        if (nsfw && !event.getTextChannel().isNSFW()) {
+        if (nsfw && !event.getGuildChannel().asTextChannel().isNSFW()) {
             this.msg.error(event, Label.of("commands.crowdfunding.nsfw"));
             return;
         }

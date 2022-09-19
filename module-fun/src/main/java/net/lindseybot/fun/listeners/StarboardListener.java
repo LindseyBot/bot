@@ -1,8 +1,11 @@
 package net.lindseybot.fun.listeners;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -10,6 +13,9 @@ import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.lindseybot.fun.entities.StarboardMessage;
 import net.lindseybot.fun.services.StarboardService;
 import net.lindseybot.shared.entities.profile.servers.Starboard;
@@ -77,12 +83,12 @@ public class StarboardListener extends ListenerAdapter {
             if (rcc.isPresent()) {
                 int count = rcc.get().getCount();
                 if (count >= settings.getMinStars()) {
-                    Message embed = this.createEmbed(count, message);
+                    MessageCreateData data = this.createEmbed(count, message);
                     if (starboard.getMessageId() != null) {
-                        starboardChannel.editMessageById(starboard.getMessageId(), embed)
+                        starboardChannel.editMessageById(starboard.getMessageId(), MessageEditData.fromCreateData(data))
                                 .queue(this.noop(), this.noop());
                     } else {
-                        starboardChannel.sendMessage(embed).queue(msg -> {
+                        starboardChannel.sendMessage(data).queue(msg -> {
                             starboard.setMessageId(msg.getIdLong());
                             service.save(starboard);
                         }, this.noop());
@@ -104,9 +110,9 @@ public class StarboardListener extends ListenerAdapter {
         }, this.noop());
     }
 
-    private Message createEmbed(int stars, Message message) {
+    private MessageCreateData createEmbed(int stars, Message message) {
         if (message == null) return null;
-        MessageBuilder messageBuilder = new MessageBuilder();
+        MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         EmbedBuilder builder = new EmbedBuilder();
         builder.setAuthor(message.getAuthor().getName(),
                 message.getJumpUrl(), message.getAuthor().getEffectiveAvatarUrl());
@@ -130,16 +136,16 @@ public class StarboardListener extends ListenerAdapter {
         }
         builder.setColor(this.getColor(stars));
         builder.setTimestamp(message.getTimeCreated());
-        messageBuilder.append(getIcon(stars))
-                .append(" ").append(String.valueOf(stars))
-                .append(" ").append(message.getTextChannel().getAsMention())
-                .append(" ID: ").append(message.getId());
+        messageBuilder.addContent(getIcon(stars))
+                .addContent(" ").addContent(String.valueOf(stars))
+                .addContent(" ").addContent(message.getChannel().getAsMention())
+                .addContent(" ID: ").addContent(message.getId());
         messageBuilder.setEmbeds(builder.build());
         messageBuilder.setAllowedMentions(
                 Arrays.asList(Message.MentionType.EMOJI, Message.MentionType.CHANNEL));
         Button button = Button.link(message.getJumpUrl(), "Jump")
                 .withEmoji(Emoji.fromUnicode("\uD83D\uDD17"));
-        messageBuilder.setActionRows(ActionRow.of(button));
+        messageBuilder.setComponents(ActionRow.of(button));
         return messageBuilder.build();
     }
 

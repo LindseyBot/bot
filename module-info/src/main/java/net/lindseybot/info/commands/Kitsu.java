@@ -75,7 +75,7 @@ public class Kitsu extends InteractionHandler {
                 embed.field(Label.raw("NSFW"), Label.raw("No"), true);
             }
         }
-        if (nsfw && !event.getTextChannel().isNSFW()) {
+        if (nsfw && !event.getGuildChannel().asTextChannel().isNSFW()) {
             this.msg.error(event, Label.of("commands.kitsu.nsfw"));
             return;
         }

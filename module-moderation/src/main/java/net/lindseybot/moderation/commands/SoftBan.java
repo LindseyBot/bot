@@ -52,7 +52,8 @@ public class SoftBan extends InteractionHandler {
         String reason = event.getOption("reason", "No reason provided.", OptionMapping::getAsString);
         event.deferReply(false).queue((a) -> {
             try {
-                guild.ban(user, 7, reason)
+                guild.ban(user, 7, TimeUnit.DAYS)
+                        .reason(reason)
                         .delay(1, TimeUnit.SECONDS)
                         .and(guild.unban(user))
                         .queue((aVoid) -> {

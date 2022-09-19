@@ -97,7 +97,8 @@ public class AntiScamListener extends ListenerAdapter {
             }));
             if (integer.incrementAndGet() > settings.getStrikes()
                 || OffsetDateTime.now().minusDays(1).isBefore(author.getTimeJoined())) {
-                event.getMember().ban(7, "Scam link: " + domain)
+                event.getMember().ban(24, TimeUnit.HOURS)
+                        .reason("Scam link: " + domain)
                         .queue(this.noop(), this.noop());
                 return;
             }

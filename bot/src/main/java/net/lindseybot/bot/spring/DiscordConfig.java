@@ -35,7 +35,7 @@ public class DiscordConfig {
     public ShardManager jda(BotProperties config, IEventManager manager) throws LoginException {
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder
                 .createDefault(config.getToken())
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.PENDING))
                 .setEventManagerProvider((d) -> manager);
         if (config.getGateway() != null && !config.getGateway().isBlank()) {

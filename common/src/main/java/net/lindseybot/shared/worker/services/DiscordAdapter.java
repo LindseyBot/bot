@@ -2,7 +2,6 @@ package net.lindseybot.shared.worker.services;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -11,6 +10,11 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.lindseybot.shared.entities.discord.*;
 import net.lindseybot.shared.enums.Language;
 import net.lindseybot.shared.utils.StandardEmotes;
@@ -62,8 +66,8 @@ public class DiscordAdapter {
                 .replace(":TYPING:", StandardEmotes.TYPING.asMention());
     }
 
-    public Message getMessage(FMessage fake, ISnowflake snowflake) {
-        MessageBuilder builder = new MessageBuilder();
+    public MessageEditData toEdit(FMessage fake, ISnowflake snowflake) {
+        MessageEditBuilder builder = new MessageEditBuilder();
         if (fake.getContent() != null) {
             builder.setContent(this.getLabel(fake.getContent(), snowflake));
         }
@@ -102,7 +106,64 @@ public class DiscordAdapter {
                 ActionRow row = ActionRow.of(components);
                 rows.add(row);
             }
-            builder.setActionRows(rows);
+            builder.setComponents(rows);
+        }
+        if (fake.getAttachments() != null && !fake.getAttachments().isEmpty()) {
+            List<FileUpload> files = fake.getAttachments().stream()
+                    .map(file -> FileUpload.fromData(file.getStream(), file.getName()))
+                    .toList();
+            builder.setAttachments(files);
+        }
+        return builder.build();
+    }
+
+    public MessageCreateData toNew(FMessage fake, ISnowflake snowflake) {
+        MessageCreateBuilder builder = new MessageCreateBuilder();
+        if (fake.getContent() != null) {
+            builder.setContent(this.getLabel(fake.getContent(), snowflake));
+        }
+        if (fake.getAllowedMentions() != null) {
+            builder.setAllowedMentions(this.allowed(fake));
+        }
+        if (fake.getEmbed() != null) {
+            builder.setEmbeds(this.createEmbed(fake.getEmbed(), snowflake));
+        }
+        if (!fake.getComponents().isEmpty()) {
+            List<ActionRow> rows = new ArrayList<>();
+            List<ItemComponent> components = new ArrayList<>();
+            int i = 0;
+            for (MessageComponent component : fake.getComponents()) {
+                if (component instanceof FButton button) {
+                    components.add(this.createButton(button, snowflake));
+                } else if (component instanceof FSelectMenu menu) {
+                    if (!components.isEmpty()) {
+                        ActionRow row = ActionRow.of(components);
+                        rows.add(row);
+                        components.clear();
+                        i = 0;
+                    }
+                    rows.add(ActionRow.of(this.createSelectMenu(menu, snowflake)));
+                    continue;
+                }
+                i++;
+                if (i % 5 == 0) {
+                    ActionRow row = ActionRow.of(components);
+                    rows.add(row);
+                    components.clear();
+                    i = 0;
+                }
+            }
+            if (!components.isEmpty()) {
+                ActionRow row = ActionRow.of(components);
+                rows.add(row);
+            }
+            builder.setComponents(rows);
+        }
+        if (fake.getAttachments() != null && !fake.getAttachments().isEmpty()) {
+            List<FileUpload> files = fake.getAttachments().stream()
+                    .map(file -> FileUpload.fromData(file.getStream(), file.getName()))
+                    .toList();
+            builder.setFiles(files);
         }
         return builder.build();
     }

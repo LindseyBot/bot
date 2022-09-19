@@ -62,7 +62,7 @@ public class MyAnimeList extends InteractionHandler {
         } else {
             age = null;
         }
-        if ("Rx".equals(age) && !event.getTextChannel().isNSFW()) {
+        if ("Rx".equals(age) && !event.getGuildChannel().asTextChannel().isNSFW()) {
             this.msg.error(event, Label.of("commands.kitsu.nsfw"));
             return;
         }

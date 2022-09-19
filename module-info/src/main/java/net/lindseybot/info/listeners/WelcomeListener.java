@@ -1,6 +1,6 @@
 package net.lindseybot.info.listeners;
 
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -51,8 +51,7 @@ public class WelcomeListener extends ListenerAdapter {
             return;
         }
         String finalMsg = PlaceHolderUtils.replace(msg, event.getMember(), event.getGuild());
-        TextChannel channel = event.getGuild()
-                .getTextChannelById(settings.getChannelId());
+        TextChannel channel = event.getGuild().getTextChannelById(settings.getChannelId());
         if (channel == null) {
             settings.setEnabled(false);
             repository.save(settings);

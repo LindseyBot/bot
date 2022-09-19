@@ -15,6 +15,7 @@ import net.lindseybot.shared.worker.SlashCommand;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Component
@@ -51,7 +52,7 @@ public class HackBan extends InteractionHandler {
         String reason = event.getOption("reason", "No reason provided.", OptionMapping::getAsString);
         event.deferReply(false).queue((a) -> {
             try {
-                guild.ban(user, 7, reason).queue((aVoid) -> {
+                guild.ban(user, 7, TimeUnit.DAYS).reason(reason).queue((aVoid) -> {
                     this.msg.reply(event, Label.of("commands.hackban.success"));
                 }, throwable -> {
                     this.msg.error(event, Label.of("error.discord", throwable.getMessage()));

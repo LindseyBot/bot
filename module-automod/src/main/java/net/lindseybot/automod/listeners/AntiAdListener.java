@@ -96,7 +96,8 @@ public class AntiAdListener extends ListenerAdapter {
         }));
         try {
             if (integer.incrementAndGet() > settings.getStrikes()) {
-                event.getMember().ban(7, "Advertising")
+                event.getMember().ban(24, TimeUnit.HOURS)
+                        .reason("Advertising")
                         .queue();
                 return;
             }
