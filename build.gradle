@@ -1,5 +1,5 @@
 ext {
-    JDA_VERSION = '5.0.0-alpha.19'
+    JDA_VERSION = '5.0.0-beta.5'
     JDA_SLUG = 'net.dv8tion:JDA'
     ORG_JSON_VERSION = '20190722'
     EXPIRING_MAP_VERSION = '0.5.10'

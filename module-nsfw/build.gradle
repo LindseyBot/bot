@@ -40,7 +40,7 @@ tasks.named('jar') {
 
 dependencies {
     // Dependencies
-    api('com.github.Kodehawa:imageboard-api:2.5.2')
+    api('com.github.Kodehawa:imageboard-api:2.6.0')
 
     // Shared dependencies
     implementation project(':common')

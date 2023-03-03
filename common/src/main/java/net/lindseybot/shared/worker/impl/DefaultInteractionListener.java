@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.lindseybot.shared.entities.discord.Label;
@@ -52,10 +52,10 @@ public class DefaultInteractionListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (!this.service.hasCommand(event.getCommandPath())) {
+        if (!this.service.hasCommand(event.getFullCommandName().replace(" ", "/"))) {
             return;
         }
-        CommandReference reference = this.service.getCommand(event.getCommandPath());
+        CommandReference reference = this.service.getCommand(event.getFullCommandName().replace(" ", "/"));
         if (reference.isGuildOnly() && !event.isFromGuild()) {
             return;
         } else if (reference.isNsfw() && !this.isNSFW(event.getChannel())) {
@@ -70,7 +70,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 } catch (UserError error) {
                     this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
-                    log.error("Failed to execute command: " + event.getCommandPath(), ex);
+                    log.error("Failed to execute command: " + event.getFullCommandName(), ex);
                     this.msg.error(event, Label.of("error.internal"));
                 }
             }))).get(1500, TimeUnit.MILLISECONDS);
@@ -80,7 +80,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
             if (event.isAcknowledged()) {
                 return;
             }
-            log.warn("Timed out during command execution: {}", event.getCommandPath());
+            log.warn("Timed out during command execution: {}", event.getFullCommandName());
             event.deferReply(reference.isEphemeral())
                     .queue();
         }
@@ -125,7 +125,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         String id = event.getComponentId();
         if (id.contains(":")) {
             id = id.split(":")[0];
@@ -166,7 +166,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
     public void onGenericAutoCompleteInteraction(@NotNull GenericAutoCompleteInteractionEvent event) {
         if (event instanceof
                 CommandAutoCompleteInteractionEvent commandEvent) {
-            String cmdPath = commandEvent.getCommandPath();
+            String cmdPath = commandEvent.getFullCommandName().replace(" ", "/");
             String optName = commandEvent.getFocusedOption().getName();
             String path = (cmdPath + "/" + optName).replace("/", ".");
             if (!this.service.hasAutoComplete(path)) {
@@ -188,7 +188,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
 
     @Override
     public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
-        String id = event.getCommandPath();
+        String id = event.getFullCommandName().replace(" ", "/");
         if (!this.service.hasMessageCommand(id)) {
             return;
         }
@@ -218,7 +218,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
 
     @Override
     public void onUserContextInteraction(@NotNull UserContextInteractionEvent event) {
-        String id = event.getCommandPath();
+        String id = event.getFullCommandName().replace(" ", "/");
         if (!this.service.hasUserCommand(id)) {
             return;
         }

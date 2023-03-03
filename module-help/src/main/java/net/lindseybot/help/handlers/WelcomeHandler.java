@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.lindseybot.help.models.ModuleHandler;
 import net.lindseybot.help.services.HelpWelcomeService;
@@ -113,7 +113,7 @@ public class WelcomeHandler extends InteractionHandler implements ModuleHandler 
     }
 
     @SelectMenu("setup.welcome.1")
-    public void onStep1(SelectMenuInteractionEvent event) {
+    public void onStep1(StringSelectInteractionEvent event) {
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null

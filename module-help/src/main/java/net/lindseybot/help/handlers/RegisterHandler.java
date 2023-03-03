@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.lindseybot.help.models.ModuleHandler;
 import net.lindseybot.help.services.HelpRegisterService;
@@ -120,11 +120,11 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
     }
 
     @SelectMenu("setup.register.1")
-    public void onStep1(SelectMenuInteractionEvent event) {
+    public void onStep1(StringSelectInteractionEvent event) {
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions().isEmpty()) {
+                   || event.getSelectedOptions().isEmpty()) {
             return;
         }
         SelectOption channel = event.getSelectedOptions().get(0);
@@ -161,11 +161,11 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
     }
 
     @SelectMenu("setup.register.2")
-    public void onStep2(SelectMenuInteractionEvent event) {
+    public void onStep2(StringSelectInteractionEvent event) {
         if (this.isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions().isEmpty()) {
+                   || event.getSelectedOptions().isEmpty()) {
             return;
         }
         SelectOption roleOpt = event.getSelectedOptions().get(0);

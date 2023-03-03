@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.lindseybot.shared.worker.*;
 import net.lindseybot.shared.worker.reference.*;
 
@@ -179,7 +179,7 @@ public class DefaultInteractionService implements InteractionService {
         } else if (method.getParameterCount() == 0) {
             log.warn("Invalid select menu listener declaration: " + menu.value());
             return;
-        } else if (!SelectMenuInteractionEvent.class.equals(method.getParameterTypes()[0])) {
+        } else if (!StringSelectInteractionEvent.class.equals(method.getParameterTypes()[0])) {
             log.warn("Invalid select menu listener declaration: " + menu.value());
             return;
         }

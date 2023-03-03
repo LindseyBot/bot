@@ -3,7 +3,7 @@ package net.lindseybot.help.handlers;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.lindseybot.help.models.ModuleHandler;
 import net.lindseybot.help.services.HelpStarboardService;
@@ -116,11 +116,11 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
     }
 
     @SelectMenu("setup.starboard.1")
-    public void onStep1(SelectMenuInteractionEvent event) {
+    public void onStep1(StringSelectInteractionEvent event) {
         if (isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions().isEmpty()) {
+                   || event.getSelectedOptions().isEmpty()) {
             return;
         }
         SelectOption channel = event.getSelectedOptions().get(0);
@@ -157,11 +157,11 @@ public class StarboardHandler extends InteractionHandler implements ModuleHandle
     }
 
     @SelectMenu("setup.starboard.2")
-    public void onStep2(SelectMenuInteractionEvent event) {
+    public void onStep2(StringSelectInteractionEvent event) {
         if (isNotSafe(event)) {
             return;
         } else if (event.getGuild() == null
-                || event.getSelectedOptions().isEmpty()) {
+                   || event.getSelectedOptions().isEmpty()) {
             return;
         }
         SelectOption count = event.getSelectedOptions().get(0);

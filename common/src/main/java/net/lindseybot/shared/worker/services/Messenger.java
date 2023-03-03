@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -42,7 +42,7 @@ public interface Messenger {
      * @param event SelectionMenuEvent.
      * @param label Message content.
      */
-    default void error(@NotNull SelectMenuInteractionEvent event, @NotNull Label label) {
+    default void error(@NotNull StringSelectInteractionEvent event, @NotNull Label label) {
         this.reply(event, FMessage.of(label, true));
     }
 

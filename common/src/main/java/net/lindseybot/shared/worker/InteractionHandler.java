@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
@@ -38,7 +38,7 @@ public abstract class InteractionHandler {
         return id.substring(id.indexOf(":") + 1);
     }
 
-    protected @Nullable String getData(SelectMenuInteractionEvent event) {
+    protected @Nullable String getData(StringSelectInteractionEvent event) {
         String id = event.getComponentId();
         if (!id.contains(":")) {
             return null;
@@ -46,7 +46,7 @@ public abstract class InteractionHandler {
         return id.substring(id.indexOf(":") + 1);
     }
 
-    protected @Nullable String getSelected(SelectMenuInteractionEvent event) {
+    protected @Nullable String getSelected(StringSelectInteractionEvent event) {
         List<SelectOption> option = event.getSelectedOptions();
         if (option.isEmpty()) {
             return null;

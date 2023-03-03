@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -193,7 +194,7 @@ public class DiscordAdapter {
     private SelectMenu createSelectMenu(FSelectMenu model, ISnowflake snowflake) {
         List<SelectOption> options = this.createSelectOptions(model.getOptions(), snowflake);
         String id = model.getId() + (model.getData() != null ? (":" + model.getData()) : "");
-        SelectMenu.Builder builder = SelectMenu.create(id)
+        SelectMenu.Builder builder = StringSelectMenu.create(id)
                 .setRequiredRange(model.getMin(), model.getMax())
                 .addOptions(options)
                 .setDisabled(model.isDisabled());

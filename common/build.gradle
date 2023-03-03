@@ -48,6 +48,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
 
     // Prometheus
+    api('org.jetbrains:annotations:24.0.0')
     api('io.prometheus:simpleclient:0.16.0')
     api('io.prometheus:simpleclient_httpserver:0.16.0')
 

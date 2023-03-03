@@ -3,7 +3,7 @@ package net.lindseybot.economy.commands;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.lindseybot.economy.properties.ImageGenProperties;
 import net.lindseybot.economy.repositories.sql.BadgeRepository;
@@ -71,7 +71,7 @@ public class BadgeCommand extends InteractionHandler {
     }
 
     @SelectMenu("badge.picker")
-    public void onListSelect(SelectMenuInteractionEvent event) {
+    public void onListSelect(StringSelectInteractionEvent event) {
         if (event.getSelectedOptions().isEmpty()) {
             return;
         }
@@ -124,7 +124,7 @@ public class BadgeCommand extends InteractionHandler {
     }
 
     @SelectMenu("badge.equip")
-    public void onEquip(SelectMenuInteractionEvent event) {
+    public void onEquip(StringSelectInteractionEvent event) {
         String data = this.getData(event);
         if (data == null) {
             return;

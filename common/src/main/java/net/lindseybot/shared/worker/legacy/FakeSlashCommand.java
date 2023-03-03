@@ -48,7 +48,7 @@ public class FakeSlashCommand extends SlashCommandInteractionEvent {
 
     @NotNull
     @Override
-    public String getCommandPath() {
+    public String getFullCommandName() {
         return data.getPath();
     }
 

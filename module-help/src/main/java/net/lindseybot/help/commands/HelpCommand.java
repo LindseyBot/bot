@@ -2,7 +2,7 @@ package net.lindseybot.help.commands;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.*;
 import net.lindseybot.shared.entities.discord.builders.*;
@@ -41,7 +41,7 @@ public class HelpCommand extends InteractionHandler {
     }
 
     @SelectMenu(value = "help", ephemeral = true)
-    public void onSelectMenu(SelectMenuInteractionEvent event) {
+    public void onSelectMenu(StringSelectInteractionEvent event) {
         String data = this.getSelected(event);
         if ("automod".equalsIgnoreCase(data)) {
             this.msg.edit(event, this.getAutomod());

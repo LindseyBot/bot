@@ -234,6 +234,11 @@ public class ProxyRestAction implements ReplyCallbackAction {
         return null;
     }
 
+    @Override
+    public ReplyCallbackAction setSuppressedNotifications(boolean suppressed) {
+        return null;
+    }
+
     @NotNull
     @Override
     public ReplyCallbackAction mentionRepliedUser(boolean mention) {
