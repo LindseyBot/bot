@@ -1,8 +1,8 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version "${SPRING_VERSION}"
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'io.freefair.lombok' version '6.1.0'
+    id 'io.spring.dependency-management' version "${SPRING_DEPENDENCY}"
+    id 'io.freefair.lombok' version "${LOMBOK_VERSION}"
 }
 
 group = 'net.lindseybot'

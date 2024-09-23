@@ -1,10 +1,12 @@
 ext {
-    JDA_VERSION = '5.0.0-beta.5'
+    JDA_VERSION = '5.1.1'
     JDA_SLUG = 'net.dv8tion:JDA'
     ORG_JSON_VERSION = '20190722'
     EXPIRING_MAP_VERSION = '0.5.10'
     SPRING_VERSION = '2.6.6'
+    SPRING_DEPENDENCY = '1.1.6'
     JACKSON_VERSION = '2.13.2.1'
+    LOMBOK_VERSION = '8.10'
 }
 
 version = System.getenv("RELEASE") ?: "beta"

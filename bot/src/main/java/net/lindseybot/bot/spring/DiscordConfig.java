@@ -38,33 +38,6 @@ public class DiscordConfig {
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.PENDING))
                 .setEventManagerProvider((d) -> manager);
-        if (config.getGateway() != null && !config.getGateway().isBlank()) {
-            builder.setSessionController(new GatewayController(config));
-            builder.setCompression(Compression.NONE);
-            log.info("Starting JDA with Gateway Proxy");
-        }
-        if (config.getRest() != null && !config.getRest().isBlank()) {
-            try {
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .addInterceptor(new DiscordInterceptor(new URL(config.getRest())))
-                        .readTimeout(2, TimeUnit.MINUTES)
-                        .writeTimeout(5, TimeUnit.SECONDS)
-                        .callTimeout(2, TimeUnit.MINUTES)
-                        .connectTimeout(5, TimeUnit.SECONDS)
-                        .build();
-                builder.setHttpClient(client);
-
-                ScheduledThreadPoolExecutor pool = new ScheduledThreadPoolExecutor(256);
-                pool.setThreadFactory(new CountingThreadFactory(() -> "JDA", "RateLimit", false));
-                pool.setKeepAliveTime(1, TimeUnit.MINUTES);
-                pool.allowCoreThreadTimeOut(true);
-                builder.setRateLimitPool(pool);
-
-                log.info("Starting JDA with rest proxy.");
-            } catch (MalformedURLException ex) {
-                log.error("Failed to format rest URL", ex);
-            }
-        }
         if (config.getShards() != null) {
             ShardProperties shards = config.getShards();
             builder.setShardsTotal(shards.getTotal());
