@@ -1,4 +1,5 @@
 rootProject.name = 'lindseybot'
+
 include('bot')
 include('common')
 include('module-automod')

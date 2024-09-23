@@ -6,7 +6,7 @@ import lombok.Setter;
 import net.lindseybot.shared.converters.LongListJsonConverter;
 import net.lindseybot.shared.entities.items.Background;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 

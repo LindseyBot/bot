@@ -6,7 +6,7 @@ import lombok.Setter;
 import net.lindseybot.shared.enums.Flags;
 import net.lindseybot.shared.enums.Language;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Setter

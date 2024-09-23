@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.lindseybot.shared.converters.LongSetStringConverter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;

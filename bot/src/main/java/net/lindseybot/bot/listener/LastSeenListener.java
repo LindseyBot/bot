@@ -1,5 +1,6 @@
 package net.lindseybot.bot.listener;
 
+import jakarta.annotation.PreDestroy;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -11,7 +12,6 @@ import net.lindseybot.shared.entities.profile.ServerProfile;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -2,7 +2,7 @@ package net.lindseybot.shared.converters;
 
 import org.json.JSONArray;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 import java.util.HashSet;
 import java.util.Set;
 

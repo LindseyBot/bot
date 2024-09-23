@@ -1,8 +1,8 @@
 package net.lindseybot.shared.converters;
 
+import jakarta.persistence.AttributeConverter;
 import org.json.JSONArray;
 
-import javax.persistence.AttributeConverter;
 import java.util.ArrayList;
 import java.util.List;
 
