@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.lindseybot.shared.entities.discord.FMessage;
-import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
 import net.lindseybot.shared.worker.services.DiscordAdapter;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ public class MessengerImpl implements Messenger {
     @Override
     public void reply(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message) {
         MessageCreateData content = this.toNew(message, event.getMember());
-        if (event instanceof FakeSlashCommand fake) {
+        if (event instanceof IsFakeSlash fake) {
             this.reply(fake.getMessage(), message);
         } else if (event.isAcknowledged()) {
             var hook = event.getHook()
@@ -109,7 +108,7 @@ public class MessengerImpl implements Messenger {
     @Override
     public void edit(@NotNull SlashCommandInteractionEvent event, @NotNull FMessage message) {
         MessageEditData content = this.toEdit(message, event.getMember());
-        if (event instanceof FakeSlashCommand fake) {
+        if (event instanceof IsFakeSlash fake) {
             this.reply(fake.getMessage(), message);
         } else if (event.isAcknowledged()) {
             var hook = event.getHook()

@@ -1,4 +1,4 @@
-package net.lindseybot.shared.worker.legacy;
+package net.lindseybot.legacy.fake;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,13 +14,14 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.lindseybot.shared.worker.legacy.proxy.ProxyRestAction;
+import net.lindseybot.legacy.fake.proxy.ProxyRestAction;
+import net.lindseybot.shared.worker.impl.IsFakeSlash;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class FakeSlashCommand extends SlashCommandInteractionEvent {
+public class FakeSlashCommand extends SlashCommandInteractionEvent implements IsFakeSlash {
 
     private final FakeSlashData data;
     private final Message message;

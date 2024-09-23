@@ -1,19 +1,25 @@
 package net.lindseybot.legacy.listeners;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import gnu.trove.map.TLongObjectMap;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.utils.MiscUtil;
+import net.lindseybot.legacy.fake.FakeSlashCommand;
+import net.lindseybot.legacy.fake.FakeSlashData;
 import net.lindseybot.legacy.models.SlashConverter;
 import net.lindseybot.legacy.services.LegacyService;
 import net.lindseybot.shared.entities.discord.Label;
-import net.lindseybot.shared.worker.legacy.FakeSlashData;
+import net.lindseybot.shared.worker.impl.DefaultInteractionListener;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -31,25 +37,24 @@ public class CommandListener extends ListenerAdapter {
     private final LegacyService legacy;
     private final Pattern pattern = Pattern.compile("(?:([^\\s\"]+)|\"((?:\\w+|\\\\\"|[^\"])+)\")");
 
-    private final Map<String, SlashConverter> converters;
-    private final StringRedisTemplate redis;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<String, SlashConverter> converters = new HashMap<>();
+    private final DefaultInteractionListener listener;
 
-    public CommandListener(IEventManager api,
-                           Messenger msg,
-                           LegacyService legacy,
-                           List<SlashConverter> converters,
-                           StringRedisTemplate redis) {
-        api.register(this);
+    public CommandListener(
+            Messenger msg,
+            LegacyService legacy,
+            DefaultInteractionListener listener,
+            List<SlashConverter> converters,
+            IEventManager api) {
         this.msg = msg;
         this.legacy = legacy;
-        this.redis = redis;
-        this.converters = new HashMap<>();
+        this.listener = listener;
         converters.forEach((c) -> {
             for (String name : c.getNames()) {
                 this.converters.put(name, c);
             }
         });
+        api.register(this);
     }
 
     @Override
@@ -82,7 +87,7 @@ public class CommandListener extends ListenerAdapter {
         } else {
             arguments.remove(0);
         }
-        // -- Convert & Send
+        // -- Parse all arguments using converter
         SlashConverter converter = this.converters.get(name);
         if (converter == null) {
             return;
@@ -91,13 +96,49 @@ public class CommandListener extends ListenerAdapter {
         if (data == null) {
             return;
         }
-        String json;
-        try {
-            json = objectMapper.writeValueAsString(data);
-        } catch (Exception ex) {
-            return;
-        }
-        redis.convertAndSend("legacy", json);
+        // -- Populate special parameters
+        data.getOptions().forEach((optName, option) -> {
+            if (option.getType() == OptionType.USER) {
+                TLongObjectMap<Object> resolved = MiscUtil.newLongMap();
+                Member member = event.getGuild().retrieveMemberById(option.getValue())
+                        .complete();
+                if (member != null) {
+                    resolved.put(member.getIdLong(), member);
+                    option.setResolved(resolved);
+                    return;
+                }
+                User user = event.getJDA().retrieveUserById(option.getValue())
+                        .complete();
+                if (user != null) {
+                    resolved.put(user.getIdLong(), user);
+                    option.setResolved(resolved);
+                } else {
+                    log.warn("Invalid user: {}", option.getValue());
+                }
+            } else if (option.getType() == OptionType.CHANNEL) {
+                GuildChannel channel = event.getGuild().getGuildChannelById(option.getValue());
+                if (channel == null) {
+                    log.warn("Invalid channel: {}", option.getValue());
+                    return;
+                }
+                TLongObjectMap<Object> resolved = MiscUtil.newLongMap();
+                resolved.put(channel.getIdLong(), channel);
+                option.setResolved(resolved);
+            } else if (option.getType() == OptionType.ROLE) {
+                Role role = event.getGuild().getRoleById(option.getValue());
+                if (role == null) {
+                    log.warn("Invalid role: {}", option.getValue());
+                    return;
+                }
+                TLongObjectMap<Object> resolved = MiscUtil.newLongMap();
+                resolved.put(role.getIdLong(), role);
+                option.setResolved(resolved);
+            }
+        });
+        // -- Fire slash command event
+        FakeSlashCommand command = new FakeSlashCommand(
+                event.getJDA().getShardManager(), data, event.getMessage());
+        this.listener.onSlashCommandInteraction(command);
     }
 
     private String findPrefix(String message, Guild guild, Member self) {

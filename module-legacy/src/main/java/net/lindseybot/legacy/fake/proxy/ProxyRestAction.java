@@ -1,4 +1,4 @@
-package net.lindseybot.shared.worker.legacy.proxy;
+package net.lindseybot.legacy.fake.proxy;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessagePollData;
-import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
+import net.lindseybot.legacy.fake.FakeSlashCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

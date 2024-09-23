@@ -10,7 +10,6 @@ import net.lindseybot.shared.properties.BotProperties;
 import net.lindseybot.shared.properties.ShardProperties;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.InteractionService;
-import net.lindseybot.shared.worker.Metrics;
 import net.lindseybot.shared.worker.impl.DefaultInteractionListener;
 import net.lindseybot.shared.worker.impl.DefaultInteractionService;
 import net.lindseybot.shared.worker.impl.PooledEventManager;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -58,14 +56,9 @@ public class DiscordConfig {
     }
 
     @Bean
-    public Metrics metrics() throws IOException {
-        return new Metrics();
-    }
-
-    @Bean
     public DefaultInteractionListener interactionListener(
-            InteractionService service, IEventManager api, Messenger msg, Metrics metrics) {
-        return new DefaultInteractionListener(service, api, msg, metrics);
+            InteractionService service, IEventManager api, Messenger msg) {
+        return new DefaultInteractionListener(service, api, msg);
     }
 
 }

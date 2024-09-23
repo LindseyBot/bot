@@ -1,4 +1,4 @@
-package net.lindseybot.shared.worker.legacy;
+package net.lindseybot.legacy.fake;
 
 import lombok.Getter;
 import lombok.Setter;

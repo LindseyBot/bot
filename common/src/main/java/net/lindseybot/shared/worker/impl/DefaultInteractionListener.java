@@ -1,6 +1,5 @@
 package net.lindseybot.shared.worker.impl;
 
-import io.prometheus.client.Summary;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.attribute.IAgeRestrictedChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -17,9 +16,7 @@ import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.worker.InteractionService;
-import net.lindseybot.shared.worker.Metrics;
 import net.lindseybot.shared.worker.UserError;
-import net.lindseybot.shared.worker.legacy.FakeSlashCommand;
 import net.lindseybot.shared.worker.reference.*;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.jetbrains.annotations.NotNull;
@@ -33,21 +30,19 @@ import java.util.concurrent.TimeoutException;
 public class DefaultInteractionListener extends ListenerAdapter {
 
     private final Messenger msg;
-    private final Metrics metrics;
     private final InteractionService service;
     private final ThreadPoolTaskExecutor taskExecutor;
 
-    public DefaultInteractionListener(InteractionService service,
-                                      IEventManager api,
-                                      Messenger msg,
-                                      Metrics metrics) {
+    public DefaultInteractionListener(
+            InteractionService service,
+            IEventManager api,
+            Messenger msg) {
         this.service = service;
         this.msg = msg;
         api.register(this);
         taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setThreadNamePrefix("commands-");
         taskExecutor.initialize();
-        this.metrics = metrics;
     }
 
     @Override
@@ -63,17 +58,16 @@ public class DefaultInteractionListener extends ListenerAdapter {
             return;
         }
         try {
-            Summary.Child timer = this.metrics.commands(event.getName(), !(event instanceof FakeSlashCommand));
-            this.taskExecutor.submit(() -> timer.observe(timer.time(() -> {
+            this.taskExecutor.submit(() -> {
                 try {
                     reference.invoke(event);
                 } catch (UserError error) {
                     this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
-                    log.error("Failed to execute command: " + event.getFullCommandName(), ex);
+                    log.error("Failed to execute command: {}", event.getFullCommandName(), ex);
                     this.msg.error(event, Label.of("error.internal"));
                 }
-            }))).get(1500, TimeUnit.MILLISECONDS);
+            }).get(1500, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | InterruptedException e) {
             log.error("Failed to schedule command execution", e);
         } catch (TimeoutException e) {
@@ -103,7 +97,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 } catch (UserError error) {
                     this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
-                    log.error("Failed to execute button: " + event.getComponentId(), ex);
+                    log.error("Failed to execute button: {}", event.getComponentId(), ex);
                     this.msg.error(event, Label.of("error.internal"));
                 }
             }).get(1500, TimeUnit.MILLISECONDS);
@@ -118,7 +112,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 event.deferEdit()
                         .queue();
             } else {
-                event.deferReply(reference.isEdit())
+                event.deferReply(false)
                         .queue();
             }
         }
@@ -141,7 +135,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 } catch (UserError error) {
                     this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
-                    log.error("Failed to execute select menu: " + event.getComponentId(), ex);
+                    log.error("Failed to execute select menu: {}", event.getComponentId(), ex);
                     this.msg.error(event, Label.of("error.internal"));
                 }
             }).get(1500, TimeUnit.MILLISECONDS);
@@ -156,7 +150,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 event.deferEdit()
                         .queue();
             } else {
-                event.deferReply(reference.isEdit())
+                event.deferReply(false)
                         .queue();
             }
         }
@@ -200,7 +194,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
                 } catch (UserError error) {
                     this.msg.error(event, error.getLabel());
                 } catch (Exception ex) {
-                    log.error("Failed to execute message command: " + id, ex);
+                    log.error("Failed to execute message command: {}", id, ex);
                     this.msg.error(event, Label.of("error.internal"));
                 }
             }).get(1500, TimeUnit.MILLISECONDS);
@@ -270,7 +264,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
             if (event.isAcknowledged()) {
                 return;
             }
-            log.warn("Timed out during user execution: {}", id);
+            log.warn("Timed out during modal execution: {}", id);
             event.deferReply(reference.isEphemeral())
                     .queue();
         }

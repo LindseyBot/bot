@@ -37,16 +37,10 @@ dependencies {
     api("org.json:json:${ORG_JSON_VERSION}")
     api("net.jodah:expiringmap:${EXPIRING_MAP_VERSION}")
     api("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
-    implementation('net.sf.trove4j:trove4j:3.0.3') // fake options
-
-    // Prometheus
     api('org.jetbrains:annotations:24.0.0')
-    api('io.prometheus:simpleclient:0.16.0')
-    api('io.prometheus:simpleclient_httpserver:0.16.0')
 
     // Spring
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation('org.springframework.boot:spring-boot-starter-data-redis')
 
     // Development
     testImplementation('org.springframework.boot:spring-boot-starter-test')
