@@ -5,27 +5,22 @@ import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
-import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.internal.utils.concurrent.CountingThreadFactory;
 import net.lindseybot.shared.properties.BotProperties;
 import net.lindseybot.shared.properties.ShardProperties;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.InteractionService;
 import net.lindseybot.shared.worker.Metrics;
-import net.lindseybot.shared.worker.impl.*;
+import net.lindseybot.shared.worker.impl.DefaultInteractionListener;
+import net.lindseybot.shared.worker.impl.DefaultInteractionService;
+import net.lindseybot.shared.worker.impl.PooledEventManager;
 import net.lindseybot.shared.worker.services.Messenger;
-import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Configuration

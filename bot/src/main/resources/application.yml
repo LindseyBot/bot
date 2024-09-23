@@ -3,8 +3,6 @@ app:
     token: ''
     shards:
       total: 2
-    gateway: 'ws://127.0.0.1:1234'
-    rest: 'http://rest:1235'
   images:
     ip: 127.0.0.1
     port: 8080
@@ -15,10 +13,6 @@ app:
     port: 6379
     password: 'password'
 spring:
-  redis:
-    host: 127.0.0.1
-    password: password
-    port: 6379
   datasource:
     url: jdbc:mariadb://host:3306/database?UseUnicode=true&amp;characterEncoding=utf8
     username: username
@@ -30,3 +24,8 @@ spring:
     database-platform: org.hibernate.dialect.MariaDBDialect
     hibernate:
       ddl-auto: validate
+  data:
+    redis:
+      port: 6379
+      password: password
+      host: 127.0.0.1
