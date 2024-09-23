@@ -2,8 +2,7 @@ package net.lindseybot.economy.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.lindseybot.economy.models.BetModel;
-import net.lindseybot.economy.repositories.redis.BetRepository;
+import net.jodah.expiringmap.ExpiringMap;
 import net.lindseybot.economy.services.EconomyService;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -15,22 +14,22 @@ import net.lindseybot.shared.worker.SlashCommand;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Bet extends InteractionHandler {
 
     private final Random random = new Random();
     private final EconomyService service;
-    private final BetRepository repository;
+    private final Map<Long, Integer> cache = ExpiringMap.builder()
+            .expiration(5, TimeUnit.MINUTES)
+            .build();
 
-    public Bet(Messenger messenger,
-               EconomyService service,
-               BetRepository repository) {
+    public Bet(Messenger messenger, EconomyService service) {
         super(messenger);
         this.service = service;
-        this.repository = repository;
     }
 
     @SlashCommand("bet")
@@ -38,16 +37,13 @@ public class Bet extends InteractionHandler {
         if (!this.service.has(event.getUser(), 5)) {
             this.msg.error(event, Label.of("economy.not_enough"));
             return;
-        } else if (this.repository.findById(event.getUser().getIdLong()).isPresent()) {
+        } else if (cache.containsKey(event.getUser().getIdLong())) {
             this.msg.error(event, Label.of("commands.bet.running"));
             return;
         }
         this.service.deduct(event.getUser(), 5);
         if (this.random.nextBoolean()) {
-            BetModel bet = new BetModel();
-            bet.setId(event.getUser().getIdLong());
-            bet.setCount(5);
-            this.repository.save(bet);
+            this.cache.put(event.getUser().getIdLong(), 5);
             this.msg.reply(event, this.createDouble(5L, event.getUser().getIdLong()));
         } else {
             this.msg.reply(event, this.createNothing(5L, event.getUser().getIdLong()));
@@ -61,19 +57,15 @@ public class Bet extends InteractionHandler {
             this.msg.error(event, Label.of("commands.bet.owned"));
             return;
         }
-        Optional<BetModel> oBet = this.repository.findById(event.getUser().getIdLong());
-        if (oBet.isEmpty()) {
+        Integer bet = this.cache.get(event.getUser().getIdLong());
+        if (bet == null) {
             this.msg.error(event, Label.of("commands.bet.expired"));
-            return;
-        }
-        BetModel bet = oBet.get();
-        if (this.random.nextBoolean()) {
-            bet.setCount(bet.getCount() * 2);
-            this.repository.save(bet);
-            this.msg.edit(event, this.createDouble(bet.getCount(), event.getUser().getIdLong()));
+        } else if (this.random.nextBoolean()) {
+            this.cache.put(event.getUser().getIdLong(), bet * 2);
+            this.msg.edit(event, this.createDouble(bet * 2, event.getUser().getIdLong()));
         } else {
-            this.repository.delete(bet);
-            this.msg.edit(event, this.createNothing(bet.getCount(), event.getUser().getIdLong()));
+            this.cache.remove(event.getUser().getIdLong());
+            this.msg.edit(event, this.createNothing(bet, event.getUser().getIdLong()));
         }
     }
 
@@ -84,17 +76,16 @@ public class Bet extends InteractionHandler {
             this.msg.error(event, Label.of("commands.bet.owned"));
             return;
         }
-        Optional<BetModel> oBet = this.repository.findById(event.getUser().getIdLong());
-        if (oBet.isEmpty()) {
+        Integer bet = this.cache.get(event.getUser().getIdLong());
+        if (bet == null) {
             this.msg.error(event, Label.of("commands.bet.expired"));
             return;
         }
-        BetModel bet = oBet.get();
-        this.repository.delete(bet);
-        this.service.pay(event.getUser(), bet.getCount());
+        this.cache.remove(event.getUser().getIdLong());
+        this.service.pay(event.getUser(), bet);
         // --
         MessageBuilder builder = new MessageBuilder();
-        builder.content(Label.of("commands.bet.end", bet.getCount()));
+        builder.content(Label.of("commands.bet.end", bet));
         builder.addComponent(new ButtonBuilder()
                 .secondary("bet.reset", Label.raw("Try again")).withData(event.getUser().getId())
                 .build());
@@ -106,7 +97,7 @@ public class Bet extends InteractionHandler {
         if (!this.service.has(event.getUser(), 5)) {
             this.msg.error(event, Label.of("economy.not_enough"));
             return;
-        } else if (this.repository.findById(event.getUser().getIdLong()).isPresent()) {
+        } else if (cache.containsKey(event.getUser().getIdLong())) {
             this.msg.error(event, Label.of("commands.bet.running"));
             return;
         }
@@ -117,10 +108,7 @@ public class Bet extends InteractionHandler {
         }
         this.service.deduct(event.getUser(), 5);
         if (this.random.nextBoolean()) {
-            BetModel bet = new BetModel();
-            bet.setId(event.getUser().getIdLong());
-            bet.setCount(5);
-            this.repository.save(bet);
+            this.cache.put(event.getUser().getIdLong(), 5);
             this.msg.edit(event, this.createDouble(5L, event.getUser().getIdLong()));
         } else {
             this.msg.edit(event, this.createNothing(5L, event.getUser().getIdLong()));

@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.lindseybot.economy.models.BlackjackModel;
-import net.lindseybot.economy.repositories.redis.BlackjackRepository;
+import net.lindseybot.economy.services.BlackJackService;
 import net.lindseybot.economy.services.EconomyService;
 import net.lindseybot.shared.entities.discord.FMessage;
 import net.lindseybot.shared.entities.discord.Label;
@@ -22,17 +22,15 @@ import java.util.regex.Pattern;
 @Component
 public class Blackjack extends InteractionHandler {
 
-    private final EconomyService service;
-    private final BlackjackRepository repository;
-    private final Random rnd = new Random();
-
     private static final int COST = 10;
     private static final int REWARD = 25;
     private static final String VERSO = " \uD83C\uDCA1";
-
+    private final EconomyService service;
+    private final BlackJackService repository;
+    private final Random rnd = new Random();
     private final List<Integer> playerHand = new ArrayList<>();
 
-    public Blackjack(Messenger messenger, EconomyService service, BlackjackRepository repository) {
+    public Blackjack(Messenger messenger, EconomyService service, BlackJackService repository) {
         super(messenger);
         this.service = service;
         this.repository = repository;

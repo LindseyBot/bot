@@ -7,13 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @Slf4j
 @Configuration
 @ComponentScan("net.lindseybot.economy")
 @EnableJpaRepositories("net.lindseybot.economy.repositories.sql")
-@EnableRedisRepositories("net.lindseybot.economy.repositories.redis")
 public class LibraryEconomy {
 
     public LibraryEconomy() {
