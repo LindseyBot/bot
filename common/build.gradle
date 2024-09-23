@@ -12,14 +12,6 @@ sourceCompatibility = targetCompatibility = '17'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        name 'm2-dv8tion'
-        url 'https://m2.dv8tion.net/releases'
-    }
-    maven {
-        name 'jitpack'
-        url 'https://jitpack.io'
-    }
 }
 
 tasks.withType(JavaCompile) {
@@ -39,13 +31,13 @@ tasks.named('jar') {
 }
 
 dependencies {
-    implementation("${JDA_SLUG}:${JDA_VERSION}") {
+    api("${JDA_SLUG}:${JDA_VERSION}") {
         exclude module: 'opus-java'
     }
-    implementation('net.sf.trove4j:trove4j:3.0.3')
-    implementation("org.json:json:${ORG_JSON_VERSION}")
-    implementation("net.jodah:expiringmap:${EXPIRING_MAP_VERSION}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
+    api("org.json:json:${ORG_JSON_VERSION}")
+    api("net.jodah:expiringmap:${EXPIRING_MAP_VERSION}")
+    api("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
+    implementation('net.sf.trove4j:trove4j:3.0.3') // fake options
 
     // Prometheus
     api('org.jetbrains:annotations:24.0.0')

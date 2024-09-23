@@ -12,14 +12,6 @@ sourceCompatibility = targetCompatibility = '17'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        name 'm2-dv8tion'
-        url 'https://m2.dv8tion.net/releases'
-    }
-    maven {
-        name 'jitpack'
-        url 'https://jitpack.io'
-    }
 }
 
 tasks.withType(JavaCompile) {
@@ -39,14 +31,10 @@ tasks.named('jar') {
 }
 
 dependencies {
-    // Dependencies
-    api('com.github.Kodehawa:imageboard-api:2.6.0')
+    api('io.github.kodehawa:imageboard-api:2.6.1.1')
 
     // Shared dependencies
     implementation project(':common')
-    implementation("${JDA_SLUG}:${JDA_VERSION}") {
-        exclude module: 'opus-java'
-    }
 
     // Spring
     implementation('org.springframework.boot:spring-boot-starter')

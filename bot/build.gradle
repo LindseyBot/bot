@@ -12,22 +12,6 @@ sourceCompatibility = targetCompatibility = '17'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        name 'notfab'
-        url 'https://maven.notfab.net/Hosted'
-    }
-    maven {
-        name 'm2-dv8tion'
-        url 'https://m2.dv8tion.net/releases'
-    }
-    maven {
-        name 'lindsey'
-        url 'https://maven.lindseybot.net/repository/maven-lindsey/'
-    }
-    maven {
-        name 'jitpack'
-        url 'https://jitpack.io'
-    }
 }
 
 bootJar {
@@ -38,6 +22,7 @@ bootJar {
 }
 
 dependencies {
+    implementation project(':common')
     implementation project(':module-automod')
     implementation project(':module-economy')
     implementation project(':module-fun')
@@ -49,13 +34,6 @@ dependencies {
     implementation project(':module-wiki')
     implementation project(':module-testing')
     implementation('io.sentry:sentry-logback:6.2.1')
-
-    // Shared Dependencies
-    implementation project(':common')
-    implementation("${JDA_SLUG}:${JDA_VERSION}") {
-        exclude module: 'opus-java'
-    }
-    implementation("com.fasterxml.jackson.core:jackson-databind:${JACKSON_VERSION}")
 
     // Spring
     implementation('redis.clients:jedis:4.2.1')
