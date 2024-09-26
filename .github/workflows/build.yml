@@ -16,6 +16,17 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+      - name: Fetch version
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          
+          echo VERSION=$VERSION
+          echo "RELEASE=$VERSION" >> $GITHUB_ENV
+          echo "release=$VERSION" > ./bot/src/main/resources/sentry.properties
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
       - name: Build with gradle
@@ -23,3 +34,27 @@ jobs:
         env:
           USERNAME: ${{ github.actor }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker Build
+        run: docker build ./bot/ --file ./bot/Dockerfile --tag $IMAGE_NAME
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/$IMAGE_NAME
+          
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          echo IMAGE_ID=$IMAGE_ID
+          
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          
+          echo "Pushing images"
+          docker push $IMAGE_ID:latest
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          version: ${{ env.RELEASE }}

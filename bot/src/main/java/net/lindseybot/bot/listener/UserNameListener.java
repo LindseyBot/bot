@@ -11,10 +11,11 @@ import net.lindseybot.bot.services.ProfileServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class UserNameListener extends ListenerAdapter implements ExpirationListener<Long, String> {
@@ -22,11 +23,12 @@ public class UserNameListener extends ListenerAdapter implements ExpirationListe
     private final ProfileServiceImpl profiles;
     private final ExpiringMap<Long, String> users = ExpiringMap.builder()
             .expirationPolicy(ExpirationPolicy.CREATED)
-            .expiration(1, TimeUnit.MINUTES)
-            .expirationListener(this)
-            .maxSize(15_000)
+            .expiration(5, TimeUnit.MINUTES)
+            .asyncExpirationListener(this)
+            .maxSize(50_000)
             .build();
-    private final Queue<UserUpdate> queue = new ArrayDeque<>();
+    private final AtomicInteger tracker = new AtomicInteger(0);
+    private final Queue<UserUpdate> queue = new ConcurrentLinkedQueue<>();
 
     public UserNameListener(IEventManager api, ProfileServiceImpl profiles) {
         this.profiles = profiles;
@@ -35,20 +37,19 @@ public class UserNameListener extends ListenerAdapter implements ExpirationListe
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        long userId = event.getAuthor().getIdLong();
-        if (users.containsKey(userId)) {
-            return;
-        }
-        users.put(userId, event.getAuthor().getAsTag());
+        var author = event.getAuthor();
+        users.put(author.getIdLong(), author.getAsTag());
     }
 
     @Override
     public void expired(Long userId, String name) {
         this.queue.add(new UserUpdate(userId, name));
-        if (queue.size() > 250) {
+        int size = tracker.incrementAndGet();
+        if (size > 250) {
             List<UserUpdate> updates = queue.stream()
                     .limit(250).toList();
             this.profiles.updateNames(updates);
+            tracker.set(0);
         }
     }
 
