@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  IMAGE_NAME: bot
+  IMAGE_NAME: lindseybot/bot
 jobs:
   build:
     runs-on: ubuntu-latest
