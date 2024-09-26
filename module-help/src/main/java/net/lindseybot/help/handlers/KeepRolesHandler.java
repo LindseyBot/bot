@@ -10,6 +10,7 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.ButtonBuilder;
 import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.profile.servers.KeepRoles;
+import net.lindseybot.shared.services.CacheService;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
@@ -18,10 +19,15 @@ import org.springframework.stereotype.Component;
 public class KeepRolesHandler extends InteractionHandler implements ModuleHandler {
 
     private final HelpKeepRolesService service;
+    private final CacheService cache;
 
-    public KeepRolesHandler(Messenger msg, HelpKeepRolesService service) {
+    public KeepRolesHandler(
+            Messenger msg,
+            HelpKeepRolesService service,
+            CacheService cache) {
         super(msg);
         this.service = service;
+        this.cache = cache;
     }
 
     @Override
@@ -48,6 +54,7 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
         KeepRoles keepRoles = this.service.get(guild);
         keepRoles.setEnabled(true);
         this.service.save(keepRoles);
+        this.cache.getRoleHistory().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 
@@ -56,6 +63,7 @@ public class KeepRolesHandler extends InteractionHandler implements ModuleHandle
         KeepRoles keepRoles = this.service.get(guild);
         keepRoles.setEnabled(false);
         this.service.save(keepRoles);
+        this.cache.getRoleHistory().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 

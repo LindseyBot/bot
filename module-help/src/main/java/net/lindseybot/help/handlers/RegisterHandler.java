@@ -18,6 +18,7 @@ import net.lindseybot.shared.entities.discord.builders.EmbedBuilder;
 import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.discord.builders.SelectMenuBuilder;
 import net.lindseybot.shared.entities.profile.servers.Registration;
+import net.lindseybot.shared.services.CacheService;
 import net.lindseybot.shared.utils.GFXUtils;
 import net.lindseybot.shared.worker.Button;
 import net.lindseybot.shared.worker.InteractionHandler;
@@ -31,10 +32,12 @@ import java.util.List;
 public class RegisterHandler extends InteractionHandler implements ModuleHandler {
 
     private final HelpRegisterService service;
+    private final CacheService cache;
 
-    public RegisterHandler(Messenger msg, HelpRegisterService service) {
+    public RegisterHandler(Messenger msg, HelpRegisterService service, CacheService cache) {
         super(msg);
         this.service = service;
+        this.cache = cache;
     }
 
     @Override
@@ -57,6 +60,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(guild);
         registration.setEnabled(true);
         this.service.save(registration);
+        this.cache.getRegistration().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 
@@ -65,6 +69,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(guild);
         registration.setEnabled(false);
         this.service.save(registration);
+        this.cache.getRegistration().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 
@@ -77,6 +82,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
             if (channel == null) {
                 registration.setEnabled(false);
                 this.service.save(registration);
+                this.cache.getRegistration().remove(guild.getIdLong());
                 return this.onStatus(member, guild);
             }
             builder.content(Label.of("commands.modules.register.enabled", channel.getAsMention()));
@@ -143,6 +149,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(event.getGuild());
         registration.setChannelId(id);
         this.service.save(registration);
+        this.cache.getRegistration().remove(event.getGuild().getIdLong());
 
         EmbedBuilder embed = new EmbedBuilder();
         embed.title(Label.raw("Registration Setup (2/3)"));
@@ -183,11 +190,12 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(event.getGuild());
         registration.setRoleId(id);
         this.service.save(registration);
+        this.cache.getRegistration().remove(event.getGuild().getIdLong());
 
         EmbedBuilder embed = new EmbedBuilder();
         embed.title(Label.raw("Registration Setup (3/3)"));
         embed.description(Label.raw("Please type the desired register phrase/word in chat, and when you are done click the Finish button below. Remember you can use placeholders to fill" +
-                " information like the user's name."));
+                                    " information like the user's name."));
         embed.color(GFXUtils.BLUE);
 
         MessageBuilder builder = new MessageBuilder();
@@ -233,6 +241,7 @@ public class RegisterHandler extends InteractionHandler implements ModuleHandler
         Registration registration = this.service.get(event.getGuild());
         registration.setPhrase(content);
         this.service.save(registration);
+        this.cache.getRegistration().remove(event.getGuild().getIdLong());
 
         this.msg.edit(event, this.onStatus(event.getMember(), event.getGuild()));
         message.delete()

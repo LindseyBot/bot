@@ -9,6 +9,7 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.ButtonBuilder;
 import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.profile.servers.AntiAd;
+import net.lindseybot.shared.services.CacheService;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
@@ -17,10 +18,12 @@ import org.springframework.stereotype.Component;
 public class AntiAdHandler extends InteractionHandler implements ModuleHandler {
 
     private final HelpAntiAdService service;
+    private final CacheService cache;
 
-    public AntiAdHandler(Messenger msg, HelpAntiAdService service) {
+    public AntiAdHandler(Messenger msg, HelpAntiAdService service, CacheService cache) {
         super(msg);
         this.service = service;
+        this.cache = cache;
     }
 
     @Override
@@ -43,6 +46,7 @@ public class AntiAdHandler extends InteractionHandler implements ModuleHandler {
         AntiAd antiAd = this.service.get(guild);
         antiAd.setEnabled(true);
         this.service.save(antiAd);
+        this.cache.getAntiAd().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 
@@ -51,6 +55,7 @@ public class AntiAdHandler extends InteractionHandler implements ModuleHandler {
         AntiAd antiAd = this.service.get(guild);
         antiAd.setEnabled(false);
         this.service.save(antiAd);
+        this.cache.getAntiAd().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 

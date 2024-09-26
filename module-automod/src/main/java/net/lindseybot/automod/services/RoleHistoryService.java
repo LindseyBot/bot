@@ -8,6 +8,7 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.profile.members.MemberId;
 import net.lindseybot.shared.entities.profile.members.RoleHistory;
 import net.lindseybot.shared.entities.profile.servers.KeepRoles;
+import net.lindseybot.shared.services.CacheService;
 import net.lindseybot.shared.worker.services.NotificationService;
 import org.springframework.stereotype.Service;
 
@@ -17,19 +18,28 @@ public class RoleHistoryService {
     private final KeepRolesRepository repository;
     private final RoleHistoryRepository history;
     private final NotificationService notifications;
+    private final CacheService cache;
 
-    public RoleHistoryService(KeepRolesRepository repository,
-                              RoleHistoryRepository history,
-                              NotificationService notifications) {
+    public RoleHistoryService(
+            KeepRolesRepository repository,
+            RoleHistoryRepository history,
+            NotificationService notifications,
+            CacheService cache) {
         this.repository = repository;
         this.history = history;
         this.notifications = notifications;
+        this.cache = cache;
     }
 
     public boolean isActive(Guild guild) {
-        return this.repository.findById(guild.getIdLong())
+        if (this.cache.getRoleHistory().containsKey(guild.getIdLong())) {
+            return this.cache.getRoleHistory().get(guild.getIdLong());
+        }
+        boolean active = this.repository.findById(guild.getIdLong())
                 .orElse(new KeepRoles())
                 .isEnabled();
+        this.cache.getRoleHistory().put(guild.getIdLong(), active);
+        return active;
     }
 
     public RoleHistory findByMember(Member member) {
@@ -52,6 +62,7 @@ public class RoleHistoryService {
         }
         config.setEnabled(false);
         this.repository.save(config);
+        this.cache.getRoleHistory().remove(guild.getIdLong());
         this.notifications.notify(guild, keepRoles);
     }
 

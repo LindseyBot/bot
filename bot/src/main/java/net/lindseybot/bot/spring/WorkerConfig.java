@@ -1,6 +1,7 @@
 package net.lindseybot.bot.spring;
 
 import net.lindseybot.shared.properties.BotProperties;
+import net.lindseybot.shared.services.CacheService;
 import net.lindseybot.shared.worker.impl.MessengerImpl;
 import net.lindseybot.shared.worker.services.DiscordAdapter;
 import net.lindseybot.shared.worker.services.Messenger;
@@ -32,6 +33,11 @@ public class WorkerConfig {
     @Bean
     public Translator translator(ProfileService profiles) {
         return new Translator(profiles);
+    }
+
+    @Bean
+    public CacheService cacheService() {
+        return new CacheService();
     }
 
 }

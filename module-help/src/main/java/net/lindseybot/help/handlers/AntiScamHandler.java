@@ -10,6 +10,7 @@ import net.lindseybot.shared.entities.discord.Label;
 import net.lindseybot.shared.entities.discord.builders.ButtonBuilder;
 import net.lindseybot.shared.entities.discord.builders.MessageBuilder;
 import net.lindseybot.shared.entities.profile.servers.AntiScam;
+import net.lindseybot.shared.services.CacheService;
 import net.lindseybot.shared.worker.InteractionHandler;
 import net.lindseybot.shared.worker.services.Messenger;
 import org.springframework.stereotype.Component;
@@ -18,10 +19,12 @@ import org.springframework.stereotype.Component;
 public class AntiScamHandler extends InteractionHandler implements ModuleHandler {
 
     private final HelpAntiScamService service;
+    private final CacheService cache;
 
-    public AntiScamHandler(Messenger msg, HelpAntiScamService service) {
+    public AntiScamHandler(Messenger msg, HelpAntiScamService service, CacheService cache) {
         super(msg);
         this.service = service;
+        this.cache = cache;
     }
 
     @Override
@@ -48,6 +51,7 @@ public class AntiScamHandler extends InteractionHandler implements ModuleHandler
         AntiScam antiScam = this.service.get(guild);
         antiScam.setEnabled(true);
         this.service.save(antiScam);
+        this.cache.getAntiScam().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 
@@ -56,6 +60,7 @@ public class AntiScamHandler extends InteractionHandler implements ModuleHandler
         AntiScam antiScam = this.service.get(guild);
         antiScam.setEnabled(false);
         this.service.save(antiScam);
+        this.cache.getAntiScam().remove(guild.getIdLong());
         return this.onStatus(member, guild);
     }
 

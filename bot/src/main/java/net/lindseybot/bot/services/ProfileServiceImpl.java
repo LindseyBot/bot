@@ -3,6 +3,7 @@ package net.lindseybot.bot.services;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import net.lindseybot.bot.listener.UserNameListener;
 import net.lindseybot.bot.repositories.sql.MemberRepository;
 import net.lindseybot.bot.repositories.sql.ServerRepository;
 import net.lindseybot.bot.repositories.sql.UserRepository;
@@ -12,12 +13,17 @@ import net.lindseybot.shared.entities.profile.UserProfile;
 import net.lindseybot.shared.entities.profile.members.MemberId;
 import net.lindseybot.shared.worker.services.ProfileService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +34,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final UserRepository users;
     private final MemberRepository members;
     private final ServerRepository servers;
+    private final JdbcTemplate template;
 
     private final ExpiringMap<Long, UserProfile> userCache = ExpiringMap.builder()
             .expirationPolicy(ExpirationPolicy.ACCESSED)
@@ -35,12 +42,15 @@ public class ProfileServiceImpl implements ProfileService {
             .maxSize(10_000)
             .build();
 
-    public ProfileServiceImpl(UserRepository users,
-                              MemberRepository members,
-                              ServerRepository servers) {
+    public ProfileServiceImpl(
+            UserRepository users,
+            MemberRepository members,
+            ServerRepository servers,
+            JdbcTemplate template) {
         this.users = users;
         this.members = members;
         this.servers = servers;
+        this.template = template;
     }
 
     @Override
@@ -117,8 +127,20 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Transactional
-    public void updateName(long user, String name) {
-        this.users.updateName(name, System.currentTimeMillis(), user);
+    public void updateNames(List<UserNameListener.UserUpdate> updates) {
+        this.template.batchUpdate("update user_settings set name = ?, last_seen = ? where user = ?",
+                new BatchPreparedStatementSetter() {
+                    public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
+                        var update = updates.get(i);
+                        ps.setString(1, update.name());
+                        ps.setLong(2, System.currentTimeMillis());
+                        ps.setLong(3, update.id());
+                    }
+
+                    public int getBatchSize() {
+                        return updates.size();
+                    }
+                });
     }
 
 }
