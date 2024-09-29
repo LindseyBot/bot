@@ -182,7 +182,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
 
     @Override
     public void onMessageContextInteraction(@NotNull MessageContextInteractionEvent event) {
-        String id = event.getFullCommandName().replace(" ", "/");
+        String id = event.getFullCommandName();
         if (!this.service.hasMessageCommand(id)) {
             return;
         }
@@ -212,7 +212,7 @@ public class DefaultInteractionListener extends ListenerAdapter {
 
     @Override
     public void onUserContextInteraction(@NotNull UserContextInteractionEvent event) {
-        String id = event.getFullCommandName().replace(" ", "/");
+        String id = event.getFullCommandName();
         if (!this.service.hasUserCommand(id)) {
             return;
         }
